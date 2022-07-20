@@ -23,8 +23,8 @@ VISMOL_HOME = os.environ.get('VISMOL_HOME')
 if not VISMOL_HOME == None:
 	sys.path.append(os.path.join(VISMOL_HOME,"easyhybrid/pDynamoMethods") ) 
 else:
-	VISMOL_HOME = "/home/igorchem/VisMol"
-	sys.path.append(os.path.join("/home/igorchem/VisMol/easyhybrid/pDynamoMethods") ) 
+	VISMOL_HOME = "/home/igorchem/pDynamo3_scripts"
+	#sys.path.append(os.path.join("/home/igorchem/VisMol/easyhybrid/pDynamoMethods") ) 
 #------------------------------------------------------
 from pBabel                    import *                                     
 from pCore                     import *                                     
@@ -36,10 +36,10 @@ from MopacQCMMinput import *
 from WriteQMLog import * 
 #-------------------------------------------------------------------
 #path for the required files on the examples folder of EasyHynrid 3.0
-easyhybrid   = os.path.join(VISMOL_HOME, "easyhybrid")
+easyhybrid   = os.path.join(VISMOL_HOME)
 ex_path      = os.path.join(VISMOL_HOME, "examples/")
 
-scratch_path = os.path.join(easyhybrid,"TestsScratch")
+scratch_path = os.path.join("TestsScratch")
 timTop       = os.path.join(ex_path,"TIM","7tim.top")
 timCrd       = os.path.join(ex_path,"TIM","7tim.crd")
 balapkl      = os.path.join(ex_path,"bala","bAla.pkl")
@@ -232,7 +232,7 @@ def QCMM_optimizations():
 	#Save QCMM optimezed System	
 	proj.SaveProject()
 	proj.FinishRun()
-#=====================================================
+#=========================================================================
 def QCMM_MD():
 	'''
 	TESTED !!!
@@ -266,7 +266,7 @@ def QCMM_MD():
 	parameters["sampling_factor"] = 100
 	proj.RunSimulation(parameters)
 	proj.FinishRun()
-#=====================================================
+#=======================================================================
 def QCMM_MDrestricted():
 	'''
 	TESTED!!!
@@ -969,9 +969,9 @@ def FreeEnergy2DmultipleDistance(nsteps):
 	atomss = [ atom4[0], atom5[0], atom6[0] ]
 	
 	rc1 = ReactionCoordinate(atomsf,False,0)
-	rc1.GetRCLable(proj.cSystem)	
+	rc1.GetRCLabel(proj.cSystem)	
 	rc2 = ReactionCoordinate(atomss,False,0)	
-	rc2.GetRCLable(proj.cSystem)
+	rc2.GetRCLabel(proj.cSystem)
 
 	_name = "SCAN2D_4FEcalculations_multiple_distance"
 	_path = os.path.join( scratch_path,_name,"ScanTraj.ptGeo")

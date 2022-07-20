@@ -649,6 +649,31 @@ class SCAN:
         self.reactionCoordinate2[ 0,0 ] = self.molecule.coordinates3.Dihedral( atom5, atom6, atom7, atom8 )
         if self.DINCREMENT[0] == 0.0: self.DINCREMENT[0] = 360.0/float(X)
         if self.DINCREMENT[1] == 0.0: self.DINCREMENT[1] = 360.0/float(Y)
+        
+        angle_1    = self.DMINIMUM[0] 
+        rmodel     = RestraintEnergyModel.Harmonic( angle_1, self.forceC[0], period = 360.0 )
+        restraint  = RestraintDihedral.WithOptions( energyModel = rmodel, 
+                                                    point1 = atom1      ,
+                                                    point2 = atom2      ,
+                                                    point3 = atom3      ,
+                                                    point4 = atom4      )
+        restraints["RC1"] = restraint
+        #---- ----------------------------------------------------------------------------        
+        angle_2     = self.DMINIMUM[1]
+        rmodel      = RestraintEnergyModel.Harmonic( angle_2, self.forceC[1], period = 360.0 )
+        restraint   = RestraintDihedral.WithOptions( energyModel = rmodel, 
+                                                     point1 = atom1      ,
+                                                     point2 = atom2      ,
+                                                     point3 = atom3      ,
+                                                     point4 = atom4      )
+        restraints["RC2"] = restraint  
+        #---- ----------------------------------------------------------------------------   
+        coordinateFile = os.path.join( self.baseName ,self.trajFolder+".ptGeo","frame{}_{}.pkl".format( 0, 0 ) )
+        relaxRun = GeometrySearcher( self.molecule, self.baseName )
+        relaxRun.ChangeDefaultParameters( self.GeoOptPars )
+        relaxRun.Minimization(self.optmizer)
+        self.en0 = self.molecule.Energy(log=None)
+        Pickle( coordinateFile, self.molecule.coordinates3 ) 
         #-------------------------------------------------------------------------------------
         for i in range ( 1, X ):  
         #.--------------------------------------------------------------------------------            
@@ -737,6 +762,7 @@ class SCAN:
         #..................................................
         
         if self.logfile:
+            if self.saveFormat == None: self.saveFormat = "None"
             trajName = os.path.join( self.baseName, self.trajFolder+self.saveFormat )
             trajpath = os.path.join( self.baseName, self.trajFolder+".ptGeo" )
             
