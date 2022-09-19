@@ -206,7 +206,7 @@ class EnergyRefinement:
 				self.molecule.coordinates3 = ImportCoordinates3( self.fileLists[i],log=None )
 				lsFrames= GetFrameIndex(self.fileLists[i][:-4])						
 				if self.ylen > 0:
-					self.energiesArray[ lsFrames[1], lsFrames[0] ] = self.molecule.Energy()
+					dself.energiesArray[ lsFrames[1], lsFrames[0] ] = self.molecule.Energy()
 					self.indexArrayX[ lsFrames[1], lsFrames[0] ] = lsFrames[0]
 					self.indexArrayY[ lsFrames[1], lsFrames[0] ] = lsFrames[1]
 				else:

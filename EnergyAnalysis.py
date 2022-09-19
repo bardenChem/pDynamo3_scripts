@@ -69,7 +69,7 @@ class EnergyAnalysis:
 		i = 0 
 		energyTmp = []
 		#----------------------------------
-		if 	self.Type == "1D":
+		if self.Type == "1D":
 			for line in reading:
 				if i > 0:
 					lns = line.split()

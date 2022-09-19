@@ -7,14 +7,15 @@
 #-----------------...EasyHybrid 3.0...-----------------------#
 #-----------Credits and other information here---------------#
 ##############################################################
-from pBabel                    import *                                     
-from pCore                     import *                                     
-from pMolecule                 import *                              
+import pBabel
+import pCore
+import pMolecule                            
 from pMolecule.MMModel         import *
 from pMolecule.NBModel         import *                                     
 from pMolecule.QCModel         import *
 import numpy as np
 import os, sys, glob
+import math
 #===============================================================================
 orcaScratchBase="/home/igorchem/CCDIR/scratch"
 skfPath        ="/home/igorchem/CCDIR/3ob-3-1"
@@ -188,9 +189,9 @@ def copySystem(system):
     '''
     Make a System deepy copy handling with the Non-bonded methods definitions 
     '''
-    nbmodel_hold = system.nbModel
+    nbmodel_hold   = system.nbModel
     system.nbModel = None
-    newSystem = Clone(system)
+    newSystem      = Clone(system)
     newSystem.DefineNBModel ( nbmodel_hold )
     system.nbModel = nbmodel_hold      
     return newSystem
