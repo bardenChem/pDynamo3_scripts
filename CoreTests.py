@@ -16,28 +16,19 @@ import os, glob, sys
 
 global NmaxThreads
 NmaxThreads = 1 
-os.environ['MPLCONFIGDIR'] = '/tmp'
-VISMOL_HOME = os.environ.get('VISMOL_HOME')
-#path fo the core python files on your machine
-#para funcionar nas minhas máquinas, depois ver forma melhor de fazer
-if not VISMOL_HOME == None:
-	sys.path.append(os.path.join(VISMOL_HOME,"easyhybrid/pDynamoMethods") ) 
-else:
-	VISMOL_HOME = "/home/igorchem/pDynamo3_scripts"
-	#sys.path.append(os.path.join("/home/igorchem/VisMol/easyhybrid/pDynamoMethods") ) 
 #------------------------------------------------------
-from pBabel                    import *                                     
-from pCore                     import *                                     
-from pMolecule                 import *                    
-from CoreInterface 			   import SimulationProject
+from pBabel             import *                                     
+from pCore              import *                                     
+from pMolecule          import *                    
+from SimulationProject	import *
 from ReactionCoordinate import *
 from TrajectoryAnalysis import *
-from MopacQCMMinput import *
-from WriteQMLog import * 
+from MopacQCMMinput 	import *
+#from WriteQMLog   		import * 
 #-------------------------------------------------------------------
 #path for the required files on the examples folder of EasyHynrid 3.0
-easyhybrid   = os.path.join(VISMOL_HOME)
-ex_path      = os.path.join(VISMOL_HOME, "examples/")
+easyhybrid   = os.path.join(os.getcwd())
+ex_path      = os.path.join(easyhybrid, "examples/")
 
 scratch_path = os.path.join("TestsScratch")
 timTop       = os.path.join(ex_path,"TIM","7tim.top")
@@ -54,27 +45,23 @@ def SetMMsytem():
 	Use the methods of the CoreInterface Class to set the Triosephosphate isomerase System
 	'''
 	#--------------------------------------------------------------------
-	proj = SimulationProject( os.path.join(scratch_path,"MM_SetUp") )
-	proj.LoadSystemFromForceField(timTop,timCrd)	
+	proj = SimulationProject.From_Force_Field(timTop,timCrd,os.path.join( scratch_path,"MM_SetUp") )	
 	#optimize full system
 	parameters_a = {"simulation_type":"Geometry_Optimization","maxIterations":1000,"rmsGradient":1 }	
-	proj.RunSimulation(parameters_a)
+	proj.Run_Simulation(parameters_a)
 	#prune system to spherical selection
 	_pattern = "*:LIG.248:C02"
-	proj.SphericalPruning(_pattern,25.0)
-	proj.SettingFixedAtoms(_pattern,20.0)
+	proj.Spherical_Pruning(_pattern,25.0)
+	proj.Setting_Free_Atoms(_pattern,20.0)
 	parameters_b = {"simulation_type":"Geometry_Optimization","maxIterations":1000,"rmsGradient":1,"save_pdb":True}
 	#otimize pruned systems
-	proj.RunSimulation(parameters_b)
+	proj.Run_Simulation(parameters_b)
 	#seve a pkl with the MM model defined for the pruned system 
 	proj.SaveProject()
 	proj.FinishRun() 
+'''
 #=====================================================
 def MMMD_Algorithms():
-	'''
-	TESTED !!!
-	Molecular Mechanics Molecular Dynamics 
-	'''
 	#---------------------------------------------------
 	#If the pkl with the Pruned MM system does not exist, generate it
 	if not os.path.exists( os.path.join(scratch_path,"MM_SetUp.pkl") ):
@@ -102,10 +89,6 @@ def MMMD_Algorithms():
 	proj.FinishRun() 			
 #=====================================================
 def MMMD_Heating():
-	'''
-	TESTED !!!
-	Molecular Mechanics Molecular Dynamics 
-	'''
 	#-----------------------------------------------
 	#If the pkl with the Pruned MM system does not exist, generate it
 	if not os.path.exists( os.path.join( scratch_path,"MM_SetUp.pkl") ):
@@ -130,11 +113,6 @@ def MMMD_Heating():
 	proj.FinishRun()			
 #=====================================================
 def QCMM_Energies():
-	'''
-	TESTED !!!
-	Setting Quantum chemical model and saving the region.
-	Test single point energy calculations using all Semiempirical methods provided in pDynamo.
-	'''
 	#-----------------------------------------------
 	#If the pkl with the Pruned MM system does not exist, generate it
 	if not os.path.exists( os.path.join( scratch_path, "MM_SetUp.pkl") ):
@@ -161,10 +139,6 @@ def QCMM_Energies():
 	proj.FinishRun()
 #=====================================================
 def QCMM_DFTBplus():
-	'''
-	TESTED !!!
-	Setting quantum chemical system to Run interfaced with DFTB+
-	'''
 	#-----------------------------------------------
 	#If the pkl with the Pruned QC system does not exist, generate it
 	if not os.path.exists( os.path.join( scratch_path, "QCMM_SMOs.pkl") ):
@@ -177,10 +151,6 @@ def QCMM_DFTBplus():
 	proj.FinishRun()
 #=====================================================
 def QCMM_Orca():
-	'''
-	TESTED !!!
-	Test interface of ORCA
-	'''
 	#-----------------------------------------------
 	#If the pkl with the Pruned QCsystem does not exist, generate it
 	if not os.path.exists( os.path.join( scratch_path, "QCMM_SMOs.pkl") ):
@@ -194,10 +164,6 @@ def QCMM_Orca():
 	proj.FinishRun()
 #=====================================================
 def QCMM_optimizations():
-	'''
-	TESTED !!!
-	Test the Geometry optimizations algorithms with hybrid potential system
-	'''
 	#-----------------------------------------------
 	#If the pkl with the Pruned QCsystem does not exist, generate it
 	if not os.path.exists( os.path.join( scratch_path,"QCMM_SMOs.pkl") ):
@@ -234,10 +200,6 @@ def QCMM_optimizations():
 	proj.FinishRun()
 #=========================================================================
 def QCMM_MD():
-	'''
-	TESTED !!!
-	Test QCMM hybrid molecular dynamics
-	'''
 	#-----------------------------------------------
 	#If the pkl with the Pruned QCsystem does not exist, generate it
 	if not os.path.exists( os.path.join( scratch_path, "QCMMopts.pkl") ):
@@ -268,10 +230,6 @@ def QCMM_MD():
 	proj.FinishRun()
 #=======================================================================
 def QCMM_MDrestricted():
-	'''
-	TESTED!!!
-	Test QCMM molecular dnamics with restricted reaction coorinates
-	'''
 	#---------------------------------------------
 	#If the pkl with the Pruned QCsystem does not exist, generate it
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
@@ -312,9 +270,6 @@ def QCMM_MDrestricted():
 	proj.FinishRun()		
 #==============================================================
 def TrajectoryAnalysisPlots():
-	'''
-	Test the analysis and plotting for molecular dynamics simulations.
-	'''
 	# Root mean square and radius of gyration plots 
 	# Distance analysis in restricted molecular dynamics 
 	# Extraction of most representative frame based on the metrics: rmsd, rg and reaction coordinate distances
@@ -347,10 +302,6 @@ def TrajectoryAnalysisPlots():
 
 #==============================================================
 def QCMMScanSimpleDistance(_nsteps,_dincre,name="Default"):
-	'''
-	TESTED !
-	Test QCMM one-dimensional reaction scans, using simple
-	'''
 	#---------------------------------------------
 	#If the pkl with the Pruned QCsystem does not exist, generate it
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
@@ -379,9 +330,6 @@ def QCMMScanSimpleDistance(_nsteps,_dincre,name="Default"):
 	proj.FinishRun()
 #===============================================================
 def QCMMScanMultipleDistance(_nsteps,_dincre,name="Default"):
-	'''
-	Test QCMM one-dimensional reaction scans, using multiple distance 
-	'''
 	#---------------------------------------------
 	#If the pkl with the Pruned QCsystem does not exist, generate it
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
@@ -413,9 +361,6 @@ def QCMMScanMultipleDistance(_nsteps,_dincre,name="Default"):
 	proj.FinishRun()
 #=====================================================
 def Scan1D_Dihedral(_nsteps,_dincre=10.0,name="Default"):
-	'''
-	Test relaxed scan with dihedral reaction coordinates
-	'''
 	#---------------------------------------------	
 	_scanFolder = "SCAN1D_dihedral"
 	if not name == "Default":
@@ -444,9 +389,6 @@ def Scan1D_Dihedral(_nsteps,_dincre=10.0,name="Default"):
 	proj.FinishRun()
 #=====================================================
 def Scan2D_Dihedral(_xnsteps,_ynsteps,_dincreX=10.0,_dincreY=10.0,name="Default"):
-	'''
-	Test relaxed scan with dihedral reaction coordinates
-	'''
 	#---------------------------------------------	
 	_scanFolder = "SCAN2D_dihedral"
 	if not name == "Default": _scanFolder = name
@@ -480,9 +422,6 @@ def Scan2D_Dihedral(_xnsteps,_ynsteps,_dincreX=10.0,_dincreY=10.0,name="Default"
 	proj.FinishRun()
 #=====================================================
 def QCMMScan2DsimpleDistance(_xnsteps,_ynsteps,_dincrex,_dincrey,name="Default"):
-	'''
-	Evaluate tests for two-dimensional surface scans, with reaction coordinates set as simple distances
-	'''	
 	#---------------------------------------------
 	#If the pkl with the Pruned QCsystem does not exist, generate it
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
@@ -515,8 +454,6 @@ def QCMMScan2DsimpleDistance(_xnsteps,_ynsteps,_dincrex,_dincrey,name="Default")
 	proj.FinishRun()	
 #=====================================================
 def QCMMScan2DmixedDistance(_xnsteps,_ynsteps,_dincrex,_dincrey,name="Default"):
-	'''
-	'''
 	#-------------------------------------------------
 	#If the pkl with the Pruned QCsystem does not exist, generate it
 	if not os.path.exists( os.path.join(scratch_path, "QCMMopts.pkl") ): 
@@ -554,8 +491,6 @@ def QCMMScan2DmixedDistance(_xnsteps,_ynsteps,_dincrex,_dincrey,name="Default"):
 	proj.FinishRun()
 #=====================================================
 def QCMMScan2DmultipleDistance(_xnsteps,_ynsteps,_dincrex,_dincrey,name="Default"):
-	'''
-	'''
 	#-------------------------------------------------
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
 		QCMMoptimizations()
@@ -594,8 +529,6 @@ def QCMMScan2DmultipleDistance(_xnsteps,_ynsteps,_dincrex,_dincrey,name="Default
 	proj.FinishRun()	
 #=====================================================
 def QCMMScans2D_Adaptative(_xnsteps,_ynsteps,_dincrex,_dincrey):
-	'''
-	'''
 	#-------------------------------------------------
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
 		QCMMoptimizations()
@@ -630,9 +563,6 @@ def QCMMScans2D_Adaptative(_xnsteps,_ynsteps,_dincrex,_dincrey):
 	proj.FinishRun()	
 #=====================================================
 def FreeEnergy1DSimpleDistance(nsteps):
-	'''
-	Test simulations to get the Free energy of one-dimensional reaction scan using umbrella sampling and WHAM
-	'''
 	#-------------------------------------------------
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
 		QCMM_optimizations()
@@ -678,8 +608,6 @@ def FreeEnergy1DSimpleDistance(nsteps):
 	proj.RunSimulation(PMF_parameters)
 #=====================================================
 def FreeEnergy1DSimpleDistanceOPT(nsteps):	
-	'''
-	'''
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
 		QCMM_optimizations()
 	proj=SimulationProject( os.path.join(scratch_path,"FE_simple_distance_OPT") )		
@@ -722,9 +650,6 @@ def FreeEnergy1DSimpleDistanceOPT(nsteps):
 	proj.RunSimulation(PMF_parameters)
 #=================================================================
 def FreeEnergy1DMultipleDistance(nsteps):
-	'''
-	Test simulations to get the Free energy of one-dimensional reaction scan using umbrella sampling and WHAM
-	'''
 	#-----------------------------------------------------------
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
 		QCMM_optimizations()
@@ -774,9 +699,6 @@ def FreeEnergy1DMultipleDistance(nsteps):
 	proj.FinishRun()
 #=====================================================
 def UmbrellaSampling1Drestart(nsteps):
-	'''
-	Test the restart utility of the Umbrella sapling preset simulation
-	'''
 	#-----------------------------------------------------------
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
 		QCMM_optimizations()
@@ -841,8 +763,6 @@ def UmbrellaSampling1Drestart(nsteps):
 	proj.FinishRun()
 #=====================================================
 def FreeEnergy2DsimpleDistance(nsteps):
-	'''
-	'''
 	proj=SimulationProject( os.path.join(scratch_path,"FE_2D_simple_distance") )
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
 		QCMM_optimizations()		
@@ -896,8 +816,6 @@ def FreeEnergy2DsimpleDistance(nsteps):
 	proj.FinishRun()
 #=====================================================
 def FreeEnergy2DmixedDistance(nsteps):
-	'''
-	'''
 	proj=SimulationProject( os.path.join(scratch_path,"FE_2D_mixed_distance") )	
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
 		QCMM_optimizations()
@@ -953,8 +871,6 @@ def FreeEnergy2DmixedDistance(nsteps):
 	proj.FinishRun()
 #=====================================================
 def FreeEnergy2DmultipleDistance(nsteps):
-	'''
-	'''
 	proj=SimulationProject( os.path.join(scratch_path,"FE_2D_multiple_distance") )	
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
 		QCMM_optimizations()
@@ -1008,8 +924,6 @@ def FreeEnergy2DmultipleDistance(nsteps):
 	proj.FinishRun()
 #=====================================================
 def FreeEnergyDihedral1D(nsteps):
-	'''
-	'''	
 	proj=SimulationProject( os.path.join(scratch_path,"FE_dihedral_1D") )		
 	proj.LoadSystemFromSavedProject( balapkl )	
 	#-------------------------------------------------
@@ -1051,8 +965,6 @@ def FreeEnergyDihedral1D(nsteps):
 	proj.RunSimulation(parameters)
 #=====================================================
 def FreeEnergyDihedral2D(nsteps):
-	'''
-	'''
 	proj=SimulationProject( os.path.join(scratch_path,"FE_2D_dihedral") )		
 	proj.LoadSystemFromSavedProject( balapkl )
 	
@@ -1101,9 +1013,6 @@ def FreeEnergyDihedral2D(nsteps):
 	proj.FinishRun()
 #=====================================================
 def EnergyAnalysisPlots():
-	'''
-	General tests of plots from energies analysis from our simulations
-	'''
 	#---------------------------------------------------------------------------------
 	#LOAD system
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
@@ -1208,9 +1117,6 @@ def EnergyAnalysisPlots():
 	#internal refinemen
 #===============================================================================
 def ReacCoordSearchers(_type):	
-	'''
-	Test simulation protocols to determine reaction paths
-	'''
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
 		QCMM_optimizations()
 	proj=SimulationProject( os.path.join(scratch_path,"ReactionPathsSearchers") )		
@@ -1273,8 +1179,6 @@ def ReacCoordSearchers(_type):
 	proj.RunSimulation(parameters)
 #================================================================================
 def NEB_FreeEnergy():
-	'''
-	'''
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
 		QCMM_optimizations()
 	proj=SimulationProject( os.path.join(scratch_path,"NEB_FreeEnergy") )		
@@ -1332,9 +1236,6 @@ def NEB_FreeEnergy():
 
 #================================================================================
 def pDynamoEnergyRef_1D():
-	'''
-	Tested
-	'''	
 	proj=SimulationProject( os.path.join(scratch_path, "pDynamoSMO") )
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
 		QCMM_optimizations()		
@@ -1372,9 +1273,6 @@ def pDynamoEnergyRef_1D():
 	proj.RunSimulation(parameters)	
 #=====================================================
 def pDynamoEnergyRef_2D():
-	'''
-	Test two dimensinal energy refinement with internal pDynamo quantum chemical methods
-	'''
 	proj=SimulationProject( os.path.join(scratch_path, "pDynamoSMO2D") )
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
 		QCMM_optimizations()		
@@ -1419,8 +1317,6 @@ def pDynamoEnergyRef_2D():
 	proj.RunSimulation(parameters)
 #=====================================================
 def pDynamoEnergyRef_abInitio():
-	'''
-	'''
 	proj=SimulationProject( os.path.join(scratch_path, "pDynamoABintio") )
 	
 	#setting reaction coordinates for ploting labels
@@ -1457,8 +1353,6 @@ def pDynamoEnergyRef_abInitio():
 	proj.RunSimulation(parameters)
 #=====================================================
 def MopacEnergyRef():
-	'''
-	'''
 	proj=SimulationProject( os.path.join(scratch_path, "mopacSMO") )
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
 		QCMM_optimizations()		
@@ -1500,8 +1394,6 @@ def MopacEnergyRef():
 	proj.RunSimulation(parameters)	
 #=====================================================
 def Change_QC_Region():
-	'''
-	'''
 	proj=SimulationProject( os.path.join(scratch_path, "pDynamoSMO") )
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
 		QCMM_optimizations()		
@@ -1544,8 +1436,6 @@ def CombinedFES_ABinitioSMO():
 	pass
 #=====================================================
 def ORCAEnergy_ref():
-	'''
-	'''
 	proj=SimulationProject( os.path.join(scratch_path, "ORCA_test") )
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
 		QCMM_optimizations()		
@@ -1591,8 +1481,6 @@ def Thermodynamics():
 	pass
 #=====================================================
 def write_qm_log():
-	'''
-	'''		
 	proj = SimulationProject( os.path.join(scratch_path, "QMlog") )
 	if not os.path.exists(os.path.join(scratch_path, "QMlog") ):
 		os.makedirs( os.path.join(scratch_path, "QMlog") )
@@ -1610,7 +1498,7 @@ def write_qm_log():
 	mop.CalculateGradVectors()
 	mop.write_input(0,1)
 	mop.Execute()
-
+'''
 #=====================================================
 if __name__ == "__main__":	
 	#------------------------------------
@@ -1629,7 +1517,10 @@ if __name__ == "__main__":
 		help_text+= "\n\t31:pDynamo internal refinement\n\t32:ORCA Energy refinement\n\t33:Change QC Region tests"
 		print(help_text)			
 	#------------------------------------------------
-	elif int(sys.argv[1]) == 1:  MMMD_Algorithms()
+
+	elif int(sys.argv[1]) == 1: 
+		SetMMsytem() 
+		#MMMD_Algorithms()
 	elif int(sys.argv[1]) == 2:	 MMMD_Heating()
 	elif int(sys.argv[1]) == 3:	 QCMM_Energies()
 	elif int(sys.argv[1]) == 4:  QCMM_DFTBplus()	

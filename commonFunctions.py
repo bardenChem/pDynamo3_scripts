@@ -8,7 +8,7 @@
 #-----------Credits and other information here---------------#
 ##############################################################
 import pBabel
-import pCore
+from  pCore import Clone
 import pMolecule                            
 from pMolecule.MMModel         import *
 from pMolecule.NBModel         import *                                     

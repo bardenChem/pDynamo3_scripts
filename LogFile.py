@@ -68,7 +68,7 @@ class LogFileWriter:
         #self.fileObj    = open( self.filePath,"w")
 
     #===================================================================    
-    def add_simulation_parameters_text (self, parameters):
+    def add_simulation_parameters_text(self, parameters):
         """ Function doc """
         if parameters['simulation_type'] ==  'Relaxed_Surface_Scan':
             if "ATOMS_RC2" in parameters:
