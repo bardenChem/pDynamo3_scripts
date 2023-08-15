@@ -26,6 +26,7 @@ class Analysis:
 		'''
 		Default Constructor
 		'''
+		self.parameters = _parameters
 
 
 	def Execute(self):

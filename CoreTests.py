@@ -28,7 +28,7 @@ from MopacQCMMinput 	import *
 #-------------------------------------------------------------------
 #path for the required files on the examples folder of EasyHynrid 3.0
 easyhybrid   = os.path.join(os.getcwd())
-ex_path      = os.path.join(easyhybrid, "examples/")
+ex_path      = os.path.join(easyhybrid, "examples")
 
 scratch_path = os.path.join("TestsScratch")
 timTop       = os.path.join(ex_path,"TIM","7tim.top")
@@ -45,7 +45,7 @@ def SetMMsytem():
 	Use the methods of the CoreInterface Class to set the Triosephosphate isomerase System
 	'''
 	#--------------------------------------------------------------------
-	proj = SimulationProject.From_Force_Field(timTop,timCrd,os.path.join( scratch_path,"MM_SetUp") )	
+	proj = SimulationProject.From_Force_Field(timTop,timCrd,_FolderName=scratch_path)	
 	#optimize full system
 	parameters_a = {"simulation_type":"Geometry_Optimization","maxIterations":1000,"rmsGradient":1 }	
 	proj.Run_Simulation(parameters_a)
@@ -57,9 +57,8 @@ def SetMMsytem():
 	#otimize pruned systems
 	proj.Run_Simulation(parameters_b)
 	#seve a pkl with the MM model defined for the pruned system 
-	proj.SaveProject()
+	proj.SaveSystem()
 	proj.FinishRun() 
-'''
 #=====================================================
 def MMMD_Algorithms():
 	#---------------------------------------------------
@@ -67,8 +66,7 @@ def MMMD_Algorithms():
 	if not os.path.exists( os.path.join(scratch_path,"MM_SetUp.pkl") ):
 		SetMMsytem()
 	#------------------------------------------------
-	proj=SimulationProject( os.path.join(scratch_path,"MM_MDAlgs") )	
-	proj.LoadSystemFromSavedProject( os.path.join(scratch_path, "MM_SetUp.pkl") )
+	proj= SimulationProject.From_PKL( os.path.join(scratch_path, "MM_SetUp.pkl"),_FolderName=os.path.join(scratch_path,"MM_MDAlgs") )	
 	refcrd3 = Clone(proj.cSystem.coordinates3)
 	#-----------------------------------------------
 	integrators = ["Verlet", "LeapFrog", "Langevin"]	
@@ -1498,7 +1496,7 @@ def write_qm_log():
 	mop.CalculateGradVectors()
 	mop.write_input(0,1)
 	mop.Execute()
-'''
+
 #=====================================================
 if __name__ == "__main__":	
 	#------------------------------------
@@ -1520,7 +1518,7 @@ if __name__ == "__main__":
 
 	elif int(sys.argv[1]) == 1: 
 		SetMMsytem() 
-		#MMMD_Algorithms()
+		MMMD_Algorithms()
 	elif int(sys.argv[1]) == 2:	 MMMD_Heating()
 	elif int(sys.argv[1]) == 3:	 QCMM_Energies()
 	elif int(sys.argv[1]) == 4:  QCMM_DFTBplus()	

@@ -88,6 +88,7 @@ class MD:
         if "log_frequency"              in _parameters: self.logFrequency           = _parameters["log_frequency"]
         if "temperature_scale_option"   in _parameters: self.temperatureScaleOption = _parameters["temperature_scale_option"]
         if "Debug"                      in _parameters: self.DEBUG                  = _parameters["Debug"]
+        if "save_format"                in _parameters: self.saveFormat             = _parameters["save_format"]
         if "seed"                       in _parameters:
             self.seed = _parameters["seed"]
             self.RNG  = NormalDeviateGenerator.WithRandomNumberGenerator ( RandomNumberGenerator.WithSeed ( self.seed ) )
@@ -188,7 +189,15 @@ class MD:
                                           temperature            = self.temperature ,
                                           timeStep               = self.timeStep    ,
                                           trajectories           = trajectory_list  )
-
+    
+    #====================================================================================
+    def Finalize(self):
+        '''
+        '''
+        if self.saveFormat == ".dcd" or self.saveFormat == ".mdcrd":
+            if self.saveFormat != self.trajectoryName:
+                traj_save = os.path.splitext(self.trajectoryName)[0] + self.saveFormat
+                Duplicate(self.trajectoryName,traj_save,self.molecule)
     #=====================================================================================
     def Print(self):
         '''

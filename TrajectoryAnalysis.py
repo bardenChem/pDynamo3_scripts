@@ -26,7 +26,7 @@ from pSimulation                import *
 #=====================================================================
 class TrajectoryAnalysis:
 	'''
-	Concentre functions to perform analysis from molecular dynamics trajectories
+	Functions to perform analysis from molecular dynamics trajectories
 	'''
 	#-----------------------------------------
 	def __init__(self,_trajFolder,_system,t_time):
@@ -60,11 +60,17 @@ class TrajectoryAnalysis:
 		Get Radius of Gyration and Root Mean Square distance for the trajectory
 		'''
 		masses  = Array.FromIterable ( [ atom.mass for atom in self.molecule.atoms ] )
-		crd3    = ImportCoordinates3( os.path.join(self.trajFolder,"frame0.pkl") )
-		system  = AtomSelection.FromAtomPattern ( self.molecule, "*:*:CA" )
-		#------------------------------------------------------------------------------
-		# . Calculate the radius of gyration.
-		rg0 = crd3.RadiusOfGyration(selection = system, weights = masses)
+		crd3    = Unpickle(os.path.join(self.trajFolder,"frame0.pkl"))[0]
+		system  = None 
+		rg0     = None
+		try:
+			system  = AtomSelection.FromAtomPattern ( self.molecule, "*:*:CA" )		#------------------------------------------------------------------------------
+			# . Calculate the radius of gyration.
+			rg0 = crd3.RadiusOfGyration(selection = system, weights = masses)
+		except:
+			system  = AtomSelection.FromAtomPattern ( self.molecule, "*:*:C*" )		#------------------------------------------------------------------------------
+			# . Calculate the radius of gyration.
+			rg0 = crd3.RadiusOfGyration(selection = system, weights = masses)
 		#------------------------------------------------------------------------------
 		# . Save the starting coordinates.
 		reference3 = Clone(crd3)  
@@ -72,7 +78,7 @@ class TrajectoryAnalysis:
 		n = []
 		m = 0             
 		#-------------------------------------------------------------------------------
-		while self.trajectory.RestoreOwnerData ( ):
+		while self.trajectory.RestoreOwnerData():
 			self.molecule.coordinates3.Superimpose ( reference3, selection = system, weights = masses )
 			self.RG.append  ( self.molecule.coordinates3.RadiusOfGyration( selection = system, weights = masses ) )
 			self.RMS.append ( self.molecule.coordinates3.RootMeanSquareDeviation( reference3, selection = system, weights = masses ) )
