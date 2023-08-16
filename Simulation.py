@@ -384,7 +384,8 @@ class Simulation:
 		if "trajectory_name" in self.parameters: traj_name = self.parameters["trajectory_name"]
 		MDrun = MD(self.molecule,self.baseFolder,self.parameters['MD_method'],traj_name)
 		MDrun.ChangeDefaultParameters(self.parameters)
-		MDrun.RunProduction(self.parameters['nsteps'],sampling,_Restricted=True)		
+		MDrun.RunProduction(self.parameters['nsteps'],sampling,_Restricted=True)
+		MDrun.Finalize()		
 
 	#=======================================================================
 	def UmbrellaSampling(self):

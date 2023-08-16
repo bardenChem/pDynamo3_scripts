@@ -47,7 +47,7 @@ def SetMMsytem():
 	#--------------------------------------------------------------------
 	proj = SimulationProject.From_Force_Field(timTop,timCrd,_FolderName=scratch_path)	
 	#optimize full system
-	parameters_a = {"simulation_type":"Geometry_Optimization","maxIterations":1000,"rmsGradient":1 }	
+	parameters_a = {"simulation_type":"Geometry_Optimization","maxIterations":1000,"rmsGradient":2 }	
 	proj.Run_Simulation(parameters_a)
 	#prune system to spherical selection
 	_pattern = "*:LIG.248:C02"
@@ -63,10 +63,10 @@ def SetMMsytem():
 def MMMD_Algorithms():
 	#---------------------------------------------------
 	#If the pkl with the Pruned MM system does not exist, generate it
-	if not os.path.exists( os.path.join(scratch_path,"MM_SetUp.pkl") ):
+	if not os.path.exists( os.path.join(scratch_path,"7tim.pkl") ):
 		SetMMsytem()
 	#------------------------------------------------
-	proj= SimulationProject.From_PKL( os.path.join(scratch_path, "MM_SetUp.pkl"),_FolderName=os.path.join(scratch_path,"MM_MDAlgs") )	
+	proj= SimulationProject.From_PKL( os.path.join(scratch_path, "7tim.pkl"),_FolderName=os.path.join(scratch_path,"MM_MDAlgs") )	
 	refcrd3 = Clone(proj.cSystem.coordinates3)
 	#-----------------------------------------------
 	integrators = ["Verlet", "LeapFrog", "Langevin"]	
