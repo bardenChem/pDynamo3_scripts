@@ -22,11 +22,12 @@ class QuantumMethods:
 		'''
 		Default constructor
 		'''
-		self.methodClass 	= "SMO" #  SMO, HF, DFT, ORCA, MOPAC and PYSCF
-		self.selectionType  = "Hybrid" # be "Whole" 
+		self.methodClass 	= "SMO" #  SMO, HF, DFT, ORCA, DFTB, MOPAC and PYSCF
+		self.selectionType  = "Hybrid" # "Hybrid", "Whole" 
 		self.selection      = None 
 		self.systemBase     = None 
 		self.QuantumSystem  = None 
+		self.converger      = "standard" # veryLoose, loose, standard, tight, veryTight 
 
 	#-------------------------------------
 	@classmethod

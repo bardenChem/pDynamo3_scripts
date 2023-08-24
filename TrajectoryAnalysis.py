@@ -60,7 +60,7 @@ class TrajectoryAnalysis:
 		Get Radius of Gyration and Root Mean Square distance for the trajectory
 		'''
 		masses  = Array.FromIterable ( [ atom.mass for atom in self.molecule.atoms ] )
-		crd3    = Unpickle(os.path.join(self.trajFolder,"frame0.pkl"))[0]
+		crd3    = Unpickle(os.path.join(self.trajFolder,"frame0.pkl"))
 		system  = None 
 		rg0     = None
 		try:

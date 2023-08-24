@@ -47,7 +47,7 @@ class MD:
         self.molecule               = _system
         self.baseName               = _baseFolder 
         self.trajName               = _trajName
-        self.trajectoryNameSoft     = _baseFolder+self.trajName+".ptRes" # this naming scheme makes sense for the umbrella sampling runs
+        self.trajectoryNameSoft     = os.path.join(_baseFolder,self.trajName+".ptRes") # this naming scheme makes sense for the umbrella sampling runs
         self.trajectoryNameCurr     = os.path.join(_baseFolder,self.trajName+".ptGeo")
         self.trajectory             = None
         self.trajectorySoft         = None
@@ -195,9 +195,9 @@ class MD:
         '''
         '''
         if self.saveFormat == ".dcd" or self.saveFormat == ".mdcrd":
-            if self.saveFormat != self.trajectoryName:
-                traj_save = os.path.splitext(self.trajectoryName)[0] + self.saveFormat
-                Duplicate(self.trajectoryName,traj_save,self.molecule)
+            if self.saveFormat != self.trajName:
+                traj_save = os.path.join(self.baseName,self.trajName + self.saveFormat)
+                Duplicate(self.trajectoryNameCurr,traj_save,self.molecule)
     #=====================================================================================
     def Print(self):
         '''

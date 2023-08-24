@@ -38,7 +38,7 @@ class SimulationProject:
             DEBUG       : if this paramters it set True, some extra steps in the system setting will be performe to check the things up
         '''        
         self.baseName       = None
-        self.folderName     = os.getcwd()
+        self.folderName     = _projectFolder
         self.systems        = {} #System Dict loaded in this project 
         self.simulation     = [] #List given the simulations executed in this project
         self.systemKeys     = []
@@ -51,9 +51,9 @@ class SimulationProject:
         self.MMmodel        = {} #MM models Dict loaded in this project
         self.refEnergy      = 0.0 
 
-        if not _projectFolder == None:
-            self.folderName = self.baseName
-            if not os.path.exists(self.folderName): os.makedirs(self.folderName)
+        if not self.folderName:
+            self.folderName = os.getcwd()
+        if not os.path.exists(self.folderName): os.makedirs(self.folderName)
 
     #===================================================================================
     @classmethod
@@ -64,15 +64,11 @@ class SimulationProject:
         self                = selfClass(_projectFolder=_FolderName)
         _system             = ImportSystem(_pklPath)
         _name               = os.path.basename(_pklPath)
-        self.baseName       = _pklPath[:-4]
+        self.baseName       = _name[:-4]
         self.systems[_name] = _system
         self.system         = _system
         self.systemCoutCurr += 1 
         self.systemKeys.append(_name)
-        #-----------------------------
-        if not _FolderName == None:
-            self.folderName = self.baseName
-            if not os.path.exists(self.folderName): os.makedirs(self.folderName)
         #-----------------------------
         return(self)
     #=================================================================================== 
@@ -88,17 +84,13 @@ class SimulationProject:
         _system              = ImportSystem(_topologyFile)
         _system.DefineNBModel(self.NBmodel) 
         _system.coordinates3 = ImportCoordinates3(_coordinateFile)               
-        _name                = _topologyFile[:-4]
-        self.baseName        = _name
+        _name                = os.path.basename(_topologyFile)
+        self.baseName        = _name[:-4]
         self.systems[_name]  = _system
         self.MMmodel[_name]  = _system.mmModel
         self.systemKeys.append(_name)
         self.system          = _system
-        self.systemCoutCurr +=1
-        #-----------------------------
-        if not _FolderName == None:
-            self.folderName = self.baseName
-            if not os.path.exists(self.folderName): os.makedirs(self.folderName)
+        self.systemCoutCurr +=1        
         #-----------------------------
         return(self)        
     #===================================================================================
@@ -118,10 +110,6 @@ class SimulationProject:
         self.system          = _system
         self.systemKeys.append(_name)
         #-----------------------------
-        if not _FolderName == None:
-            self.folderName = self.baseName
-            if not os.path.exists(self.baseName): os.makedirs(self.baseName)
-        #-----------------------------
         return(self) 
     #===================================================================================
     @classmethod
@@ -138,16 +126,12 @@ class SimulationProject:
         #...........................................
         _system              = ImportSystem(_coordinateFile)
         _system.coordinates3 = ImportCoordinates3(_coordinateFile)               
-        _name                = os.path.basename(_coordinateFile)
-        self.baseName        = _name
+        _name                = os.path.basenem(_coordinateFile)
+        self.baseName        = _name[:-4]
         self.systems[_name]  = _system
         self.MMmodels[_name] = _system.mmModel
         self.system          = _system
-        self.systemKeys.append(_name)
-        #-----------------------------
-        if not _FolderName == None:
-            self.folderName = self.baseName
-            if not os.path.exists(self.folderName): os.makedirs(self.folderName)
+        self.systemKeys.append(_name)  
         #-----------------------------
         return(self) 
     #====================================================================================
@@ -258,7 +242,7 @@ class SimulationProject:
         #----------------------------------------------------------------------
         #---------------------------------------------------------------------
         _parameters["active_system"] = self.system
-        if not "folder" in _parameters:_parameters["folder"] = self.baseName        
+        if not "folder" in _parameters:_parameters["folder"] = self.folderName        
         process = Simulation(_parameters)
         process.Execute()
     #=========================================================================
@@ -301,6 +285,13 @@ class SimulationProject:
         '''
         savePathPkl = os.path.join(self.folderName,self.baseName+".pkl")
         savePathPdb = os.path.join(self.folderName,self.baseName+".pdb")
+        i = 0;
+        while os.path.exists(savePathPdb):
+            savePathPdb = savePathPdb[:-4] + "_#{}.pdb".format(i)
+            i += 1
+        while os.path.exists(savePathPkl):
+            savePathPkl = savePathPkl[:-4] + "_#{}.pkl".format(i)
+            i += 1
         Pickle( savePathPkl,self.system )
         ExportSystem( savePathPdb,self.system )
         
