@@ -178,7 +178,7 @@ def QCMM_optimizations():
 	#problems saving trajectory! But geometry opt working
 
 	_plotParameters = None
-	parameters = {"maxIterations":600 			           ,
+	parameters = {"maxIterations":1000 			           ,
 				  "rmsGradient":0.1   			           ,
 				  "log_frequency":10 		               ,
 				  "simulation_type":"Geometry_Optimization",
@@ -191,7 +191,7 @@ def QCMM_optimizations():
 		parameters["optmizer"]=alg
 		parameters["trajectory_name"]="QCMMopt_"+alg+".ptGeo"						
 		proj.Run_Simulation(parameters)
-		proj.system.coordinates3 = initialCoords;
+		#proj.system.coordinates3 = initialCoords;
 	#Save QCMM optimezed System	
 	proj.SaveSystem()
 	proj.FinishRun()
@@ -298,13 +298,13 @@ def TrajectoryAnalysisPlots():
 def QCMMScanSimpleDistance(_nsteps,_dincre,name="Default"):
 	#---------------------------------------------
 	#If the pkl with the Pruned QCsystem does not exist, generate it
-	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
+	if not os.path.exists( os.path.join(scratch_path,"QCMMopts","7tim.pkl") ):
 		QCMM_optimizations()
-	#---------------------------------------------
+
+	proj=SimulationProject.From_PKL( os.path.join(scratch_path,"QCMMopts","7tim.pkl"), os.path.join(scratch_path,"QCMM_SCAN1D_simple_distance") )		
+
 	_scanFolder = "QCMM_SCAN1D_simple_distance"
 	if not name == "Default": _scanFolder = name
-	proj=SimulationProject( os.path.join(scratch_path,_scanFolder) )		
-	proj.LoadSystemFromSavedProject( os.path.join(scratch_path,"QCMMopts.pkl") )
 	#setting atoms for scan
 	atom1 = AtomSelection.FromAtomPattern(proj.system,"*:LIG.*:C02")
 	atom2 = AtomSelection.FromAtomPattern(proj.system,"*:LIG.*:H02")
@@ -320,19 +320,22 @@ def QCMMScanSimpleDistance(_nsteps,_dincre,name="Default"):
 				   "log_frequency":100      ,
 				   "simulation_type":"Relaxed_Surface_Scan",
 				   "force_constant":4000.0	}	
-	proj.Run_Simulation(parameters)		
+	proj.Run_Simulation(parameters)	
+	proj.SaveSystem()
 	proj.FinishRun()
 #===============================================================
 def QCMMScanMultipleDistance(_nsteps,_dincre,name="Default"):
 	#---------------------------------------------
 	#If the pkl with the Pruned QCsystem does not exist, generate it
-	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
-		QCMMoptimizations()
+	if not os.path.exists( os.path.join(scratch_path,"QCMMopts","7tim.pkl") ):
+		QCMM_optimizations()
+
+	proj=SimulationProject.From_PKL( os.path.join(scratch_path,"QCMMopts","7tim.pkl"), os.path.join(scratch_path,"QCMM_SCAN1D_multiple_distance") )		
+
 	#---------------------------------------------	
 	_scanFolder = "QCMM_SCAN1D_multiple_distance"
 	if not name == "Default": _scanFolder = name
-	proj=SimulationProject( os.path.join(scratch_path,_scanFolder) )		
-	proj.LoadSystemFromSavedProject( os.path.join(scratch_path,"QCMMopts.pkl") )
+	
 	#---------------------------------------------
 	#setting atoms for scan
 	atom1 = AtomSelection.FromAtomPattern(proj.system,"*:LIG.*:C02")
@@ -351,16 +354,16 @@ def QCMMScanMultipleDistance(_nsteps,_dincre,name="Default"):
 				   "force_constant":4000.0}
     #run the simulation
     #---------------------------------------------------------------------
-	proj.Run_Simulation(parameters)		
+	proj.Run_Simulation(parameters)
+	proj.SaveSystem()
 	proj.FinishRun()
 #=====================================================
 def Scan1D_Dihedral(_nsteps,_dincre=10.0,name="Default"):
 	#---------------------------------------------	
 	_scanFolder = "SCAN1D_dihedral"
-	if not name == "Default":
-		_scanFolder = name
-	proj=SimulationProject( os.path.join(scratch_path,_scanFolder) )		
-	proj.LoadSystemFromSavedProject( balapkl )
+
+	proj=SimulationProject.From_PKL( os.path.join(balapkl), os.path.join(scratch_path,"dihedral1D") )		
+
 	proj.system.Summary()
 	#---------------------------------------------
 	#setting atoms for scan	
@@ -379,15 +382,16 @@ def Scan1D_Dihedral(_nsteps,_dincre=10.0,name="Default"):
 				   "force_constant":100.0                   }
     #run the simulation
     #---------------------------------------------------------------------
-	proj.Run_Simulation(parameters)		
+	proj.Run_Simulation(parameters)
+	proj.SaveSystem()
 	proj.FinishRun()
 #=====================================================
 def Scan2D_Dihedral(_xnsteps,_ynsteps,_dincreX=10.0,_dincreY=10.0,name="Default"):
 	#---------------------------------------------	
 	_scanFolder = "SCAN2D_dihedral"
 	if not name == "Default": _scanFolder = name
-	proj=SimulationProject( os.path.join(scratch_path,_scanFolder) )		
-	proj.LoadSystemFromSavedProject( balapkl )
+	
+	proj=SimulationProject.From_PKL( os.path.join(balapkl), os.path.join(scratch_path,"dihedral2D") )		
 	proj.system.Summary()
 	#---------------------------------------------
 	#setting atoms for scan	
@@ -412,19 +416,18 @@ def Scan2D_Dihedral(_xnsteps,_ynsteps,_dincreX=10.0,_dincreY=10.0,name="Default"
     #run the simulation
     #---------------------------------------------------------------------
 	proj.Run_Simulation(parameters)
-	proj.SaveProject()		
+	proj.SaveSystem()		
 	proj.FinishRun()
 #=====================================================
 def QCMMScan2DsimpleDistance(_xnsteps,_ynsteps,_dincrex,_dincrey,name="Default"):
 	#---------------------------------------------
 	#If the pkl with the Pruned QCsystem does not exist, generate it
-	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
-		QCMMoptimizations()
+	if not os.path.exists( os.path.join(scratch_path,"QCMMopts","7tim.pkl") ):
+		QCMM_optimizations()
 	_scanFolder = "QCMM_Scan2D_simple_distance"
 	if not name == "Default": _scanFolder = name
-	proj=SimulationProject( os.path.join(scratch_path,_scanFolder) )		
-	proj.LoadSystemFromSavedProject( os.path.join(scratch_path,"QCMMopts.pkl") )
-	#----------------------------------------
+	proj=SimulationProject.From_PKL( os.path.join(scratch_path,"QCMMopts","7tim.pkl"), os.path.join(scratch_path,_scanFolder) )		
+
 	#Set atoms for th reaction coordinates
 	atom1  = AtomSelection.FromAtomPattern(proj.system,"*:LIG.*:C02")
 	atom2  = AtomSelection.FromAtomPattern(proj.system,"*:LIG.*:H02")
@@ -444,18 +447,19 @@ def QCMMScan2DsimpleDistance(_xnsteps,_ynsteps,_dincrex,_dincrey,name="Default")
 				   "log_frequency":100    ,
 				   "simulation_type":"Relaxed_Surface_Scan",				 
 				   "NmaxThreads":        4}
-	proj.Run_Simulation(parameters)		
+	proj.Run_Simulation(parameters)	
+	proj.SaveSystem()	
 	proj.FinishRun()	
 #=====================================================
 def QCMMScan2DmixedDistance(_xnsteps,_ynsteps,_dincrex,_dincrey,name="Default"):
 	#-------------------------------------------------
 	#If the pkl with the Pruned QCsystem does not exist, generate it
-	if not os.path.exists( os.path.join(scratch_path, "QCMMopts.pkl") ): 
-		QCMMoptimizations()
+	if not os.path.exists( os.path.join(scratch_path, "QCMMopts","7tim.pkl") ): 
+		QCMM_optimizations()
 	_scanFolder = "QCMM_Scan2D_mixed_distance"
 	if not name == "Default": _scanFolder = name
-	proj=SimulationProject( os.path.join(scratch_path, _scanFolder ) )	
-	proj.LoadSystemFromSavedProject( os.path.join(scratch_path,"QCMMopts.pkl") )
+	proj=SimulationProject.From_PKL( os.path.join(scratch_path,"QCMMopts","7tim.pkl"), os.path.join(scratch_path,_scanFolder) )		
+
 	#--------------------------------------------------
 	#set atoms for reaction coordinates
 	atom1  = AtomSelection.FromAtomPattern(proj.system,"*:LIG.*:C02")
@@ -481,17 +485,18 @@ def QCMMScan2DmixedDistance(_xnsteps,_ynsteps,_dincrex,_dincrey,name="Default"):
 				   "simulation_type":"Relaxed_Surface_Scan",
 				   "NmaxThreads":4        }
 	#--------------------------------------------------
-	proj.Run_Simulation(parameters)		
+	proj.Run_Simulation(parameters)	
+	proj.SaveSystem()	
 	proj.FinishRun()
 #=====================================================
 def QCMMScan2DmultipleDistance(_xnsteps,_ynsteps,_dincrex,_dincrey,name="Default"):
 	#-------------------------------------------------
-	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
+	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl","7tim.pkl") ):
 		QCMMoptimizations()
 	_scanFolder = "QCMM_Scan2D_multiple_distance"
 	if not name == "Default": _scanFolder = name
-	proj=SimulationProject( os.path.join(scratch_path,_scanFolder) )
-	proj.LoadSystemFromSavedProject( os.path.join(scratch_path,"QCMMopts.pkl") )
+	proj=SimulationProject.From_PKL( os.path.join(scratch_path,"QCMMopts","7tim.pkl"), os.path.join(scratch_path,_scanFolder) )		
+
 	#--------------------------------------------------
 	atom1 = AtomSelection.FromAtomPattern(proj.system,"*:LIG.*:C02")
 	atom2 = AtomSelection.FromAtomPattern(proj.system,"*:LIG.*:H02")
@@ -519,15 +524,16 @@ def QCMMScan2DmultipleDistance(_xnsteps,_ynsteps,_dincrex,_dincrey,name="Default
 				   "simulation_type":"Relaxed_Surface_Scan",
 				   "NmaxThreads":        4}
 				 
-	proj.Run_Simulation(parameters)		
+	proj.Run_Simulation(parameters)	
+	proj.SaveSystem()
 	proj.FinishRun()	
 #=====================================================
 def QCMMScans2D_Adaptative(_xnsteps,_ynsteps,_dincrex,_dincrey):
 	#-------------------------------------------------
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
 		QCMMoptimizations()
-	proj=SimulationProject( os.path.join(scratch_path,"QCMM_Scan2D_adaptative")	)	
-	proj.LoadSystemFromSavedProject( os.path.join(scratch_path,"QCMMopts.pkl") )
+	proj=SimulationProject.From_PKL( os.path.join(scratch_path,"QCMMopts","7tim.pkl"), os.path.join(scratch_path,"Scan_adaptative") )		
+
 	#--------------------------------------------------
 	atom1 = AtomSelection.FromAtomPattern(proj.system,"*:LIG.*:C02")
 	atom2 = AtomSelection.FromAtomPattern(proj.system,"*:LIG.*:H02")
@@ -553,15 +559,17 @@ def QCMMScans2D_Adaptative(_xnsteps,_ynsteps,_dincrex,_dincrey):
 				   "log_frequency":100    ,
 				   "simulation_type":"Relaxed_Surface_Scan",
 				   "adaptative": True     }
-	proj.Run_Simulation(parameters)		
+	proj.Run_Simulation(parameters)	
+	proj.SaveSystem()
 	proj.FinishRun()	
 #=====================================================
 def FreeEnergy1DSimpleDistance(nsteps):
 	#-------------------------------------------------
-	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
+	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl","7tim.pkl") ):
 		QCMM_optimizations()
-	proj=SimulationProject( os.path.join(scratch_path,"FE_simple_distance") )		
-	proj.LoadSystemFromSavedProject( os.path.join(scratch_path,"QCMMopts.pkl") )
+
+	proj=SimulationProject.From_PKL(os.path.join(scratch_path,"QCMMopts","7tim.pkl"), _FolderProject=os.path.join(scratch_path,"FE_simple_distance") )		
+	
 	#-------------------------------------------------
 	_name = "SCAN1D_4FEcalculations_simple_distance"
 	_path = os.path.join( os.path.join(scratch_path,_name,"ScanTraj.ptGeo") )
@@ -600,12 +608,18 @@ def FreeEnergy1DSimpleDistance(nsteps):
 				   		"temperature":300.15}
 	#RUN WHAM, calculate PMF and free energy
 	proj.Run_Simulation(PMF_parameters)
+	proj.SaveSystem()
+	proj.FinishRun()
 #=====================================================
-def FreeEnergy1DSimpleDistanceOPT(nsteps):	
-	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
+def FreeEnergy1DSimpleDistanceOPT(nsteps):
+	'''
+
+	'''	
+	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl","7tim.pkl") ):
 		QCMM_optimizations()
-	proj=SimulationProject( os.path.join(scratch_path,"FE_simple_distance_OPT") )		
-	proj.LoadSystemFromSavedProject( os.path.join(scratch_path,"QCMMopts.pkl") )
+
+	proj=SimulationProject.From_PKL(os.path.join(scratch_path,"QCMMopts","7tim.pkl"), _FolderProject=os.path.join(scratch_path,"FE_simple_distance") )		
+
 	#-------------------------------------------------
 	_name = "SCAN1D_4FEcalculations_simple_distance"
 	_path = os.path.join( os.path.join(scratch_path,_name,"ScanTraj.ptGeo") )
@@ -642,14 +656,15 @@ def FreeEnergy1DSimpleDistanceOPT(nsteps):
 				   		"simulation_type":"PMF_Analysis",
 				   		"temperature":300.15}
 	proj.Run_Simulation(PMF_parameters)
+	proj.SaveSystem()
+	proj.FinishRun()
 #=================================================================
 def FreeEnergy1DMultipleDistance(nsteps):
 	#-----------------------------------------------------------
-	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
+	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl","7tim.pkl") ):
 		QCMM_optimizations()
 	#-----------------------------------------------------------
-	proj=SimulationProject( os.path.join(scratch_path,"FE_multiple_distance") )	
-	proj.LoadSystemFromSavedProject( os.path.join(scratch_path,"QCMMopts.pkl") )
+	proj=SimulationProject.From_PKL(os.path.join(scratch_path,"QCMMopts","7tim.pkl"), _FolderProject=os.path.join(scratch_path,"FE_multiple_distance") )	
 	#-------------------------------------------------
 	_name = "SCAN1D_4FEcalculations_multiple_distance"
 	_path = os.path.join( os.path.join(scratch_path,_name,"ScanTraj.ptGeo" ) )
@@ -690,15 +705,16 @@ def FreeEnergy1DMultipleDistance(nsteps):
 	#-------------------------------------------------
 	#Run umbrella sampling 
 	proj.Run_Simulation(PMF_parameters)
+	proj.SaveSystem()
 	proj.FinishRun()
 #=====================================================
 def UmbrellaSampling1Drestart(nsteps):
 	#-----------------------------------------------------------
-	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
+	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl","7tim.pkl") ):
 		QCMM_optimizations()
 	#-----------------------------------------------------------
-	proj=SimulationProject( os.path.join(scratch_path,"UmbrellaSampling_Restart") )	
-	proj.LoadSystemFromSavedProject( os.path.join(scratch_path,"QCMMopts.pkl") )	
+	proj=SimulationProject.From_PKL(os.path.join(scratch_path,"QCMMopts","7tim.pkl"), _FolderProject=os.path.join(scratch_path,"Umbrella_Sampling_restart") )	
+
 	atom1 = AtomSelection.FromAtomPattern(projsystem,"*:LIG.*:C02")
 	atom2 = AtomSelection.FromAtomPattern(projsystem,"*:LIG.*:H02")
 	atom3 = AtomSelection.FromAtomPattern(projsystem,"*:GLU.164:OE2")
@@ -754,13 +770,16 @@ def UmbrellaSampling1Drestart(nsteps):
 	proj.Run_Simulation(USparameters)
 	_PMFparameters["xwindows"]=10
 	proj.Run_Simulation(_PMFparameters)
+	proj.SaveSystem()
 	proj.FinishRun()
 #=====================================================
 def FreeEnergy2DsimpleDistance(nsteps):
 	proj=SimulationProject( os.path.join(scratch_path,"FE_2D_simple_distance") )
-	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
-		QCMM_optimizations()		
-	proj.LoadSystemFromSavedProject( os.path.join(scratch_path,"QCMMopts.pkl") )
+	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl","7tim.pkl") ):
+		QCMM_optimizations()
+
+	proj=SimulationProject.From_PKL(os.path.join(scratch_path,"QCMMopts","7tim.pkl"), _FolderProject=os.path.join(scratch_path,"FE_2D_multiple_distance_restart") )	
+	
 	#-------------------------------------------------------------------
 	atom1 = AtomSelection.FromAtomPattern(projsystem,"*:LIG.*:C02")
 	atom2 = AtomSelection.FromAtomPattern(projsystem,"*:LIG.*:H02")
@@ -810,10 +829,10 @@ def FreeEnergy2DsimpleDistance(nsteps):
 	proj.FinishRun()
 #=====================================================
 def FreeEnergy2DmixedDistance(nsteps):
-	proj=SimulationProject( os.path.join(scratch_path,"FE_2D_mixed_distance") )	
-	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
+	
+	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl","7tim.pkl") ):
 		QCMM_optimizations()
-	proj.LoadSystemFromSavedProject( os.path.join(scratch_path,"QCMMopts.pkl") )
+	proj = SimulationProject.From_PKL( os.path.join(scratch_path,"QCMMopts.pkl","7tim.pkl"),_FolderName="FE_2D_mixed_distance" )
 	
 	atom1 = AtomSelection.FromAtomPattern(projsystem,"*:LIG.*:C02")
 	atom2 = AtomSelection.FromAtomPattern(projsystem,"*:LIG.*:H02")
@@ -865,10 +884,12 @@ def FreeEnergy2DmixedDistance(nsteps):
 	proj.FinishRun()
 #=====================================================
 def FreeEnergy2DmultipleDistance(nsteps):
-	proj=SimulationProject( os.path.join(scratch_path,"FE_2D_multiple_distance") )	
-	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
+
+	
+	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl","7tim.pkl") ):
 		QCMM_optimizations()
-	proj.LoadSystemFromSavedProject( os.path.join(scratch_path,"QCMMopts.pkl") )
+	proj = SimulationProject.From_PKL( os.path.join(scratch_path,"QCMMopts.pkl","7tim.pkl"),_FolderName="FE2D_multiple_distance" )
+
 	atom1 = AtomSelection.FromAtomPattern(projsystem,"*:LIG.*:C02")
 	atom2 = AtomSelection.FromAtomPattern(projsystem,"*:LIG.*:H02")
 	atom3 = AtomSelection.FromAtomPattern(projsystem,"*:GLU.164:OE2")	
@@ -903,7 +924,7 @@ def FreeEnergy2DmultipleDistance(nsteps):
 	
 	proj.Run_Simulation(USparameters)
 
-	_path = os.path.join( scratch_path, "FE_2D_multiple_distance")	
+	_path = os.path.join( scratch_path, "FE2D_multiple_distance")	
 	PMFparameters = { "source_folder":_path ,
 				   "xnbins":12           ,
 				   "ynbins":12           ,
@@ -915,11 +936,11 @@ def FreeEnergy2DmultipleDistance(nsteps):
 				   "temperature":300.15	 }
 	#RUN WHAM, calculate PMF and free energy
 	proj.Run_Simulation(PMFparameters)
+	proj.SaveSystem()
 	proj.FinishRun()
 #=====================================================
 def FreeEnergyDihedral1D(nsteps):
-	proj=SimulationProject( os.path.join(scratch_path,"FE_dihedral_1D") )		
-	proj.LoadSystemFromSavedProject( balapkl )	
+	proj=SimulationProject.From_PKL(balapkl, os.path.join(scratch_path,"FE_dihedral_1D") )		
 	#-------------------------------------------------
 	_name = "SCAN1D_4FEcalculations_dihedral"
 	_path = os.path.join( os.path.join(scratch_path,_name,"ScanTraj.ptGeo") )
@@ -959,8 +980,9 @@ def FreeEnergyDihedral1D(nsteps):
 	proj.Run_Simulation(parameters)
 #=====================================================
 def FreeEnergyDihedral2D(nsteps):
-	proj=SimulationProject( os.path.join(scratch_path,"FE_2D_dihedral") )		
-	proj.LoadSystemFromSavedProject( balapkl )
+	'''
+	'''
+	proj=SimulationProject.From_PKL( balapkl, _FolderPath=os.path.join(scratch_path,"FE_2D_dihedral") )		
 	
 	atomsf = [ 4, 6,  8, 14 ] 
 	atomss = [ 6, 8, 14, 16 ]
@@ -1009,7 +1031,7 @@ def FreeEnergyDihedral2D(nsteps):
 def EnergyAnalysisPlots():
 	#---------------------------------------------------------------------------------
 	#LOAD system
-	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
+	if not os.path.exists( os.path.join(scratch_path,"QCMMopts","7tim.pkl") ):
 		QCMM_optimizations()
 	proj=SimulationProject( os.path.join(scratch_path,"Energy Plots") )		
 	proj.LoadSystemFromSavedProject( os.path.join(scratch_path,"QCMMopts.pkl") )
