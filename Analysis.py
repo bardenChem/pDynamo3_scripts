@@ -17,6 +17,13 @@ import numpy as np
 #-------------------------------------------------------------
 from EnergyAnalysis     	import EnergyAnalysis
 from TrajectoryAnalysis 	import TrajectoryAnalysis
+from PotentialOfMeanForce   import PMF
+from pBabel                    	import *                                     
+from pCore                     	import *                                     
+from pMolecule                 	import *            
+from pScientific               	import *                 
+         
+from pSimulation               	import *
 #-------------------------------------------------------------
 #=======================================================================
 class Analysis:
@@ -27,15 +34,16 @@ class Analysis:
 		Default Constructor
 		'''
 		self.parameters = _parameters
+		self.molecule   = _parameters["active_system"]
 
-
+	#=========================================================================
 	def Execute(self):
 		'''
 		'''
 		Type = self.parameters["analysis_type"]
 		if   Type == "Trajectory_Analysis": self.TrajectoryPlots() 		
 		elif Type == "Energy_Plots":		self.EnergyPlots()
-		elif Type == "PMF":                 self.PMF()
+		elif Type == "PMF":                 self.PMFAnalysis()
 
 	#=========================================================================	
 	def TrajectoryPlots(self) :
@@ -167,3 +175,5 @@ class Analysis:
 			if OneDimPlot: EAfe.Plot1D_FreeEnergy(crd1_label,crd2_label,show)
 			else 		 : EAfe.Plot2D(cnt_lines,crd1_label,crd2_label,xlims,ylims,show)
 		elif nDims == 1: EAfe.Plot1D(crd1_label,XLIM=xlims,SHOW=show)
+
+#==================================================================================

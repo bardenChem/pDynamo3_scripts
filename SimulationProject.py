@@ -13,6 +13,7 @@ import os, glob, sys
 #Loading own libraries
 from commonFunctions import *
 from Simulation import Simulation
+from Analysis import *
 #--------------------------------------------------------------
 #loading pDynamo Libraries
 from pBabel                    import *                                     
@@ -252,6 +253,10 @@ class SimulationProject:
         Parameters:
             _parameters: Dict with all possible parameters for analysis of the given simulation 
         '''
+        _parameters["active_system"] = self.system
+        if not "folder" in _parameters:_parameters["folder"] = self.folderName        
+        process = Analysis(_parameters)
+        process.Execute()
         pass 
     #========================================================================================
     def PrintSystems(self):
