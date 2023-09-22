@@ -35,6 +35,7 @@ class Analysis:
 		'''
 		self.parameters = _parameters
 		self.molecule   = _parameters["active_system"]
+		self.baseFolder = _parameters["folder"]
 
 	#=========================================================================
 	def Execute(self):

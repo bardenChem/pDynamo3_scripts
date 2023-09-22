@@ -80,10 +80,10 @@ class US:
         '''
         Set new values for default parameters
         '''
-        if "NmaxThreads"        in _parameters: self.nprocs                      = _parameters["NmaxThreads"]
-        if "save_format"        in _parameters: self.saveFormat                  = _parameters["save_format"]
-        if "force_constant_1"   in _parameters: self.forceC[0]                   = _parameters["force_constant_1"]
-        if "force_constant_2"   in _parameters: self.forceC[1]                   = _parameters["force_constant_2"]
+        if "NmaxThreads"        in _parameters: self.nprocs     = _parameters["NmaxThreads"]
+        if "save_format"        in _parameters: self.saveFormat = _parameters["save_format"]
+        if "force_constant_1"   in _parameters: self.forceC[0]  = _parameters["force_constant_1"]
+        if "force_constant_2"   in _parameters: self.forceC[1]  = _parameters["force_constant_2"]
         #parameters for MD
         if "temperature"        in _parameters: self.mdParameters["temperature"]      = _parameters["temperature"]
         if "timeStep"           in _parameters: self.mdParameters["timeStep"]         = _parameters["timeStep"]
