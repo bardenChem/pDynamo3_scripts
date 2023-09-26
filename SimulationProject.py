@@ -14,6 +14,7 @@ import os, glob, sys
 from commonFunctions import *
 from Simulation import Simulation
 from Analysis import *
+from QuantumMethods import *
 #--------------------------------------------------------------
 #loading pDynamo Libraries
 from pBabel                    import *                                     
@@ -190,6 +191,18 @@ class SimulationProject:
         self.systems[newLabel].DefineNBModel( self.NBmodel )
         self.system = self.systems[newLabel]
         if self.DEBUG: self.Energy
+    
+    #=========================================================================
+    def Set_QC_Method(self,_parameters):
+        '''
+        '''        
+        qs =  QuantumMethods.From_Parameters(_parameters)
+        if self.DEBUG: qs.Export_QC_System()
+        newLabel = "QC_system_"
+        if "Hamiltonian" in _parameters: newLabel += _parameters["Hamiltonian"] 
+        if "functional" in _parameters: newLabel  += _parameters["functional"] 
+        self.systems[newLabel]                     = qs.system
+        self.system                                = self.systems[newLabel]
     #=========================================================================
     def Set_QCMM_SMO(self,_parameters):
         '''
@@ -282,8 +295,12 @@ class SimulationProject:
         the systems and trajectories worked in this simulations
         Though, in the current state only will save the current system to a pkl file
         '''
-        Pickle( os.path.join(self.folderName,self.baseName+".pkl"),self.system )
-        ExportSystem( os.path.join(self.folderName,self.baseName+".pdb"),self.system )
+        savePathPkl = os.path.join(self.folderName,self.baseName+".pkl")
+        savePathPdb = os.path.join(self.folderName,self.baseName+".pdb")
+
+        for key in self.systems:
+            savePathPkl = os.path.join(savePathPkl, self.baseName+"_"+key+".pkl")
+            Pickle( savePathPkl, self.systems[key] )        
     #.-------------------------------------------------------------------------
     def SaveSystem(self):
         '''

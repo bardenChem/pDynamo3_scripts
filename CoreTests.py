@@ -24,6 +24,7 @@ from SimulationProject	import *
 from ReactionCoordinate import *
 from TrajectoryAnalysis import *
 from MopacQCMMinput 	import *
+from QuantumMethods		import *
 #from WriteQMLog   		import * 
 #-------------------------------------------------------------------
 #path for the required files on the examples folder of EasyHynrid 3.0
@@ -110,7 +111,7 @@ def MMMD_Heating():
 	proj.Run_Simulation(parameters)
 	proj.FinishRun()			
 #=====================================================
-def QCMM_Energies():
+def QCMM_SMO_Energies():
 	#-----------------------------------------------
 	#If the pkl with the Pruned MM system does not exist, generate it
 	if not os.path.exists( os.path.join(scratch_path,"7tim.pkl") ):
@@ -118,22 +119,29 @@ def QCMM_Energies():
 	#------------------------------------------------
 	proj= SimulationProject.From_PKL( os.path.join(scratch_path, "7tim.pkl"),
 									_FolderName=os.path.join(scratch_path,"SMO_energies") )
+	
+	#-------------------------------------------------
 	#Defining QC region
 	lig = AtomSelection.FromAtomPattern(proj.system,"*:LIG.248:*")
 	glu = AtomSelection.FromAtomPattern(proj.system,"*:GLU.164:*")
 	his = AtomSelection.FromAtomPattern(proj.system,"*:HIE.94:*")
 	selections= [ lig, glu, his ]
-	print(selections)
-	#-----------------------------
-	#List of internal Hamiltonians provided by pDynamo with parameters for all atoms
+	#-------------------------------------------------
+	_parameters = { "active_system":proj.system,
+					"region":selections        , 
+					"method_class":"SMO"       ,
+					"Hamiltonian":"am1"        ,
+					"multiplicity":1           ,
+					"QCcharge":1               }					
+	#-------------------------------------------------
+	#List of internal Hamiltonians provided by pDynamo
 	SMOmodels = ["am1","am1dphot","pddgpm3","pm3","rm1","pm6"]	
-	#-----------------------------
+	#-------------------------------------------------
 	#saving qc/mm setup
-	_parameters = {"region":selections,"multiplicity":1,"QCcharge":1}
 	for smo in SMOmodels:
 		_parameters["Hamiltonian"] = smo
-		proj.Set_QCMM_SMO(_parameters)
-		
+		#proj.system  = QuantumMethods_UnitTest(_parameters)
+		proj.Set_QC_Method(_parameters)
 	#saving qc/mm setup
 	proj.SaveSystem()
 	proj.FinishRun()
@@ -1447,7 +1455,7 @@ if __name__ == "__main__":
 	elif int(sys.argv[1]) == 0:	 SetMMsytem()
 	elif int(sys.argv[1]) == 1:  MMMD_Algorithms()
 	elif int(sys.argv[1]) == 2:	 MMMD_Heating()
-	elif int(sys.argv[1]) == 3:	 QCMM_Energies()
+	elif int(sys.argv[1]) == 3:	 QCMM_SMO_Energies()
 	elif int(sys.argv[1]) == 4:  QCMM_DFTBplus()	
 	elif int(sys.argv[1]) == 5:  QCMM_Orca()
 	elif int(sys.argv[1]) == 6:  QCMM_optimizations()

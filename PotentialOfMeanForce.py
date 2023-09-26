@@ -35,11 +35,9 @@ class PMF:
 		Class constructor
 		'''
 		self.molecule 	= _system
-		self.baseName	= _name
-		
+		self.baseName	= _name		
 		self.srcFolder	= _sourceFolder
-		self.fileNames	= []
-		
+		self.fileNames	= []		
 		self.text		= ""
 		self.LOG		= open( os.path.join(self.baseName,"FreeEnergy.log") ,"w" ) # free energy log
 		
