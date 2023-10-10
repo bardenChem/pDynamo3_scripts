@@ -80,7 +80,7 @@ class EnergyRefinement:
 		'''
 		qc_charge=0.0
 		mmCharges = _system.mmState.charges
-		for i in range(len(mmCharges)): qc_charge += mmCharges[i]			
+		for i in range( len(mmCharges) ): qc_charge += mmCharges[i]			
 		return( round(qc_charge) )
 	#=====================================================================================
 	def ChangeQCRegion(self,_centerAtom,_radius,_crd3=None):
@@ -90,6 +90,7 @@ class EnergyRefinement:
 			_centerAtom:
 			_radius    :
 		'''
+		qcModel = None
 		if type(_centerAtom) == list:  
 			atom_list = [] 		
 			for i in self.molecule.atoms.items:
@@ -108,15 +109,6 @@ class EnergyRefinement:
 			newSystem    	 = PruneByAtom(self.molecule, Selection(newSelection) )		
 			self.charge  	 = self.GetQCCharge(newSystem)
 			self.pureQCAtoms = list(newSelection)	
-			qcModel          = None
-			if self.molecule.qcModel == None:
-				qcModel = QCModelMNDO.WithOptions( hamiltonian = "am1" )
-			else: qcModel = self.molecule.qcModel
-			#-------------------------------------------------------------------------------
-			self.molecule.electronicState = ElectronicState.WithOptions( charge = self.charge, multiplicity = self.multiplicity )
-			self.molecule.DefineQCModel(qcModel, qcSelection=Selection(self.pureQCAtoms) )
-			self.molecule.Summary()			
-
 		#-------------------------------------------------------------------
 		else:
 			sel              = Selection.FromIterable([_centerAtom])
@@ -125,15 +117,14 @@ class EnergyRefinement:
 			newSystem    	 = PruneByAtom(self.molecule, Selection(newSelection) )		
 			self.charge  	 = self.GetQCCharge(newSystem)
 			self.pureQCAtoms = list(newSelection)	
-			qcModel          = None
-			if self.molecule.qcModel == None:
-				qcModel = QCModelMNDO.WithOptions( hamiltonian = "am1" )
-			else: qcModel = self.molecule.qcModel
+
+		if self.molecule.qcModel == None: qcModel = QCModelMNDO.WithOptions( hamiltonian = "am1" )
+		else: qcModel = self.molecule.qcModel
 			#-------------------------------------------------------------------------------
-			self.molecule.electronicState = ElectronicState.WithOptions( charge = self.charge, multiplicity = self.multiplicity )
-			self.molecule.DefineQCModel(qcModel, qcSelection=Selection(self.pureQCAtoms) )
-			self.molecule.Summary()		
-        	#---------------------------------------------------
+		self.molecule.electronicState = ElectronicState.WithOptions( charge = self.charge, multiplicity = self.multiplicity )
+		self.molecule.DefineQCModel(qcModel, qcSelection=Selection(self.pureQCAtoms) )
+		self.molecule.Summary()		
+        #---------------------------------------------------
         
 	#=====================================================================================
 	def RunInternalSMO(self,_methods,_NmaxThreads):
@@ -145,27 +136,28 @@ class EnergyRefinement:
 		'''
 		self.SMOenergies = {}
 		self.methods 	 = _methods
-		NBmodel 	 	 = self.molecule.nbModel
-		converger = DIISSCFConverger.WithOptions( energyTolerance   = 1.0e-4,
-                                                  densityTolerance  = 1.0e-6,
-                                                  maximumIterations = 500   )
+
+		_qc_parameters = {  "active_system":proj.system,
+							"region":self.pureQCAtoms  , 
+							"method_class":"SMO"       ,
+							"Hamiltonian":"am1"        ,
+							"multiplicity":1           ,
+							"QCcharge":1               }	
 		#--------------------------------------------------------------------
 		for smo in _methods:
 			if VerifyMNDOKey(smo):
 				with pymp.Parallel(_NmaxThreads) as p:
 					for i in p.range( len(self.fileLists) ):
-						qcModel = QCModelMNDO.WithOptions( hamiltonian = smo,converger=converger )
-						self.molecule.electronicState = ElectronicState.WithOptions( charge = self.charge, multiplicity = self.multiplicity )
-						self.molecule.DefineQCModel( qcModel, qcSelection=Selection(self.pureQCAtoms) )
-						self.molecule.DefineNBModel( NBmodel )
-						self.molecule.coordinates3 = ImportCoordinates3( self.fileLists[i],log=None )
+						_qc_parameters["Hamiltonian"] = smo
+						qcSystem = QuantumMethods.From_Parameters(_qc_parameters)
+						qcSystem.system.coordinates3 = ImportCoordinates3( self.fileLists[i],log=None )
 						lsFrames= GetFrameIndex(self.fileLists[i][:-4])						
 						if self.ylen > 0:
-							self.energiesArray[ lsFrames[1], lsFrames[0] ] = self.molecule.Energy(log=None)
+							self.energiesArray[ lsFrames[1], lsFrames[0] ] = qcSystem.system.Energy(log=None)
 							self.indexArrayX[ lsFrames[1], lsFrames[0] ] = lsFrames[0]
 							self.indexArrayY[ lsFrames[1], lsFrames[0] ] = lsFrames[1]
 						else:
-							self.energiesArray[ lsFrames[0] ] = self.molecule.Energy(log=None)
+							self.energiesArray[ lsFrames[0] ] = qcSystem.system.Energy(log=None)
 							self.indexArrayX[ lsFrames[0] ] = lsFrames[0]	
 				#-----------------------------------------
 				if self.ylen > 0:

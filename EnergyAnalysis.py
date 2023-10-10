@@ -54,11 +54,14 @@ class EnergyAnalysis:
 		self.labely         = ""                              # String holding the name of Y axis  
 		self.baseName 		= ""							  # string holding the path of the folder
 		self.identifiers    = []                              # List of string identifiers 
-		
+		self.fig_size_x     = 0 
+		self.fig_size_y     = 0 
 		if self.ylen > 0:
 			self.dimensions = 2
 		else:
 			self.dimensions = 1
+
+		
 	#================================================
 	def ReadLog(self, _fileName):
 		'''
@@ -246,6 +249,8 @@ class EnergyAnalysis:
 		
 		#--------------------------------------------
 		plt.plot(self.RC1,self.energies1D,'-ok')
+		if self.fig_size_x > 0:
+			plt.set_size_inches(self.fig_size_x,self.fig_size_y)
 		plt.xlabel(label)
 		plt.ylabel(self.labely)		
 		#--------------------------------------------

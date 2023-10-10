@@ -196,9 +196,11 @@ class SimulationProject:
     def Set_QC_Method(self,_parameters):
         '''
         '''        
+        _parameters["active_system"] = self.system 
         qs =  QuantumMethods.From_Parameters(_parameters)
         if self.DEBUG: qs.Export_QC_System()
         newLabel = "QC_system_"
+        print(_parameters)
         if "Hamiltonian" in _parameters: newLabel += _parameters["Hamiltonian"] 
         if "functional" in _parameters: newLabel  += _parameters["functional"] 
         self.systems[newLabel]                     = qs.system

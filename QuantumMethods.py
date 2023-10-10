@@ -78,9 +78,9 @@ class QuantumMethods:
 		#...................................
 		elif self.methodClass == "ORCA":
 			options =  "\n% output\n"
-        	options += "print [ p_mos ] 1\n"
-        	options += "print [ p_overlap ] 5\n"
-        	options += "end # output"
+			options += "print [ p_mos ] 1\n"
+			options += "print [ p_overlap ] 5\n"
+			options += "end # output"
 			self.qcModel = QCModelORCA.WithOptions( keywords = [ _parameters["functional"],_parameters["basis"],options  ], 
                                             deleteJobFiles  = False                      							  ,
                                             scratch         =_parameters["scratch"]                                   )
@@ -101,7 +101,7 @@ class QuantumMethods:
 		else: self.system.DefineQCModel(self.qcModel)
 		self.system.DefineNBModel( NBmodel )
         #------------------------------------------------------------------------
-		energy = self.system.Energy()
+		#energy = self.system.Energy()
 		return(self)
         
 	#-----------------------------------------

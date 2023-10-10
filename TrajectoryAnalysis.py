@@ -60,7 +60,7 @@ class TrajectoryAnalysis:
 		Get Radius of Gyration and Root Mean Square distance for the trajectory
 		'''
 		masses  = Array.FromIterable ( [ atom.mass for atom in self.molecule.atoms ] )
-		crd3    = Unpickle(os.path.join(self.trajFolder,"frame0.pkl"))
+		crd3    = Unpickle(os.path.join(self.trajFolder,"frame0.pkl"))[0]
 		system  = None 
 		rg0     = None
 		try:
@@ -133,28 +133,30 @@ class TrajectoryAnalysis:
 		kde.fit(self.distances2[:,None])
 		density_rc2 = np.exp(kde.score_samples(self.distances2[:,None]))
 		self.rc2_MF = max(density_rc2)
-		kde.fit(self.RMS[:,None])
-		density_rms = np.exp(kde.score_samples(self.RMS[:,None]))
-		self.rms_MF = max(density_rms[:,None])
-		kde.fit(self.RG[:,None])
-		density_rg  = np.exp(kde.score_samples(self.RG[:,None]))
-		self.rg_MF  = max(density_rg[:,None])
+		try:
+			kde.fit(self.RMS[:,None])
+			density_rms = np.exp(kde.score_samples(self.RMS[:,None]))
+			self.rms_MF = max(density_rms[:,None])
+			kde.fit(self.RG[:,None])
+			density_rg  = np.exp(kde.score_samples(self.RG[:,None]))
+			self.rg_MF  = max(density_rg[:,None])
 		
 		#------------------------------------------------------------------------------
-		distold = abs(density_rms[0] - self.rms_MF)
-		distnew = 0.0
-		fn      = 0 
-		for i in range( len(density_rms) ):
-			distnew = abs(density_rms[i] - self.rms_MF)
-			if distnew < distold:
-				distold = distnew
-				fn = i
+			distold = abs(density_rms[0] - self.rms_MF)
+			distnew = 0.0
+			fn      = 0 
+			for i in range( len(density_rms) ):
+				distnew = abs(density_rms[i] - self.rms_MF)
+				if distnew < distold:
+					distold = distnew
+					fn = i
 		#------------------------------------------------		
-		self.molecule.coordinates3 = ImportCoordinates3( os.path.join(self.trajFolder,"frame{}.pkl".format(fn) ) )
-		ExportSystem( os.path.join( self.trajFolder, "mostFrequentRMS.pdb" ),self.molecule,log=None )
-		ExportSystem( os.path.join( self.trajFolder, "mostFrequentRMS.pkl" ),self.molecule,log=None )
+			self.molecule.coordinates3 = ImportCoordinates3( os.path.join(self.trajFolder,"frame{}.pkl".format(fn) ) )
+			ExportSystem( os.path.join( self.trajFolder, "mostFrequentRMS.pdb" ),self.molecule,log=None )
+			ExportSystem( os.path.join( self.trajFolder, "mostFrequentRMS.pkl" ),self.molecule,log=None )
 		#------------------------------------------------------------------------------
-		input()
+		except:
+			pass
 		if len(self.distances2) > 0:
 			distoldRC1 = abs(density_rc1[0] - self.rc1_MF)
 			distoldRC2 = abs(density_rc2[0] - self.rc2_MF)

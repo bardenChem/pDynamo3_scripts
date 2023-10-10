@@ -151,10 +151,19 @@ def QCMM_DFTBplus():
 	#If the pkl with the Pruned QC system does not exist, generate it
 	if not os.path.exists( os.path.join( scratch_path,"SMO_energies","7tim.pkl")  ):
 		QCMM_Energies()
+	dataskf = "/home/igorchem/programs/pDynamo3-12.04.21/examples/dftbPlus/data/skf"
 	#-----------------------------------------------
-	proj.SimulationProject.From_PKL( os.path.join( scratch_path, "SMO_energies", "7tim.pkl" ), _FolderName=os.path.join( scratch_path, "QCMM_DFTB"))
-	pureQCAtoms = list(proj.system.qcState.pureQCAtoms)		
-	proj.SetDFTBsystem(pureQCAtoms, -3, 1 )
+	proj = SimulationProject.From_PKL( os.path.join( scratch_path, "SMO_energies", "7tim.pkl" ), _FolderName=os.path.join( scratch_path, "QCMM_DFTB"))
+	pureQCAtoms = list(proj.system.qcState.pureQCAtoms)	
+	_parameters = { "active_system":proj.system,
+					"region":pureQCAtoms       , 
+					"method_class":"DFTB"      ,
+					"Hamiltonian":"DFTB"       ,
+					"scratch":scratch_path     , 
+					"skfPath":dataskf          ,
+					"multiplicity":1           ,
+					"QCcharge":1               }
+	proj.Set_QC_Method(_parameters)
 	proj.FinishRun()
 #=====================================================
 def QCMM_Orca():
@@ -165,8 +174,15 @@ def QCMM_Orca():
 	#-----------------------------------------------
 	proj= SimulationProject.From_PKL( os.path.join(scratch_path,"SMO_energies", "7tim.pkl"), os.path.join( scratch_path, "QCMM_ORCA") )
 	pureQCAtoms = list(proj.system.qcState.pureQCAtoms)
-	proj.SetOrcaSystem( "HF","6-31G*",pureQCAtoms,-3, 1 )
-	proj.RunSinglePoint()
+	_parameters = { "active_system":proj.system,
+					"region":pureQCAtoms       , 
+					"method_class":"ORCA"      ,
+					"functional":"HF"          ,
+					"basis":"6-31G*"           ,
+					"scratch":scratch_path     ,
+					"multiplicity":1           ,
+					"QCcharge":1               }
+	proj.Set_QC_Method(_parameters)
 	proj.FinishRun()
 #=====================================================
 def QCMM_optimizations():
@@ -1170,6 +1186,8 @@ def NEB_FreeEnergy():
 
 #================================================================================
 def pDynamoEnergyRef_1D():
+	'''
+	'''
 	proj=SimulationProject( os.path.join(scratch_path, "pDynamoSMO") )
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
 		QCMM_optimizations()		
