@@ -137,12 +137,12 @@ class EnergyRefinement:
 		self.SMOenergies = {}
 		self.methods 	 = _methods
 
-		_qc_parameters = {  "active_system":proj.system,
-							"region":self.pureQCAtoms  , 
-							"method_class":"SMO"       ,
-							"Hamiltonian":"am1"        ,
-							"multiplicity":1           ,
-							"QCcharge":1               }	
+		_qc_parameters = {  "active_system":self.molecule,
+							"region":self.pureQCAtoms    , 
+							"method_class":"SMO"         ,
+							"Hamiltonian":"am1"          ,
+							"multiplicity":1             ,
+							"QCcharge":1                 }	
 		#--------------------------------------------------------------------
 		for smo in _methods:
 			if VerifyMNDOKey(smo):
