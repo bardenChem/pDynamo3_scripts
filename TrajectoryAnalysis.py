@@ -46,6 +46,9 @@ class TrajectoryAnalysis:
 		self.rg_MF      = 0.0
 		self.rms_MF     = 0.0
 		self.energies   = []
+		self.label_RC1  = None 
+		self.label_RC2  = None 
+
 
 		if self.trajFolder[-4:] == ".dcd":			
 			Duplicate(self.trajFolder,self.trajFolder[:-4]+".ptGeo",self.molecule)
@@ -112,10 +115,8 @@ class TrajectoryAnalysis:
 		self.rms_MF = Counter(self.RMS).most_common(1)[0][0]
 		self.rg_MF  = Counter(self.RG).most_common(1)[0][0]
         '''
-		try:
-			from sklearn.neighbors import KernelDensity
-		except:
-			pass
+		try: 	from sklearn.neighbors import KernelDensity
+		except:	pass
 		kde = KernelDensity(bandwidth=1.0, kernel='gaussian')
 		self.distances1 = np.array(self.distances1, dtype=np.float32)
 		self.distances2 = np.array(self.distances2, dtype=np.float32)
@@ -150,8 +151,10 @@ class TrajectoryAnalysis:
 				if distnew < distold:
 					distold = distnew
 					fn = i
-		#------------------------------------------------		
-			self.molecule.coordinates3 = ImportCoordinates3( os.path.join(self.trajFolder,"frame{}.pkl".format(fn) ) )
+		#------------------------------------------------
+			print( os.path.join(self.trajFolder,"frame{}.pkl".format(fn) ) )
+			input()	
+			self.molecule.coordinates3 = ImportSystem( os.path.join(self.trajFolder,"frame{}.pkl".format(fn) ) )
 			ExportSystem( os.path.join( self.trajFolder, "mostFrequentRMS.pdb" ),self.molecule,log=None )
 			ExportSystem( os.path.join( self.trajFolder, "mostFrequentRMS.pkl" ),self.molecule,log=None )
 		#------------------------------------------------------------------------------
@@ -167,8 +170,10 @@ class TrajectoryAnalysis:
 				distnew = abs( abs(density_rc1[i] - self.rc1_MF) -  abs(density_rc2[i] - self.rc2_MF) )
 				if distnew < distold:
 					distold = distnew
-					fn = i			
-			self.molecule.coordinates3 = ImportCoordinates3( os.path.join(self.trajFolder,"frame{}.pkl".format(fn) ) )
+					fn = i		
+			a  = Unpickle( os.path.join(self.trajFolder,"frame{}.pkl".format(fn) ) )
+
+			self.molecule.coordinates3 = a[0]
 			ExportSystem( os.path.join( self.trajFolder,"mostFrequentRC1RC2.pdb"), self.molecule,log=None  )
 			ExportSystem( os.path.join( self.trajFolder,"mostFrequentRC1RC2.pkl"), self.molecule,log=None )
 		
@@ -208,13 +213,17 @@ class TrajectoryAnalysis:
 			pass
 
 	#=========================================================================
-	def DistancePlots(self,RCs,SHOW=False):
+	def DistancePlots(self,RCs,Energy,SHOW=False):
 		'''
 		Calculate distances for the indicated reaction coordinates.
 		'''		
+		label_text = ""
 		if len(RCs) == 2:
+			self.label_RC1 = RCs[0].label2
+			self.label_RC2 = RCs[1].label2
+			label_text = self.label_RC1 +"_"+self.label_RC2
 			while self.trajectory.RestoreOwnerData():
-				self.energies.append( self.molecule.Energy(log=None) )
+				if Energy: self.energies.append( self.molecule.Energy(log=None) )
 				if RCs[0].nAtoms == 3:
 					self.distances1.append( self.molecule.coordinates3.Distance(RCs[0].atoms[0], RCs[0].atoms[1]) - self.molecule.coordinates3.Distance(RCs[0].atoms[1], RCs[0].atoms[2]) )
 				elif RCs[0].nAtoms == 2:
@@ -225,6 +234,8 @@ class TrajectoryAnalysis:
 					self.distances2.append( self.molecule.coordinates3.Distance(RCs[1].atoms[0], RCs[1].atoms[1]) )
  				
 		if len(RCs) == 1:
+			self.label_RC1 = RCs[0].label2
+			label_text = self.label_RC1
 			while self.trajectory.RestoreOwnerData():
 				self.energies.append( self.molecule.Energy(log=None) )
 				if RCs[0].nAtoms == 3:
@@ -232,53 +243,51 @@ class TrajectoryAnalysis:
 				elif RCs[0].nAtoms == 2:
 					self.distances1.append( self.molecule.coordinates3.Distance(RCs[0].atoms[0], RCs[0].atoms[1]) )		
 		#------------------------------------------------------------------------
-		# . Save the results.        
-		textLog = open( self.trajFolder+"_MDdistAnalysis", "w" )         
-		_Text = ""
-		if len(RCs) > 1:
-			_Text = "Frame RC1 RC2 Energy\n"
-			for i in range( len(self.distances1) ):
-				_Text += "{} {} {} {}\n".format(i,self.distances1[i],self.distances2[i],self.energies[i])
-		else:
-			_Text = "Frame RC1 Energy\n"
-			for i in range( len(rc1) ):
-				_Text += "{} {} {}\n".format(i,self.distances1[i],self.energies[i])
+		# . Save the results. 
+		if not os.path.exists( self.trajFolder+"_DA"+label_text ):      
+			textLog = open( self.trajFolder+"_DA"+label_text, "w" )         
+			_Text = ""
+			if len(RCs) > 1:
+				_Text = "Frame {} {} Energy\n".format(self.label_RC1,self.label_RC2)
+				for i in range( len(self.distances1) ):
+					_Text += "{} {} {} {}\n".format(i,self.distances1[i],self.distances2[i],self.energies[i])
+			else:
+				_Text = "Frame {} Energy\n".format(self.label_RC1)
+				for i in range( len(rc1) ):
+					_Text += "{} {} {}\n".format(i,self.distances1[i],self.energies[i])
+			textLog.write(_Text)
+			textLog.close()
 		#-------------------------------------------------------------------------
 		n = np.linspace( 0, self.total_time, len(self.distances1) )
 
-		fig1, (ax1) = plt.subplots(nrows=1)
-		plt.plot(n, self.energies)
-		ax1.set_xlabel("Time (ps)")
-		ax1.set_ylabel("Energy kJ/mol")
-		plt.savefig(self.trajFolder+"_MDenergy.png")
-		if SHOW:
-			plt.show()
+		if Energy:
+			fig1, (ax1) = plt.subplots(nrows=1)
+			plt.plot(n, self.energies)
+			ax1.set_xlabel("Time (ps)")
+			ax1.set_ylabel("Energy kJ/mol")
+			plt.savefig(self.trajFolder+"_MDenergy.png")
+			if SHOW: plt.show()
 		#-------------------------------------------------------------------------
 		fig2, (ax2) = plt.subplots(nrows=1)
-		plt.plot(n, self.distances1,label=RCs[0].label,linestyle="-." )
-		if len(RCs) ==2:
-			plt.plot(n, self.distances2,label=RCs[1].label,linestyle="-.")
+		plt.plot(n, self.distances1,label=self.label_RC1,linestyle="-." )
+		if len(RCs) ==2: plt.plot(n, self.distances2,label=self.label_RC2,linestyle="-.")
+		#--------------------------------------------------------------------------
 		plt.legend()
 		ax2.set_xlabel("Time (ps)")
 		ax2.set_ylabel("Distances $\AA$")			
-		plt.savefig(self.trajFolder+"_MDdistAnalysis.png")
-		if SHOW:
-			plt.show()
+		plt.savefig(self.trajFolder+"_DA_"+label_text+".png")
+		if SHOW: plt.show()
 		#-------------------------------------------------------------------------
 		if len(RCs) == 2:
 			try:
 				import seaborn as sns
-				g=sns.jointplot(x=self.distances1,y=self.distances2,kind="kde",cmap="plasma",shade=True,height=4)
+				g=sns.jointplot(x=self.distances1,y=self.distances2,kind="kde",cmap="plasma",shade=True,height=6)
 				g.set_axis_labels(RCs[0].label,RCs[1].label)
-				plt.savefig( os.path.join( self.trajFolder,"distanceBiplot.png") )
-				if SHOW:
-					plt.show()
+				plt.savefig( os.path.join( self.trajFolder,label_text+"_Biplot.png") )
+				if SHOW: plt.show()
 			except:
 				print("Error in importing seaborn package!\nSkipping biplot distribution plot!")
-				pass
-		
-		textLog.write(_Text)
-		textLog.close()
+				pass		
 	#=========================================================================
 	def Print(self):
 		'''

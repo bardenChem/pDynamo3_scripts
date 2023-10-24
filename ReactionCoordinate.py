@@ -24,7 +24,8 @@ class ReactionCoordinate:
 			Angle
 			Dihedral
 		'''
-		self.atoms	        = _atoms
+		self.atomsSel	    = _atoms
+		self.atoms          = []
 		self.nAtoms 		= len(_atoms)
 		self.massConstraint = _massConstraint
 		self.Type 			= _type
@@ -34,6 +35,10 @@ class ReactionCoordinate:
 		self.increment      = 0.0
 		self.minimumD  		= 0.0
 		self.label 			= "Reaction Coordinate"
+		self.label2         = "ReactionCoordinate"
+
+		for atom in self.atomsSel:
+			self.atoms.append( atom[0] )
 
 		if self.Type == "Distance":
 			if self.nAtoms == 3:
@@ -57,8 +62,9 @@ class ReactionCoordinate:
 				self.label += A2.label + "(" + A2res[0] + A2res[1] + ")--"
 				self.label += A3.label + "(" + A3res[0] + A3res[1] + ") $\AA$"
 			else: 
-				self.label = A1.label + "-" + A2.label +"-"+ A3.label              
-		elif self.Type == "Distance":
+				self.label  = A1.label + "-" + A2.label +"-"+ A3.label
+				self.label2 = A1.label + "-" + A2.label               
+		elif self.Type == "Distance":			
 			A1 = _molecule.atoms.items[ self.atoms[0] ]
 			A2 = _molecule.atoms.items[ self.atoms[1] ]
 			if not sequence == None:
@@ -66,7 +72,12 @@ class ReactionCoordinate:
 				A2res = A2.parent.label.split(".")
 				self.label =  A1.label + "(" + A1res[0] + A1res[1] + ")--"
 				self.label += A2.label + "(" + A2res[0] + A2res[1] + ") $\AA$"	
-			else: self.label = A1.label + "-" + A2.label 	
+				self.label2 =A1.label + "(" + A1res[0] + A1res[1] + ")--"
+				self.label2+=A2.label + "(" + A2res[0] + A2res[1] + ")"
+			else: 
+				self.label  = A1.label + "-" + A2.label			
+				self.label2 = A1.label + "-" + A2.label 
+
 		#.--------------------------
 		elif self.Type == "Dihedral":
 			A1 = _molecule.atoms.items[ self.atoms[0] ]

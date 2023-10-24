@@ -304,18 +304,27 @@ class SimulationProject:
             savePathPkl = os.path.join(savePathPkl, self.baseName+"_"+key+".pkl")
             Pickle( savePathPkl, self.systems[key] )        
     #.-------------------------------------------------------------------------
-    def SaveSystem(self):
+    def SaveSystem( self, _cname=None):
         '''
         '''
-        savePathPkl = os.path.join(self.folderName,self.baseName+".pkl")
-        savePathPdb = os.path.join(self.folderName,self.baseName+".pdb")
-        i = 0;
-        while os.path.exists(savePathPdb):
-            savePathPdb = savePathPdb[:-4] + "_#{}.pdb".format(i)
-            i += 1
-        while os.path.exists(savePathPkl):
-            savePathPkl = savePathPkl[:-4] + "_#{}.pkl".format(i)
-            i += 1
+
+        if _cname:
+            savePathPkl = os.path.join(self.folderName,_cname+".pkl")
+            savePathPdb = os.path.join(self.folderName,_cname+".pdb")
+        else:
+            savePathPkl = os.path.join(self.folderName,self.baseName+".pkl")
+            savePathPdb = os.path.join(self.folderName,self.baseName+".pdb")
+
+            i = 0;
+            while os.path.exists(savePathPdb):
+                i += 1
+                savePathPdb = os.path.join(self.folderName,self.baseName+".pdb")
+                savePathPdb = savePathPdb[:-4] + "_#{}.pdb".format(i)
+            while os.path.exists(savePathPkl):
+                i += 1
+                savePathPkl = os.path.join(self.folderName,self.baseName+".pkl")
+                savePathPkl = savePathPkl[:-4] + "_#{}.pkl".format(i)
+        #----------------------------------------------------------------
         Pickle( savePathPkl,self.system )
         ExportSystem( savePathPdb,self.system )
         
