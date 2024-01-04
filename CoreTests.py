@@ -292,8 +292,7 @@ def TrajectoryAnalysisPlots():
 	# Root mean square and radius of gyration plots 
 	# Distance analysis in restricted molecular dynamics 
 	# Extraction of most representative frame based on the metrics: rmsd, rg and reaction coordinate distances
-	if not os.path.exists( os.path.join(scratch_path,"QCMM_restricted","production_restricted.ptGeo") ):
-		QCMM_MDrestricted()
+	if not os.path.exists( os.path.join(scratch_path,"QCMM_restricted","production_restricted.ptGeo") ): QCMM_MDrestricted()
 
 	proj=SimulationProject.From_PKL( os.path.join(scratch_path,"QCMM_restricted", "7tim.pkl" ),_FolderName="Trajector_Analysis" )		
 
@@ -1230,6 +1229,8 @@ def pDynamoEnergyRef_1D():
 				   "Software":"pDynamo"	}
 
 	proj.Run_Simulation(parameters)	
+	parameters= {"xsize":12,"type":"1D","log_name":os.path.join(scratch_path, "pDynamoSMO","energy.log"),"crd1_label":rc1_md.label,"multiple_plot":"log_names","analysis_type":"Energy_Plots","type":"1DRef"}
+	proj.Run_Analysis(parameters)
 #=====================================================
 def pDynamoEnergyRef_2D():
 	'''

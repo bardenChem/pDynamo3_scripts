@@ -56,9 +56,9 @@ class TrajectoryAnalysis:
 
 		self.trajectory = ImportTrajectory( self.trajFolder , self.molecule )
 		self.trajectory.ReadHeader()
-        	
-	#=================================================
-	def CalculateRG_RMSD(self):
+
+    #=================================================
+	def CalculateRG_RMSD(self,qc_mm=False):
 		'''
 		Get Radius of Gyration and Root Mean Square distance for the trajectory
 		'''
@@ -66,22 +66,31 @@ class TrajectoryAnalysis:
 		crd3    = Unpickle(os.path.join(self.trajFolder,"frame0.pkl"))[0]
 		system  = None 
 		rg0     = None
-		try:
-			system  = AtomSelection.FromAtomPattern ( self.molecule, "*:*:CA" )		#------------------------------------------------------------------------------
-			# . Calculate the radius of gyration.
-			rg0 = crd3.RadiusOfGyration(selection = system, weights = masses)
-		except:
-			system  = AtomSelection.FromAtomPattern ( self.molecule, "*:*:C*" )		#------------------------------------------------------------------------------
-			# . Calculate the radius of gyration.
-			rg0 = crd3.RadiusOfGyration(selection = system, weights = masses)
+		self.molecule.coordinates3 = crd3
+		energy0 = self.molecule.Energy(log=None)
+		if qc_mm:
+				system= Selection( list(self.molecule.qcState.pureQCAtoms) )
+				# . Calculate the radius of gyration.
+				rg0 = crd3.RadiusOfGyration(selection = system, weights = masses)
+		else:
+			try:
+				system  = AtomSelection.FromAtomPattern ( self.molecule, "*:*:CA" )		
+				# . Calculate the radius of gyration.
+				rg0 = crd3.RadiusOfGyration(selection = system, weights = masses)
+			except:
+				system  = AtomSelection.FromAtomPattern ( self.molecule, "*:*:*" )		
+				# . Calculate the radius of gyration.
+				rg0 = crd3.RadiusOfGyration(selection = system, weights = masses)
 		#------------------------------------------------------------------------------
 		# . Save the starting coordinates.
 		reference3 = Clone(crd3)  
 		#------------------------------------------------------------------------------
 		n = []
 		m = 0             
+
 		#-------------------------------------------------------------------------------
 		while self.trajectory.RestoreOwnerData():
+			self.energies.append( self.molecule.Energy(log=None) - energy0 )
 			self.molecule.coordinates3.Superimpose ( reference3, selection = system, weights = masses )
 			self.RG.append  ( self.molecule.coordinates3.RadiusOfGyration( selection = system, weights = masses ) )
 			self.RMS.append ( self.molecule.coordinates3.RootMeanSquareDeviation( reference3, selection = system, weights = masses ) )
@@ -172,10 +181,16 @@ class TrajectoryAnalysis:
 					distold = distnew
 					fn = i		
 			a  = Unpickle( os.path.join(self.trajFolder,"frame{}.pkl".format(fn) ) )
+			b  = Unpickle( os.path.join(self.trajFolder,"frame{}.pkl".format( len(self.distances2)-1 ) ) )
 
 			self.molecule.coordinates3 = a[0]
 			ExportSystem( os.path.join( self.trajFolder,"mostFrequentRC1RC2.pdb"), self.molecule,log=None  )
 			ExportSystem( os.path.join( self.trajFolder,"mostFrequentRC1RC2.pkl"), self.molecule,log=None )
+			self.molecule.coordinates3 = b[0]
+			ExportSystem( os.path.join( self.trajFolder,"last.pdb"), self.molecule,log=None  )
+			ExportSystem( os.path.join( self.trajFolder,"last.pkl"), self.molecule,log=None )
+
+
 		
 	#=================================================
 	def PlotRG_RMS(self,SHOW=False):
@@ -211,9 +226,16 @@ class TrajectoryAnalysis:
 		except:
 			print("Error in importing seaborn package!\nSkipping biplot distribution plot!")
 			pass
+		#---------------------------------------------------------------------------
+		fig1, (ax1) = plt.subplots(nrows=1)
+		plt.plot(n, self.energies)
+		ax1.set_xlabel("Time (ps)")
+		ax1.set_ylabel("Energy kJ/mol")
+		plt.savefig(self.trajFolder+"_MDenergy.png")
+		if SHOW: plt.show()
 
 	#=========================================================================
-	def DistancePlots(self,RCs,Energy,SHOW=False):
+	def DistancePlots(self,RCs,SHOW=False):
 		'''
 		Calculate distances for the indicated reaction coordinates.
 		'''		
@@ -223,7 +245,7 @@ class TrajectoryAnalysis:
 			self.label_RC2 = RCs[1].label2
 			label_text = self.label_RC1 +"_"+self.label_RC2
 			while self.trajectory.RestoreOwnerData():
-				if Energy: self.energies.append( self.molecule.Energy(log=None) )
+				#if Energy:	self.energies.append( self.molecule.Energy(log=None) )
 				if RCs[0].nAtoms == 3:
 					self.distances1.append( self.molecule.coordinates3.Distance(RCs[0].atoms[0], RCs[0].atoms[1]) - self.molecule.coordinates3.Distance(RCs[0].atoms[1], RCs[0].atoms[2]) )
 				elif RCs[0].nAtoms == 2:
@@ -249,8 +271,12 @@ class TrajectoryAnalysis:
 			_Text = ""
 			if len(RCs) > 1:
 				_Text = "Frame {} {} Energy\n".format(self.label_RC1,self.label_RC2)
-				for i in range( len(self.distances1) ):
-					_Text += "{} {} {} {}\n".format(i,self.distances1[i],self.distances2[i],self.energies[i])
+				if Energy:
+					for i in range( len(self.distances1) ):
+						_Text += "{} {} {} {}\n".format(i,self.distances1[i],self.distances2[i],self.energies[i])
+				else:
+					for i in range( len(self.distances1) ):
+						_Text += "{} {} {} \n".format(i,self.distances1[i],self.distances2[i])
 			else:
 				_Text = "Frame {} Energy\n".format(self.label_RC1)
 				for i in range( len(rc1) ):
@@ -260,13 +286,7 @@ class TrajectoryAnalysis:
 		#-------------------------------------------------------------------------
 		n = np.linspace( 0, self.total_time, len(self.distances1) )
 
-		if Energy:
-			fig1, (ax1) = plt.subplots(nrows=1)
-			plt.plot(n, self.energies)
-			ax1.set_xlabel("Time (ps)")
-			ax1.set_ylabel("Energy kJ/mol")
-			plt.savefig(self.trajFolder+"_MDenergy.png")
-			if SHOW: plt.show()
+		
 		#-------------------------------------------------------------------------
 		fig2, (ax2) = plt.subplots(nrows=1)
 		plt.plot(n, self.distances1,label=self.label_RC1,linestyle="-." )
@@ -281,13 +301,20 @@ class TrajectoryAnalysis:
 		if len(RCs) == 2:
 			try:
 				import seaborn as sns
-				g=sns.jointplot(x=self.distances1,y=self.distances2,kind="kde",cmap="plasma",shade=True,height=6)
+				g=sns.jointplot(x=self.distances1,y=self.distances2,kind="kde",cmap="plasma",shade=True,height=6,widht=8)
 				g.set_axis_labels(RCs[0].label,RCs[1].label)
-				plt.savefig( os.path.join( self.trajFolder,label_text+"_Biplot.png") )
+				plt.savefig( os.path.join( self.trajFolder,label_text+"_Biplot.png"),dpi=1000 )
 				if SHOW: plt.show()
 			except:
 				print("Error in importing seaborn package!\nSkipping biplot distribution plot!")
 				pass		
+
+	#=========================================================================
+	def Save_DCD(self):
+		'''
+		'''
+		traj_save = os.path.join(self.trajFolder[:-4] + ".dcd")
+		Duplicate(self.trajFolder,traj_save,self.molecule)
 	#=========================================================================
 	def Print(self):
 		'''

@@ -13,6 +13,7 @@ import pymp
 from commonFunctions import *
 from pMolecule import *
 from pMolecule.QCModel import *
+
 from MopacQCMMinput import *
 import os, glob, sys, shutil
 import numpy as np 
@@ -20,6 +21,7 @@ import numpy as np
 from pMolecule import * 
 
 from pSimulation import *
+from QuantumMethods import *
 #================================
 #**********************************************************
 class EnergyRefinement:
@@ -141,22 +143,22 @@ class EnergyRefinement:
 							"region":self.pureQCAtoms    , 
 							"method_class":"SMO"         ,
 							"Hamiltonian":"am1"          ,
-							"multiplicity":1             ,
-							"QCcharge":1                 }	
+							"multiplicity":self.multiplicity,
+							"QCcharge":self.charge       }	
 		#--------------------------------------------------------------------
 		for smo in _methods:
 			if VerifyMNDOKey(smo):
 				with pymp.Parallel(_NmaxThreads) as p:
 					for i in p.range( len(self.fileLists) ):
 						_qc_parameters["Hamiltonian"] = smo
-						qcSystem = QuantumMethods.From_Parameters(_qc_parameters)
-						qcSystem.system.coordinates3 = ImportCoordinates3( self.fileLists[i],log=None )
+						qcSystem = QuantumMethods.From_Parameters(_qc_parameters)						
+						qcSystem.system.coordinates3 = Unpickle( self.fileLists[i] )[0]
 						lsFrames= GetFrameIndex(self.fileLists[i][:-4])						
 						if self.ylen > 0:
 							self.energiesArray[ lsFrames[1], lsFrames[0] ] = qcSystem.system.Energy(log=None)
 							self.indexArrayX[ lsFrames[1], lsFrames[0] ] = lsFrames[0]
 							self.indexArrayY[ lsFrames[1], lsFrames[0] ] = lsFrames[1]
-						else:
+						else:						
 							self.energiesArray[ lsFrames[0] ] = qcSystem.system.Energy(log=None)
 							self.indexArrayX[ lsFrames[0] ] = lsFrames[0]	
 				#-----------------------------------------

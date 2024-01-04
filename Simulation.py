@@ -135,6 +135,7 @@ class Simulation:
 				for key in self.parameters["mopac_keywords"]: _mopacKeyWords.append(key)
 			ER.RunMopacSMO(self.parameters["methods_lists"],_mopacKeyWords)
 		#------------------------------------------------------------
+		ER.WriteLog()
 
 	#==================================================================
 	def GeometryOptimization(self):

@@ -77,7 +77,7 @@ class EnergyAnalysis:
 				if i > 0:
 					lns = line.split()
 					self.RC1.append( float(lns[1] ) )
-					energyTmp.append( float(lns[2]) )
+					energyTmp.append( float(lns[2] ) )
 					self.energies1D.append( float(lns[2]) )
 				i += 1
 			self.multiple1Dplot.append(energyTmp)

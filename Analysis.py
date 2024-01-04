@@ -93,18 +93,15 @@ class Analysis:
 		if "xlim_list" 		in self.parameters: xlim  	   = self.parameters["xlim_list"]
 		if "ylim_list" 		in self.parameters: ylim       = self.parameters["ylim_list"]
 		if "show" 			in self.parameters: show       = self.parameters["show"]
-		if "multiple_plot" 	in self.parameters: multiPlot  = self.parameters["multiple_plot"]		
+		if "multiple_plot" 	in self.parameters: multiPlot = True 		
 		if ysize > 0: ndim = 2
-		if "log_names" in self.parameters: multiPlot = True 
 		#--------------------------------------------------------
 		EA = EnergyAnalysis(self.parameters["xsize"],ysize,_type=self.parameters["type"] )
-		if multiPlot:
-			for log in self.parameters["log_names"]:
-				EA.ReadLog( log )
-				EA.MultPlot1D()
-		else:	EA.ReadLog( self.parameters["log_name"] )
+		
+		EA.ReadLog(self.parameters["log_name"] )
+		if multiPlot: EA.MultPlot1D(label=crd1_label)
 		#--------------------------------------------------------
-		if 	 ndim == 1: EA.Plot1D(crd1_label,XLIM=xlim,SHOW=show)
+		elif ndim == 1: EA.Plot1D(crd1_label,XLIM=xlim,SHOW=show)
 		elif ndim == 2:	EA.Plot2D(cnt_lines,crd1_label,crd2_label,xlim,ylim,show)
 
 	#=========================================================================

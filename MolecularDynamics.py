@@ -68,7 +68,8 @@ class MD:
         self.pressure               = 1.0   
         self.temperatureScaleOption = "linear"
         self.startTemperature       = 10  
-        self.DEBUG                  = False             
+        self.DEBUG                  = False 
+        self.NDIM                   = 1             
         #Setting parameters based on information that we collected on the instance construction
         self.RNG                    = NormalDeviateGenerator.WithRandomNumberGenerator ( RandomNumberGenerator.WithSeed ( self.seed ) )
         if not os.path.exists(_baseFolder): os.makedirs(_baseFolder)
@@ -138,6 +139,7 @@ class MD:
         '''
         Execute velocity verlet molecular dynamics from pDynamo methods. 
         '''
+        
         trajectory_list = [( self.trajectory, self.samplingFactor)]
         if   self.softConstraint and self.samplingFactor >  0:  trajectory_list = [ ( self.trajectory, self.samplingFactor ), (self.trajectorySoft, 1) ]
         elif self.softConstraint and self.samplingFactor == 0:  trajectory_list = [ (self.trajectorySoft, 1) ]  
@@ -161,6 +163,34 @@ class MD:
         if   self.softConstraint and self.samplingFactor >  0:  trajectory_list = [ ( self.trajectory, self.samplingFactor ), (self.trajectorySoft, 1) ]
         elif self.softConstraint and self.samplingFactor == 0:  trajectory_list = [ (self.trajectorySoft, 1) ]
         LeapFrogDynamics_SystemGeometry(self.molecule                                   ,
+                                        trajectories            = trajectory_list       ,
+                                        logFrequency            = self.logFreq          ,
+                                        normalDeviateGenerator  = self.RNG              ,
+                                        pressure                = self.pressure         ,
+                                        pressureCoupling        = self.pressureCoupling ,
+                                        steps                   = self.nsteps           ,
+                                        timeStep                = self.timeStep         ,
+                                        temperatureControl      = True                  ,
+                                        temperature             = self.temperature      , 
+                                        temperatureCoupling     = 0.1                   ) 
+    #===================================================================================================
+    def runLeapFrog_MT(self):
+        ''''
+        '''
+        with pymp.Parallel(self.NDIM) as p:
+            for i in p.range(self.NDIM):
+                trajectory_name = self.trajectoryNameCurr[:-6] + "_" +str(p)+ ".ptGeo" 
+                trajectory_soft_name = self.trajectoryNameSoft[:-6] + "_" +str(p)+ ".ptGeo" 
+
+                trajectory = ExportTrajectory( trajectory_name, self.molecule, log=None )
+                if not os.path.exists( self.trajectory_name ): os.makedirs( self.trajectory_name )
+
+            if _Restricted: 
+                trajectorySoft = ExportTrajectory( trajectory_soft_name, self.molecule, log=None )
+                if not os.path.exists( self.trajectory_soft_name ): os.makedirs( self.trajectory_soft_name )
+
+
+            LeapFrogDynamics_SystemGeometry(self.molecule                                   ,
                                         trajectories            = trajectory_list       ,
                                         logFrequency            = self.logFreq          ,
                                         normalDeviateGenerator  = self.RNG              ,

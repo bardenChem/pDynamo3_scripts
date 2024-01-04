@@ -38,7 +38,9 @@ class ReactionCoordinate:
 		self.label2         = "ReactionCoordinate"
 
 		for atom in self.atomsSel:
-			self.atoms.append( atom[0] )
+			try: self.atoms.append( atom )
+			except:self.atoms.append( atom[0] )
+
 
 		if self.Type == "Distance":
 			if self.nAtoms == 3:
