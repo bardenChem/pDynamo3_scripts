@@ -19,7 +19,8 @@ from commonFunctions 			import *
 from pBabel                     import *                                     
 from pCore                      import *                                     
 from pMolecule                  import *                   
-from pScientific                import *                                                             
+from pScientific                import * 
+from pScientific.Symmetry       import *                                        
 from pScientific.Statistics     import *
 from pScientific.Arrays         import *
 from pSimulation                import *
@@ -45,7 +46,7 @@ class TrajectoryAnalysis:
 		self.energies   = []
 		self.label_RC1  = None 
 		self.label_RC2  = None 
-		self.r_coords   = {}
+		self.RCs        = {}
 
 
 		if self.trajFolder[-4:] == ".dcd":			
@@ -56,32 +57,35 @@ class TrajectoryAnalysis:
 		self.trajectory.ReadHeader()
 
     #=================================================
-	def CalculateRG_RMSD(self,qc_mm=False):
+	def CalculateRG_RMSD(self,qc_mm=False,protein=False):
 		'''
 		Get Radius of Gyration and Root Mean Square distance for the trajectory
 		'''
-		masses  = Array.FromIterable ( [ atom.mass for atom in self.molecule.atoms ] )
-		crd3    = Unpickle(os.path.join(self.trajFolder,"frame0.pkl"))[0]
+		masses    = Array.FromIterable ( [ atom.mass for atom in self.molecule.atoms ] )
+		self.crd3 = Unpickle(os.path.join(self.trajFolder,"frame0.pkl"))[0]		
 		system  = None 
 		rg0     = None
-		self.molecule.coordinates3 = crd3
+		try:
+			self.molecule.coordinates3 = self.crd3
+		except:
+			self.crd3 = Unpickle(os.path.join(self.trajFolder,"frame0.pkl"))
+			self.molecule.coordinates3 = self.crd3
 		energy0 = self.molecule.Energy(log=None)
 		if qc_mm:
 				system= Selection( list(self.molecule.qcState.pureQCAtoms) )
 				# . Calculate the radius of gyration.
-				rg0 = crd3.RadiusOfGyration(selection = system, weights = masses)
+				rg0 = self.crd3.RadiusOfGyration(selection = system, weights = masses)
+		elif protein:
+			system  = AtomSelection.FromAtomPattern ( self.molecule, "*:*:CA" )		
+			# . Calculate the radius of gyration.
+			rg0 = self.crd3.RadiusOfGyration(selection = system, weights = masses)
 		else:
-			try:
-				system  = AtomSelection.FromAtomPattern ( self.molecule, "*:*:CA" )		
-				# . Calculate the radius of gyration.
-				rg0 = crd3.RadiusOfGyration(selection = system, weights = masses)
-			except:
-				system  = AtomSelection.FromAtomPattern ( self.molecule, "*:*:*" )		
-				# . Calculate the radius of gyration.
-				rg0 = crd3.RadiusOfGyration(selection = system, weights = masses)
+			system  = Selection.FromIterable ( range ( len ( self.molecule.atoms ) ) )
+			# . Calculate the radius of gyration.
+			rg0 = self.crd3.RadiusOfGyration(selection = system, weights = masses)
 		#------------------------------------------------------------------------------
 		# . Save the starting coordinates.
-		reference3 = Clone(crd3)  
+		reference3 = Clone(self.crd3)  
 		#------------------------------------------------------------------------------
 		n = []
 		m = 0   
@@ -112,16 +116,20 @@ class TrajectoryAnalysis:
 		textLog.write(_Text)
 		textLog.close()
 	#===================================================================================================
-	def Calculate_RDF(self,_selection_1,_selection_2=None,_selection_name=""):
+	def Calculate_RDF(self,_selection_1,_selection_2=None,_selection_name="",_box_size= 25.0):
 		'''
 		'''
-		rdf_dat = RadialDistributionFunction ( self.trajectory, self.molecule, selection1 = _selection, selection2=_selection_2 )
 
-		textLog = open( self.trajFolder+"_"+selection_name+"_"+"_rdf.log", "w" )
+		self.molecule.symmetry =  PeriodicBoundaryConditions.WithCrystalSystem ( CrystalSystemCubic ( ) )
+		self.molecule.symmetryParameters = self.molecule.symmetry.MakeSymmetryParameters ( a = _box_size)
+		print(self.molecule.symmetryParameters)
+		rdf_dat = RadialDistributionFunction ( self.trajFolder, self.molecule, selection1 = _selection_1, selection2=_selection_2, upper=10.0 )
+
+		textLog = open( self.trajFolder+"_"+_selection_name+"_"+"_rdf.log", "w" )
 		_text = "Distance(A) G(r) \n"
 
 		for i in range( len(rdf_dat[0]) ):	_text += "{} {}\n".format(rdf_dat[0][i],rdf_dat[1][i])
-		textLog.write(_Text)
+		textLog.write(_text)
 		textLog.close()
 
 		fig1, (ax1) = plt.subplots(nrows=1)
@@ -131,16 +139,16 @@ class TrajectoryAnalysis:
 		plt.savefig(self.trajFolder+"_"+_selection_name+"_rdf.png")
 
 	#-----------------------------------------------------------------------------------------------------
-	def Calculate_SD(self,_selection,_selection_name):
+	def Calculate_SD(self,_selection,_selection_name=""):
 		'''
 		'''		
-		rdf_dat = SelfDiffusionFunction( self.trajectory, self.molecule, selection  = _selection )
+		rdf_dat = SelfDiffusionFunction( self.trajFolder, self.molecule, selection  = _selection )
 		
-		textLog = open( self.trajFolder+"_"+selection_name+"_"+"_sdf.log", "w" )
+		textLog = open( self.trajFolder+"_"+_selection_name+"_"+"_sdf.log", "w" )
 		_text = "Time(ps) SDF \n"
 
 		for i in range( len(rdf_dat[0]) ):	_text += "{} {}\n".format(rdf_dat[0][i],rdf_dat[1][i])
-		textLog.write(_Text)
+		textLog.write(_text)
 		textLog.close()
 
 		fig1, (ax1) = plt.subplots(nrows=1)
@@ -152,8 +160,7 @@ class TrajectoryAnalysis:
 
 	#--------------------------------------------------
 	def ExtractFrames(self):
-		'''
-			
+		'''			
         '''
 		try: 	from sklearn.neighbors import KernelDensity
 		except:	pass
@@ -161,8 +168,6 @@ class TrajectoryAnalysis:
 		
 		self.RMS        = np.array(self.RMS, dtype=np.float32)
 		self.RG         = np.array(self.RG, dtype=np.float32)
-		self.distances1.reshape(-1,1)
-		self.distances2.reshape(-1,1)
 		self.RMS.reshape(-1,1)
 		self.RG.reshape(-1,1)
 		
@@ -185,21 +190,18 @@ class TrajectoryAnalysis:
 					fn = i
 		#------------------------------------------------
 			print( os.path.join(self.trajFolder,"frame{}.pkl".format(fn) ) )
-			input()	
 			self.molecule.coordinates3 = ImportSystem( os.path.join(self.trajFolder,"frame{}.pkl".format(fn) ) )
 			ExportSystem( os.path.join( self.trajFolder, "mostFrequentRMS.pdb" ),self.molecule,log=None )
 			ExportSystem( os.path.join( self.trajFolder, "mostFrequentRMS.pkl" ),self.molecule,log=None )
 		#------------------------------------------------------------------------------
-		except:
-			pass		
-		
-		self.molecule.coordinates3 = AveragePosition(self.trajectory,self.molecule)
+		except:	pass	
+		self.molecule.coordinates3 = AveragePositions(self.trajFolder,self.molecule)
 		ExportSystem( os.path.join( self.trajFolder,"Average.pdb"), self.molecule,log=None  )
 		ExportSystem( os.path.join( self.trajFolder,"Average.pkl"), self.molecule,log=None )
-		self.molecule.coordinates3 = refcrd3
+		self.molecule.coordinates3 = self.crd3
 
 	#=================================================
-	def ExtractFrames_biplot(self,rc_1,rc_2)
+	def ExtractFrames_biplot(self,rc_1,rc_2):
 		'''
 		'''
 		try: 	from sklearn.neighbors import KernelDensity
@@ -212,7 +214,7 @@ class TrajectoryAnalysis:
 		kde.fit(distances1[:, None])
 		density_rc1 = kde.score_samples(distances1[:,None])
 		density_rc1 = np.exp(density_rc1)
-		.rc1_MF = max(density_rc1)
+		rc1_MF = max(density_rc1)
 		distances2.reshape(-1,1)
 		kde.fit(distances2[:,None])
 		density_rc2 = np.exp(kde.score_samples(distances2[:,None]))
@@ -296,37 +298,36 @@ class TrajectoryAnalysis:
 		for rc in RCs:
 			self.RCs[str(cnt)] = [ rc, [] ]
 			cnt +=1
+		cnt -= 1
 
 		frames = 0 
 		while self.trajectory.RestoreOwnerData():
-			for i in range(cnt):
-				atom1 = self.RCs[str(cnt)][0].atoms[0]			
-				atom2 = self.RCs[str(cnt)][0].atoms[1]			
-				self.RCs[str(cnt)][1].append( self.molecule.coordinates3.Distance(atom1, atom2 ) )
+			for key in self.RCs:
+				atom1 = self.RCs[key][0].atoms[0]			
+				atom2 = self.RCs[key][0].atoms[1]			
+				self.RCs[key][1].append( self.molecule.coordinates3.Distance(atom1, atom2) )
 			frames +=1
 								
 		#------------------------------------------------------------------------
 		# . Save the results. 
-		if not os.path.exists( self.trajFolder+"_DA.log" ):      
-			textLog = open( self.trajFolder+"_DA"+label_text, "w" )         
-			_Text = "Frame "
-			for i in range(cnt):
-				_Text += "{} ".self.RCs[str(cnt)][0].label
-			_Text += "\n"
-			for j in range(frames):
-				_Text += "{} ".format(j)
-				for i in range(cnt):
-					_Text += "{} ".self.RCs[str(cnt)][1][j]
+		textLog = open( self.trajFolder+"_DA.log", "w" )         
+		_Text = "Frame "
+		for key in self.RCs: _Text += "{} ".format(self.RCs[key][0].label[:-6])
+		_Text += "\n"
+		for j in range(frames):
+			_Text += "{} ".format(j)
+			for key in self.RCs:
+				_Text += "{} ".format(self.RCs[key][1][j])			
 			_Text += "\n"			
-			
-			textLog.write(_Text)
-			textLog.close()
+		#.------------------	
+		textLog.write(_Text)
+		textLog.close()
 		#-------------------------------------------------------------------------
-		n = np.linspace( 0, self.total_time, len(self.distances1) )
-		#-------------------------------------------------------------------------
-		
+		n = np.linspace( 0, self.total_time, frames )
+		#-------------------------------------------------------------------------		
 		fig2, (ax2) = plt.subplots(nrows=1)		
-		for i in range(cnt): plt.plot(n,self.RCs[str(cnt)][1],label=self.RCs[str(cnt)[0].label])
+		for key in self.RCs: 
+			plt.plot( n, self.RCs[key][1], label=self.RCs[key][0].label[:-6] )
 		#---------------------------------------------
 		plt.xlabel("Time (ps)")
 		plt.ylabel("Distances $\AA$")

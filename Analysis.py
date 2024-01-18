@@ -86,6 +86,9 @@ class Analysis:
 		xlim      = [ 0, self.parameters["xsize"] ]
 		ylim 	  = [ 0, ysize ]
 		show 	  = False
+
+		in_point  = [0,0]
+		fin_point = [0,0]
 		#--------------------------------------------------------
 		if "contour_lines" 	in self.parameters: cnt_lines  = self.parameters["contour_lines"]
 		if "crd1_label" 	in self.parameters: crd1_label = self.parameters["crd1_label"]
@@ -93,6 +96,8 @@ class Analysis:
 		if "xlim_list" 		in self.parameters: xlim  	   = self.parameters["xlim_list"]
 		if "ylim_list" 		in self.parameters: ylim       = self.parameters["ylim_list"]
 		if "show" 			in self.parameters: show       = self.parameters["show"]
+		if "in_point"       in self.parameters: in_point   = self.parameters["in_point"]
+		if "fin_point"      in self.parameters: fin_point  = self.parameters["fin_point"]
 		if "multiple_plot" 	in self.parameters: multiPlot = True 		
 		if ysize > 0: ndim = 2
 		#--------------------------------------------------------
@@ -103,6 +108,9 @@ class Analysis:
 		#--------------------------------------------------------
 		elif ndim == 1: EA.Plot1D(crd1_label,XLIM=xlim,SHOW=show)
 		elif ndim == 2:	EA.Plot2D(cnt_lines,crd1_label,crd2_label,xlim,ylim,show)
+
+		if  "in_point" in self.parameters: EA.Path_From_PES(in_point,fin_point)
+
 
 	#=========================================================================
 	def PMFAnalysis(self):

@@ -302,11 +302,15 @@ def TrajectoryAnalysisPlots():
 	atom6 = AtomSelection.FromAtomPattern(proj.system,"*:LIG.*:O06")
 	atom5 = AtomSelection.FromAtomPattern(proj.system,"*:HIE.94:HE2")
 	atom4 = AtomSelection.FromAtomPattern(proj.system,"*:HIE.94:NE2")
-	atomsf = [ atom1[0], atom2[0], atom3[0] ] 
-	atomss = [ atom4[0], atom5[0], atom6[0] ]
-	rc1 = ReactionCoordinate(atomsf,False,0)
+
+	LIG   = AtomSelection.FromAtomPattern(proj.system,"*:LIG.*:*")	
+	HOO   = AtomSelection.FromAtomPattern(proj.system,"*:WAT.*:*")
+
+	atomsf = [  atom2[0], atom3[0] ] 
+	atomss = [  atom5[0], atom6[0] ]
+	rc1 = ReactionCoordinate(atomsf,False)
 	rc1.GetRCLabel(proj.system)	
-	rc2 = ReactionCoordinate(atomss,False,0)
+	rc2 = ReactionCoordinate(atomss,False)
 	rc2.GetRCLabel(proj.system)
 	rcs = [ rc1, rc2 ]
 
@@ -315,7 +319,11 @@ def TrajectoryAnalysisPlots():
 	traj.CalculateRG_RMSD()
 	traj.DistancePlots(rcs)
 	traj.ExtractFrames()
+	traj.Calculate_RDF(LIG,HOO,_selection_name="LIG_H2O")
+
+	traj.Calculate_SD(LIG,_selection_name="LIG")
 	traj.PlotRG_RMS()
+	traj.Save_DCD()
 
 #==============================================================
 def QCMMScanSimpleDistance(_nsteps,_dincre,name="Default"):
@@ -1071,6 +1079,18 @@ def EnergyAnalysisPlots():
 	proj.Run_Analysis(parameters)
 	#===========================================================================
 	#internal refinemen
+#===============================================================================
+def Path_From_PES():
+	'''
+	'''
+	if not os.path.exists( os.path.join(scratch_path,"QCMM_Scan2D_simple_distance") ):
+		QCMMScan2DsimpleDistance(12,12,0.15,0.15)
+	log_path = os.path.join(scratch_path,"QCMM_Scan2D_simple_distance","ScanTraj.log")
+	parameters= {"xsize":12,"ysize":12,"type":"2D","log_name":log_path,
+	"crd1_label":rc1_sd.label,"crd2_label":rc2_sd.label,
+	"contour_lines":10,"analysis_type":"Energy_Plots","in_point":[0,0],"fin_point":[11,11]}
+	proj.Run_Analysis(parameters)
+
 #===============================================================================
 def ReacCoordSearchers(_type):	
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts","7tim_#4.pkl") ):

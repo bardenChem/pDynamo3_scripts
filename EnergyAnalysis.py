@@ -359,6 +359,44 @@ class EnergyAnalysis:
 		#---------------------------------------------
 		if SHOW: plt.show()	
 		plt.close()
+	
+
+	#----------------------------------------------------------------------------------------
+	def Path_From_PES(self, in_point,fin_point):
+		''''
+		'''
+		#setting current point as initial
+		cp = in_point
+
+		z = self.energiesMatrix
+		path = [] 
+		path.append(in_point)
+
+		dirs = [ [0,1] ,[1,0], [1,1] ]
+
+		while not cp == fin_point:
+
+			A = 100000000
+			B = 100000000
+			C = 100000000
+
+			if  (cp[1] + 1) <= fin_point[1]: A = z[ cp[0], cp[1] ] + z[cp[0], (cp[1] + 1)    ] 
+			if  (cp[0] + 1) <= fin_point[0]: B = z[ cp[0], cp[1] ] + z[ (cp[0]+1), cp[1]     ] 
+			
+			if  (cp[0] + 1) == fin_point[0] and (cp[1] + 1) == fin_point[1]:
+				path.append( [ cp[0] + 1, cp[1] + 1  ])
+				break
+			else: C = z[ cp[0], cp[1] ] + z[ (cp[0]+1), (cp[1]+1) ] 
+
+			D = [ A, B, C]
+			ind = D.index(min(d))
+			cp[0] += dirs[ind][0]
+			cp[1] += dirs[ind][1]
+			path.append(cp)
+
+		print(path)
+		return(path)
+
 #=====================================================================
 
 

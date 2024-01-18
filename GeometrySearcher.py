@@ -299,7 +299,8 @@ class GeometrySearcher:
         if self.saveFormat == ".dcd" or self.saveFormat == ".mdcrd":
             if self.saveFormat != self.trajectoryName:
                 traj_save = os.path.splitext(self.trajectoryName)[0] + self.saveFormat
-                Duplicate(self.trajectoryName,traj_save,self.molecule)
+                try: Duplicate(self.trajectoryName,traj_save,self.molecule)
+                except: pass
     #===========================================================================================
     def Print(self):
         '''

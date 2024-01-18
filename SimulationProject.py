@@ -165,7 +165,7 @@ class SimulationProject:
         self.systems[newLabel].DefineNBModel( self.NBmodel )
         self.system = self.systems[newLabel]
         #---------------------------------------------------
-        if self.DEBUG: self.Energy()
+        if self.DEBUG: self.Energy
     #======================================================================================
     def Setting_Free_Atoms(self,_centerAtom,_radius):
         '''
