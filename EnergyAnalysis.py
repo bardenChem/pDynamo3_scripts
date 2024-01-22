@@ -292,7 +292,7 @@ class EnergyAnalysis:
 				_xlim = [ 0, self.xlen ]
 				_ylim = [ 0, self.ylen ]
 			X = np.linspace(_xlim[0],_xlim[1],self.xlen)
-			Y = np.linspace(_xlim[0],_xlim[1],self.ylen)
+			Y = np.linspace(_ylim[0],_ylim[1],self.ylen)
 		#------------------------------------------------------
 		z = self.energiesMatrix
 		#------------------------------------------------------
