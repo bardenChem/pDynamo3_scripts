@@ -283,16 +283,16 @@ class EnergyAnalysis:
 		'''			
 		#-----------------------------------------------------
 		self.NormalizeEnergies()
-		if len(self.RC1) > 0:
-			X = np.linspace( np.min(self.RC1) , np.max(self.RC1), self.xlen )
-			Y = np.linspace( np.min(self.RC2) , np.max(self.RC2), self.ylen )
+		if _xlim == None and _ylim == None:
+			_xlim = [ 0, self.xlen ]
+			_ylim = [ 0, self.ylen ]
+			if len(self.RC1) > 0:
+				X = np.linspace( np.min(self.RC1) , np.max(self.RC1), self.xlen )
+				Y = np.linspace( np.min(self.RC2) , np.max(self.RC2), self.ylen )
 		#------------------------------------------------------
-		else:
-			if _xlim == None:
-				_xlim = [ 0, self.xlen ]
-				_ylim = [ 0, self.ylen ]
+		else:			
 			X = np.linspace(_xlim[0],_xlim[1],self.xlen)
-			Y = np.linspace(_ylim[0],_ylim[1],self.ylen)
+			Y = np.linspace(_ylim[0],_ylim[1],self.ylen)		
 		#------------------------------------------------------
 		z = self.energiesMatrix
 		#------------------------------------------------------
@@ -372,6 +372,12 @@ class EnergyAnalysis:
 		path = [] 
 		path.append(in_point)
 
+		xi = 1
+		yi = 1 
+
+		if in_point[0] > fin_point[0]: xi *=-1
+		if in_point[1] > fin_point[1]: yi *=-1
+
 		dirs = [ [0,1] ,[1,0], [1,1] ]
 
 		while not cp == fin_point:
@@ -380,13 +386,13 @@ class EnergyAnalysis:
 			B = 100000000
 			C = 100000000
 
-			if  (cp[1] + 1) <= fin_point[1]: A = z[ cp[0], cp[1] ] + z[cp[0], (cp[1] + 1)    ] 
-			if  (cp[0] + 1) <= fin_point[0]: B = z[ cp[0], cp[1] ] + z[ (cp[0]+1), cp[1]     ] 
+			if  (cp[1] + yi) <= fin_point[1]: A = z[ cp[0], cp[1] ] + z[cp[0], (cp[1] + yi)    ] 
+			if  (cp[0] + xi) <= fin_point[0]: B = z[ cp[0], cp[1] ] + z[ (cp[0]+xi), cp[1]     ] 
 			
-			if  (cp[0] + 1) == fin_point[0] and (cp[1] + 1) == fin_point[1]:
-				path.append( [ cp[0] + 1, cp[1] + 1  ])
+			if  (cp[0] + xi) == fin_point[0] and (cp[1] + yi) == fin_point[1]:
+				path.append( [ cp[0] + xi, cp[1] + yi  ])
 				break
-			else: C = z[ cp[0], cp[1] ] + z[ (cp[0]+1), (cp[1]+1) ] 
+			else: C = z[ cp[0], cp[1] ] + z[ (cp[0]+xi), (cp[1]+yi) ] 
 
 			D = [ A, B, C]
 			ind = D.index(min(d))

@@ -187,14 +187,15 @@ class EnergyRefinement:
 		NBmodel        = self.molecule.nbModel
 
 		if _functional == "hf": 
-			qcModel = QCModelDFT.WithOptions(converger=converger,functional="hf", orbitalBasis=_basis, fitBasis = "demon" )
+			qcModel = QCModelDFT.WithOptions(converger=converger,functional="hf", orbitalBasis=_basis)
 		else                  :
 			qcModel = QCModelDFT.WithOptions(converger=converger,functional=_functional,gridIntegrator=gridIntegrator, orbitalBasis=_basis)
-
+			
 		self.molecule.electronicState = ElectronicState.WithOptions(charge = self.charge)
 		self.molecule.DefineQCModel( qcModel, qcSelection=Selection(self.pureQCAtoms) )		
 		self.molecule.DefineNBModel( NBmodel )		
 		
+		#------------------------------------------------------------------------------
 		with pymp.Parallel(_NmaxThreads) as p:
 			for i in p.range( len(self.fileLists) ):				
 				self.molecule.coordinates3 = ImportCoordinates3( self.fileLists[i],log=None )

@@ -1299,14 +1299,21 @@ def pDynamoEnergyRef_2D():
 				   "Software":"pDynamo"	}
 	#---------------------------------------------
 	proj.Run_Simulation(parameters)
+	parameters= {"xsize":12,"type":"1D",
+	"log_name":os.path.join(scratch_path, "","energy.log"),
+	"crd1_label":rc1_md.label,"multiple_plot":"log_names","analysis_type":"Energy_Plots","type":"1DRef"}
+	proj.Run_Analysis(parameters)
 #=====================================================
 def pDynamoEnergyRef_abInitio():
-	proj=SimulationProject( os.path.join(scratch_path, "pDynamoABintio") )
+	'''
+	'''
+
+	if not os.path.exists( os.path.join(scratch_path,"QCMMopts","7tim_#4.pkl") ):QCMM_optimizations()
+
+	proj=SimulationProject.From_PKL( os.path.join(scratch_path,"QCMMopts","7tim_#4.pkl"),
+		( os.path.join(scratch_path, "pDynamoABintio") ) )
+
 	
-	#setting reaction coordinates for ploting labels
-	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
-		QCMM_optimizations()		
-	proj.LoadSystemFromSavedProject( os.path.join(scratch_path,"QCMMopts.pkl") )
 	atom1 = AtomSelection.FromAtomPattern(proj.system,"*:LIG.*:C02")
 	atom2 = AtomSelection.FromAtomPattern(proj.system,"*:LIG.*:H02")
 	atom3 = AtomSelection.FromAtomPattern(proj.system,"*:GLU.164:OE2")	
@@ -1316,17 +1323,18 @@ def pDynamoEnergyRef_abInitio():
 	
 	_name = "SCAN1D_4dftRefinement"
 	_path = os.path.join( os.path.join(scratch_path,_name,"ScanTraj.ptGeo") )
-	if not os.path.exists(_path):
-		QCMMScanMultipleDistance(6,0.2,name=_name)
+	if not os.path.exists(_path): QCMMScanMultipleDistance(6,0.2,name=_name)
 	methods = ["b3lyp"] 
+
+
 	parameters = { "xnbins":6			               ,
 				   "ynbins":0			               ,
 				   "source_folder":_path                 ,
 				   "folder":os.path.join(scratch_path, "abInitio_EnergyRefinement"),
 				   "charge":-3		                    ,
 				   "multiplicity":1 	                ,
-				   "functional":"hf"                    ,
-				   "basis":"321g"					    ,
+				   "functional":methods[0]                 ,
+				   "basis":"3-21g"					    ,
 				   "NmaxThreads":NmaxThreads            ,
 				   "simulation_type":"Energy_Refinement",
 				   "crd1_label":rc1_md.label            ,
@@ -1335,12 +1343,25 @@ def pDynamoEnergyRef_abInitio():
 				   "Software":"pDynamoDFT"	}
 
 	proj.Run_Simulation(parameters)
+	parameters= {"xsize":6,
+				 "log_name":os.path.join(scratch_path,_name,
+				 "energy.log"),
+				 "crd1_label":rc1_md.label,
+				 "analysis_type":"Energy_Plots",
+				 "type":"1DRef" }
+	proj.Run_Analysis(parameters)
+
+
 #=====================================================
 def MopacEnergyRef():
-	proj=SimulationProject( os.path.join(scratch_path, "mopacSMO") )
-	if not os.path.exists( os.path.join(scratch_path,"QCMMopts","7tim_#4.pkl") ):
-		QCMM_optimizations()		
-	proj.LoadSystemFromSavedProject( os.path.join(scratch_path,"QCMMopts","7tim_#4.pkl") )
+	'''
+	'''
+	if not os.path.exists( os.path.join(scratch_path,"QCMMopts","7tim_#4.pkl") ):QCMM_optimizations()
+
+	proj=SimulationProject.From_PKL( os.path.join(scratch_path,"QCMMopts","7tim_#4.pkl"),
+		( os.path.join(scratch_path, "MopacRef") ) )
+
+	
 	methods = ["am1","pm3","pm6","pm7","rm1"]
 	atom1 = AtomSelection.FromAtomPattern(proj.system,"*:LIG.*:C02")
 	atom2 = AtomSelection.FromAtomPattern(proj.system,"*:LIG.*:H02")
@@ -1376,12 +1397,22 @@ def MopacEnergyRef():
 				   "Software":"mopac"	}
 	#---------------------------------------------
 	proj.Run_Simulation(parameters)	
+	parameters= {"xsize":4,"type":"1D",
+				 "log_name":os.path.join(scratch_path,_name,"energy.log"),
+				 "crd1_label":rc1_md.label,"multiple_plot":"log_names",
+				 "analysis_type":"Energy_Plots","type":"1DRef" }
+	proj.Run_Analysis(parameters)
+
 #=====================================================
 def Change_QC_Region():
-	proj=SimulationProject( os.path.join(scratch_path, "pDynamoSMO") )
-	if not os.path.exists( os.path.join(scratch_path,"QCMMopts","7tim_#4.pkl") ):
+	'''
+	'''
+
+	if not os.path.exists( os.path.join(scratch_path,"QCMMopts","7tim_#4.pkl") ):	
 		QCMM_optimizations()		
-	proj.LoadSystemFromSavedProject( os.path.join(scratch_path,"QCMMopts","7tim_#4.pkl") )
+
+	proj=SimulationProject.From_PKL( os.path.join(scratch_path,"QCMMopts","7tim_#4.pkl"), 
+		os.path.join(scratch_path, "Change_QC_Region") )	
 
 	methods = ["am1","rm1"]
 
@@ -1395,9 +1426,9 @@ def Change_QC_Region():
 	
 	_name = "SCAN1D_ChangeQCregion_single"
 	_path = os.path.join( os.path.join(scratch_path,_name,"ScanTraj.ptGeo") )
-	if not os.path.exists(_path):
-		QCMMScanMultipleDistance(1,0.1,name=_name)
-	parameters = { "xnbins":1			               ,
+	if not os.path.exists(_path): QCMMScanMultipleDistance(4,0.1,name=_name)
+
+	parameters = { "xnbins":4			               ,
 				   "ynbins":0			               ,
 				   "change_qc_region":True             ,
 				   "radius":5.0                        ,
@@ -1410,20 +1441,25 @@ def Change_QC_Region():
 				   "NmaxThreads":NmaxThreads            ,
 				   "simulation_type":"Energy_Refinement",
 				   "crd1_label":rc1_md.label            ,
-				   "contour_lines":12                   ,
-				   "xlim_list": [-1.0,1.0]              ,
 				   "Software":"mopac"	}
 
 	proj.Run_Simulation(parameters)
+	parameters= {"xsize":4,"type":"1D",
+				 "log_name":os.path.join(scratch_path,_name,"energy.log"),
+				 "crd1_label":rc1_md.label,"multiple_plot":"log_names",
+				 "analysis_type":"Energy_Plots","type":"1DRef" }
+	proj.Run_Analysis(parameters)
 #=====================================================
 def CombinedFES_ABinitioSMO():
 	pass
 #=====================================================
 def ORCAEnergy_ref():
-	proj=SimulationProject( os.path.join(scratch_path, "ORCA_test") )
-	if not os.path.exists( os.path.join(scratch_path,"QCMMopts.pkl") ):
+	if not os.path.exists( os.path.join(scratch_path,"QCMMopts","7tim_#4.pkl") ):	
 		QCMM_optimizations()		
-	proj.LoadSystemFromSavedProject( os.path.join(scratch_path,"QCMMopts.pkl") )
+
+	proj=SimulationProject.From_PKL( os.path.join(scratch_path,"QCMMopts","7tim_#4.pkl") ,
+									 os.path.join(scratch_path, "ORCA_test") )
+	
 	
 	atom1 = AtomSelection.FromAtomPattern(proj.system,"*:LIG.*:C02")
 	atom2 = AtomSelection.FromAtomPattern(proj.system,"*:LIG.*:H02")
@@ -1440,8 +1476,7 @@ def ORCAEnergy_ref():
 	rc2_md.GetRCLabel(proj.system)
 	_name = "SCAN1D_4OrcaRefinement"
 	_path = os.path.join( os.path.join(scratch_path,_name,"ScanTraj.ptGeo") )	
-	if not os.path.exists(_path):
-		QCMMScanMultipleDistance(6,0.2,name=_name)	
+	if not os.path.exists(_path): QCMMScanMultipleDistance(4,0.2,name=_name)	
 	#---------------------------------------------
 	parameters = { "xnbins":6			                                           ,
 				   "ynbins":0			                                           ,
@@ -1455,10 +1490,15 @@ def ORCAEnergy_ref():
 				   "NmaxThreads":NmaxThreads	                                   ,
 				   "crd1_label":rc1_md.label                                       ,
 				   "simulation_type":"Energy_Refinement"                           ,
-				   "xlim_list": [-1.25,0.75]                                       , 
 				   "Software":"ORCA"	                                           }
 	#---------------------------------------------
 	proj.Run_Simulation(parameters)
+
+	parameters= {"xsize":4,"type":"1D",
+				 "log_name":os.path.join(scratch_path,_name,"energy.log"),
+				 "crd1_label":rc1_md.label,"multiple_plot":"log_names",
+				 "analysis_type":"Energy_Plots","type":"1DRef" }
+	proj.Run_Analysis(parameters)
 
 #=====================================================
 def Thermodynamics():
