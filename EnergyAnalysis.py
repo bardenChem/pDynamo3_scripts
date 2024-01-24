@@ -346,7 +346,7 @@ class EnergyAnalysis:
 		for i in range(self.nplots2D):
 			self.identifiers.append( self.identifiers[i] )
 			self.energiesMatrix = self.multiple2Dplot[i]
-			self.Plot2D(contourlines,crd1label,crd2label,_xlim=None,_ylim=None,SHOW=False)
+			self.Plot2D(contourlines,crd1label,crd2label,_xlim=_xlim,_ylim=_ylim,SHOW=False)
 	#----------------------------------------------------------------------------------------
 	def Plot1D_FreeEnergy(self,crd1label,crd2label,SHOW=False):
 		'''
