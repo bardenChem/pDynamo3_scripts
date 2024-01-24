@@ -330,7 +330,7 @@ class EnergyAnalysis:
 		if len(self.identifiers) > 0: 
 			_method = "_" + self.identifiers[-1]
 
-		plotName = self.baseName + _method
+		plotName = self.baseName + _method[:5]
 		plt.savefig(plotName+".png",dpi=1000)
 		if SHOW: plt.show()
 		plt.close()

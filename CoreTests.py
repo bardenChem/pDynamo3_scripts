@@ -1379,26 +1379,24 @@ def MopacEnergyRef():
 	_name = "SCAN1D_4MopacRefinement"
 	_path = os.path.join( os.path.join(scratch_path,_name,"ScanTraj.ptGeo") )	
 	if not os.path.exists(_path):
-		QCMMScanMultipleDistance(20,0.08,name=_name)	
+		QCMMScanMultipleDistance(4,0.08,name=_name)	
 	#---------------------------------------------
-	parameters = { "xnbins":20			,
+	parameters = { "xnbins":4			,
 				   "ynbins":0			,
 				   "mopac_keywords":["grad qmmm","ITRY=5000"] ,
 				   "source_folder":_path,
-				   "folder":os.path.join(scratch_path, "MOPAC_EnergyRefinement"),
+				   "folder":os.path.join(scratch_path, "MopacRef"),
 				   "charge":-3		    ,
 				   "multiplicity":1 	,
 				   "methods_lists":methods,					   
 				   "NmaxThreads":1 		,
 				   "crd1_label":rc1_md.label,
-				   "contour_lines":12       ,
-				   "xlim_list": [-1.2,2.0] ,
 				   "simulation_type":"Energy_Refinement",
 				   "Software":"mopac"	}
 	#---------------------------------------------
 	proj.Run_Simulation(parameters)	
-	parameters= {"xsize":4,"type":"1D",
-				 "log_name":os.path.join(scratch_path,_name,"energy.log"),
+	parameters= {"xsize":4,
+				 "log_name":os.path.join(scratch_path,"MopacRef","energy.log"),
 				 "crd1_label":rc1_md.label,"multiple_plot":"log_names",
 				 "analysis_type":"Energy_Plots","type":"1DRef" }
 	proj.Run_Analysis(parameters)
@@ -1433,8 +1431,9 @@ def Change_QC_Region():
 				   "change_qc_region":True             ,
 				   "radius":5.0                        ,
 				   #"center":atom2[0]                   , 
-				   "center":[41.800,36.977,23.761]     , 
-				   "folder":os.path.join(scratch_path, "changingQC_EnergyRefinement"),
+				   "center":[41.800,36.977,23.761]     ,
+				   "source_folder":_path               , 
+				   "folder": os.path.join(scratch_path, "Change_QC_Region"),
 				   "charge":-3		                    ,
 				   "multiplicity":1 	                ,
 				   "methods_lists":methods              ,					   
@@ -1478,7 +1477,7 @@ def ORCAEnergy_ref():
 	_path = os.path.join( os.path.join(scratch_path,_name,"ScanTraj.ptGeo") )	
 	if not os.path.exists(_path): QCMMScanMultipleDistance(4,0.2,name=_name)	
 	#---------------------------------------------
-	parameters = { "xnbins":6			                                           ,
+	parameters = { "xnbins":4			                                           ,
 				   "ynbins":0			                                           ,
 				   "source_folder":_path                                           ,
 				   "orca_method":"hf"                                              ,

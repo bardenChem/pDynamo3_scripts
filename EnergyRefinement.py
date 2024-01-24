@@ -18,8 +18,6 @@ from MopacQCMMinput import *
 import os, glob, sys, shutil
 import numpy as np 
 
-from pMolecule import * 
-
 from pSimulation import *
 from QuantumMethods import *
 #================================
@@ -228,8 +226,10 @@ class EnergyRefinement:
 		NBmodel          = self.molecule.nbModel	
 		_mopacKeys       = _keyWords
 		
+
 		for smo in _methods:
-			for i in range( len(self.fileLists) ):
+			for i in range( len(self.fileLists) ):				
+				self.molecule.coordinates3 = ImportCoordinates3(self.fileLists[i])
 				mop = MopacQCMMinput(self.molecule,self.baseName,self.fileLists[i],_mopacKeys,smo)
 				mop.CalculateGradVectors()
 				mop.write_input(self.charge,self.multiplicity)

@@ -9,7 +9,7 @@
 ##############################################################
 
 from commonFunctions import *
-
+from pMolecule import *
 #************************************************************
 class MopacQCMMinput:
 	'''
@@ -31,8 +31,7 @@ class MopacQCMMinput:
 		self.inputFile 		= None
 		self.atomsDict		= {}
 		self.Hamiltonian    = _hamiltonian
-		if _coordName[:-4] == ".plk":
-			self.molecule.coordinates3 = ImportCoordinates3(_coordName,log=None)
+
 
 		self.charges = self.molecule.mmState.charges
 		
@@ -80,7 +79,7 @@ class MopacQCMMinput:
 		
 		sequence = getattr( self.molecule, "sequence", None )
 		mol_file_name = os.path.join( os.getcwd(),"mol.in")
-		self.mop_file_name = os.path.join(self.baseName, os.path.basename(self.coordName) + "_" + self.Hamiltonian+ ".mop" )
+		self.mop_file_name = os.path.join(self.baseName, os.path.basename(self.coordName[:-4]) + "_" + self.Hamiltonian+ ".mop" )
 		mol_file  = open( mol_file_name, "w" )
 		mop_file  = open( self.mop_file_name, "w" )
 		if sequence is not None: pdb_file  = open( self.mop_file_name[:-4]+".pdb","w")
