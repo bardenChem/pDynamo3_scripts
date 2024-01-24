@@ -128,10 +128,10 @@ class MopacQCMMinput:
 	def Execute(self, mopac_path="/opt/mopac/MOPAC2016.exe"):
 		'''
 		'''
-		command = mopac_path + " " + self.mop_file_name 		
-		
-		try: os.system(command)
-		except:
+
+		command = mopac_path + " " + self.mop_file_name 
+		if os.path.exists(command): os.system(command)
+		else: 
 			mopac_path =  "/opt/apps/mopac/2016/bin/mopac"
 			command = mopac_path + " " + self.mop_file_name
 			os.system()
