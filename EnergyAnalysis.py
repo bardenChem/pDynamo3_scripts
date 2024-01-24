@@ -284,6 +284,7 @@ class EnergyAnalysis:
 		#-----------------------------------------------------
 		X = []
 		Y = []
+		print(self.xlen,self.ylen,_xlim,_ylim)
 		self.NormalizeEnergies()
 		if _xlim == None and _ylim == None:
 			_xlim = [ 0, self.xlen ]
