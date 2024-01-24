@@ -129,7 +129,12 @@ class MopacQCMMinput:
 		'''
 		'''
 		command = mopac_path + " " + self.mop_file_name 		
-		os.system(command)
+		
+		try: os.system(command)
+		except:
+			mopac_path =  "/opt/apps/mopac/2016/bin/mopac"
+			command = mopac_path + " " + self.mop_file_name
+			os.system()
 	#--------------------------------------------------------
 	def GetEnergy(self):
 		'''
