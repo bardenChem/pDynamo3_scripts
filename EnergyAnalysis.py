@@ -282,6 +282,8 @@ class EnergyAnalysis:
 		Plot contour plot for potential, free energy and potential of mean field
 		'''			
 		#-----------------------------------------------------
+		X = []
+		Y = []
 		self.NormalizeEnergies()
 		if _xlim == None and _ylim == None:
 			_xlim = [ 0, self.xlen ]
@@ -292,7 +294,8 @@ class EnergyAnalysis:
 		#------------------------------------------------------
 		else:			
 			X = np.linspace(_xlim[0],_xlim[1],self.xlen)
-			Y = np.linspace(_ylim[0],_ylim[1],self.ylen)		
+			Y = np.linspace(_ylim[0],_ylim[1],self.ylen)
+			print(X,Y)				
 		#------------------------------------------------------
 		z = self.energiesMatrix
 		#------------------------------------------------------
