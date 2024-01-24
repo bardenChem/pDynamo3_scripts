@@ -130,7 +130,7 @@ class EnergyAnalysis:
 					self.energiesMatrix = np.zeros( (self.ylen, self.xlen), dtype=float )
 				m = int( lns[0])				
 				n = int( lns[1])				
-				self.energiesMatrix[m][n] = float(lns[2])
+				self.energiesMatrix[n][m] = float(lns[2])
 			
 			self.multiple2Dplot.append(self.energiesMatrix)
 			self.identifiers.append(method)

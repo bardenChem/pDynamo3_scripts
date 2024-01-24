@@ -229,7 +229,7 @@ class EnergyRefinement:
 
 		for smo in _methods:
 			for i in range( len(self.fileLists) ):				
-				self.molecule.coordinates3 = ImportCoordinates3(self.fileLists[i])
+				self.molecule.coordinates3 = ImportCoordinates3(self.fileLists[i],log=None)
 				mop = MopacQCMMinput(self.molecule,self.baseName,self.fileLists[i],_mopacKeys,smo)
 				mop.CalculateGradVectors()
 				mop.write_input(self.charge,self.multiplicity)
