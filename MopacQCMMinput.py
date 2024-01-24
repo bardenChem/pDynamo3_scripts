@@ -78,7 +78,7 @@ class MopacQCMMinput:
 		elif _mult == 5: MULT = "quintet"
 		
 		sequence = getattr( self.molecule, "sequence", None )
-		mol_file_name = os.path.join( os.getcwd(),"mol.in")
+		mol_file_name = os.path.join( self.baseName,"mol.in")
 		self.mop_file_name = os.path.join(self.baseName, os.path.basename(self.coordName[:-4]) + "_" + self.Hamiltonian+ ".mop" )
 		mol_file  = open( mol_file_name, "w" )
 		mop_file  = open( self.mop_file_name, "w" )
