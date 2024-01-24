@@ -104,7 +104,9 @@ class Analysis:
 		EA = EnergyAnalysis(self.parameters["xsize"],ysize,_type=self.parameters["type"] )
 		
 		EA.ReadLog(self.parameters["log_name"] )
-		if multiPlot: EA.MultPlot1D(label=crd1_label)
+		if multiPlot:
+			if   ndim == 1: EA.MultPlot1D(label=crd1_label)
+			elif ndim == 2: EA.MultPlot2D(cnt_lines,crd1_label,crd2_label,xlim,ylim,show) 
 		#--------------------------------------------------------
 		elif ndim == 1: EA.Plot1D(crd1_label,XLIM=xlim,SHOW=show)
 		elif ndim == 2:	EA.Plot2D(cnt_lines,crd1_label,crd2_label,xlim,ylim,show)
