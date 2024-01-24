@@ -103,6 +103,7 @@ class Analysis:
 		#--------------------------------------------------------
 		EA = EnergyAnalysis(self.parameters["xsize"],ysize,_type=self.parameters["type"] )
 		
+		print(xlim, ylim)
 		EA.ReadLog(self.parameters["log_name"] )
 		if multiPlot:
 			if   ndim == 1: EA.MultPlot1D(label=crd1_label)
