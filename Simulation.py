@@ -124,7 +124,8 @@ class Simulation:
 							  self.parameters["charge"]     ,
 							  self.parameters["multiplicity"])
 		#------------------------------------------------------------------
-		if "change_qc_region" in self.parameters        : ER.ChangeQCRegion(self.parameters["center"],self.parameters["radius"])
+		if "change_qc_region" in self.parameters:
+				if self.parameters["change_qc_region"] == True: ER.ChangeQCRegion(self.parameters["center"],self.parameters["radius"])
 		if 	 self.parameters["Software"] == "pDynamo"   : ER.RunInternalSMO(self.parameters["methods_lists"],nmaxthreads)
 		elif self.parameters["Software"] == "pDynamoDFT": ER.RunInternalDFT(self.parameters["functional"],self.parameters["basis"],nmaxthreads)
 		elif self.parameters["Software"] == "DFTBplus"  : ER.RunDFTB()

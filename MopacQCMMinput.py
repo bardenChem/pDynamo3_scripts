@@ -32,8 +32,9 @@ class MopacQCMMinput:
 		self.atomsDict		= {}
 		self.Hamiltonian    = _hamiltonian
 
-
-		self.charges = self.molecule.mmState.charges
+		if hasattr(self.molecule,"mmState"): 
+			self.charges = self.molecule.mmState.charges
+		else: self.charges[len(self.molecule.atoms)]
 		
 		for i in self.molecule.atoms.items:
 			symbol = GetAtomicSymbol( i.atomicNumber )
@@ -52,19 +53,20 @@ class MopacQCMMinput:
 		'''
 		PHI      = 0.0 
 		distance = 0.0
-		indx     = 0		
-		#----------------------------------		
-		for j in range( len(self.QCatoms) ):
-			indx = 0 
-			for i in self.molecule.atoms.items:						 
-				distance = self.molecule.coordinates3.Distance( indx, self.QCatoms[j] )
-				if not indx == self.QCatoms[j]:
-					PHI 	+= self.charges[indx]/ distance
-					indx    += 1
+		indx     = 0
+		if hasattr(self.molecule,"mmState"): 		
+			#----------------------------------		
+			for j in range( len(self.QCatoms) ):
+				indx = 0 
+				for i in self.molecule.atoms.items:						 
+					distance = self.molecule.coordinates3.Distance( indx, self.QCatoms[j] )
+					if not indx == self.QCatoms[j]:
+						PHI 	+= self.charges[indx]/ distance
+						indx    += 1
 			
-			PHI *= 332
-			self.gradVectors.append(PHI)
-			PHI=0		
+				PHI *= 332
+				self.gradVectors.append(PHI)
+				PHI=0		
 		
 	#===================================================================
 	def write_input(self,_chg,_mult):

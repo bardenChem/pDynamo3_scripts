@@ -149,16 +149,18 @@ class EnergyRefinement:
 				with pymp.Parallel(_NmaxThreads) as p:
 					for i in p.range( len(self.fileLists) ):
 						_qc_parameters["Hamiltonian"] = smo
-						qcSystem = QuantumMethods.From_Parameters(_qc_parameters)						
-						qcSystem.system.coordinates3 = Unpickle( self.fileLists[i] )[0]
+						qcSystem = QuantumMethods.From_Parameters(_qc_parameters)	
+						qcSystem.system.coordinates3 = ImportCoordinates3( self.fileLists[i],log=None )
 						lsFrames= GetFrameIndex(self.fileLists[i][:-4])						
 						if self.ylen > 0:
-							self.energiesArray[ lsFrames[1], lsFrames[0] ] = qcSystem.system.Energy(log=None)
+							try: self.energiesArray[ lsFrames[1], lsFrames[0] ]    = qcSystem.system.Energy(log=None)
+							except: self.energiesArray[ lsFrames[1], lsFrames[0] ] = self.energiesArray[0,0] + 1000
 							self.indexArrayX[ lsFrames[1], lsFrames[0] ] = lsFrames[0]
 							self.indexArrayY[ lsFrames[1], lsFrames[0] ] = lsFrames[1]
-						else:						
-							self.energiesArray[ lsFrames[0] ] = qcSystem.system.Energy(log=None)
-							self.indexArrayX[ lsFrames[0] ] = lsFrames[0]	
+						else:				
+							try: 	self.energiesArray[ lsFrames[0] ] = qcSystem.system.Energy(log=None)
+							except: self.energiesArray[ lsFrames[0] ] = self.energiesArray[0] + 1000
+							self.indexArrayX[ lsFrames[0] ] 		  = lsFrames[0]	
 				#-----------------------------------------
 				if self.ylen > 0:
 					self.SMOenergies[smo] = self.energiesArray
