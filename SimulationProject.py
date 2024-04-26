@@ -53,6 +53,7 @@ class SimulationProject:
         self.MMmodel        = {} #MM models Dict loaded in this project
         self.refEnergy      = 0.0 
 
+        logFile.Header()
         if not self.folderName:
             self.folderName = os.getcwd()
         if not os.path.exists(self.folderName): os.makedirs(self.folderName)
@@ -333,6 +334,12 @@ class SimulationProject:
         '''
         Finalize the run.
         '''
+        logfile.Footer()
+
+    def Unit_Test(self):
+        '''
+        '''
+        pass
         
 #==============================================================================
 if __name__ == "__main__":
