@@ -65,10 +65,12 @@ class QuantumMethods:
 			self.system.nbModel = None
        	#--------------------
 		self.Set_Converger()
-		self.system.electronicState = ElectronicState.WithOptions( charge = _parameters["QCcharge"],multiplicity = _parameters["multiplicity"] )
+		self.system.electronicState = ElectronicState.WithOptions( charge = _parameters["QCcharge"],
+																   multiplicity = _parameters["multiplicity"] )
 		#----------------------------
 		if self.methodClass == "SMO":
-			self.qcModel = QCModelMNDO.WithOptions( hamiltonian = _parameters["Hamiltonian"], converger=self.converger )
+			self.qcModel = QCModelMNDO.WithOptions( hamiltonian = _parameters["Hamiltonian"],
+												    converger=self.converger )
 		#...................................
 		elif self.methodClass == "abinitio":
 			self.qcModel = QCModelDFT.WithOptions(converger   = self.converger 			 ,
@@ -82,8 +84,8 @@ class QuantumMethods:
 			options += "print [ p_overlap ] 5\n"
 			options += "end # output"
 			self.qcModel = QCModelORCA.WithOptions( keywords = [ _parameters["functional"],_parameters["basis"],options  ], 
-                                            deleteJobFiles  = False                      							  ,
-                                            scratch         =_parameters["scratch"]                                   )
+                                            		deleteJobFiles  = False                      							  ,
+                                            		scratch         =_parameters["scratch"]                                   )
 			NBmodel  = NBModelORCA.WithDefaults()
 		#...................................
 		elif self.methodClass == "DFTB":

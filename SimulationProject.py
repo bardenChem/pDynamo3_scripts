@@ -79,6 +79,8 @@ class SimulationProject:
     def From_Force_Field(selfClass,_topologyFile,_coordinateFile,_FolderName=None):
         '''
         Initialize project from force field topology and coordinate files.
+
+        Add specic cases for Gromacs and CHARMS
         '''
         self = selfClass(_projectFolder=_FolderName)
         #...........................................
@@ -116,19 +118,17 @@ class SimulationProject:
         return(self) 
     #===================================================================================
     @classmethod
-    def Protein_From_Coordinates(selfClass,_coordinateFile,_FolderName=None):
+    def Protein_From_Coordinates(selfClass,_coordinateFile,_FolderName=None,_modelNumber=1):
         '''
         Initialize project from coordinate file with OPLS general force field
         '''
         self = selfClass(_projectFolder=_FolderName)
         #...........................................
-        _system      = ImportSystem(_coordinateFile)
+        _system      = ImportSystem(_coordinateFile, modelNumber = 1, useComponentLibrary = True)
+        self.MMmodel = MMModelOPLS.WithParameterSet("protein")
         self.NBmodel = NBModelCutOff.WithDefaults()
-        self.MMmodel = MMModelOPLS.WithParameterSet("protein") 
         _system.DefineNBModel(self.NBmodel) 
-        #...........................................
-        _system              = ImportSystem(_coordinateFile)
-        _system.coordinates3 = ImportCoordinates3(_coordinateFile)               
+        #...........................................            
         _name                = os.path.basenem(_coordinateFile)
         self.baseName        = _name[:-4]
         self.systems[_name]  = _system
@@ -206,49 +206,6 @@ class SimulationProject:
         if "functional" in _parameters: newLabel  += _parameters["functional"] 
         self.systems[newLabel]                     = qs.system
         self.system                                = self.systems[newLabel]
-    #=========================================================================
-    def Set_QCMM_SMO(self,_parameters):
-        '''
-        Define hybrid system initial configutation. 
-        '''
-        atomlist = []
-        for sel in _parameters["region"]:
-            if type(sel) == int:
-                atomlist.append(sel)
-            elif type(_parameters["region"]) == list:
-                for i in range( len(sel) ):
-                    atomlist.append( sel[i] ) 
-        #--------------------------------------------
-        if self.DEBUG:
-            print(atomlist)           
-        #---------------------------------------------
-        #define QC atoms selection
-        converger = DIISSCFConverger.WithOptions( energyTolerance   = 3.0e-4,
-                                                  densityTolerance  = 1.0e-8,
-                                                  maximumIterations = 2500  )
-        _QCRegion = Selection.FromIterable(atomlist)    
-        #---------------------------------------------
-        #Appending sytem
-        self.system = self.systems[self.systemKeys[-1]]
-        self.NBmodel = self.system.nbModel
-        self.system.nbModel = None
-        oldSystem = Clone(self.system)       
-        self.system.label = self.baseName + "#{} {} Hamiltonian and QC region Set".format(self.systemCoutCurr,_parameters["Hamiltonian"])
-        self.systemCoutCurr += 1
-        #Setting QC model 
-        self.system.electronicState = ElectronicState.WithOptions ( charge = _parameters["QCcharge"] , multiplicity = _parameters["multiplicity"] )
-        _QCmodel = QCModelMNDO.WithOptions( hamiltonian = _parameters["Hamiltonian"], converger=converger )        
-        #------------------------------------------------------------------------
-        self.system.DefineQCModel( _QCmodel, qcSelection=_QCRegion )
-        self.system.DefineNBModel( self.NBmodel )
-        self.systems["QCMM_system"] = self.system
-        #------------------------------------------------------------------------
-        if self.DEBUG:
-            qcSystem = PruneByAtom(self.system,_QCRegion)
-            ExportSystem(self.baseName+"/qcSystem.pdb",qcSystem)
-            ExportSystem(self.baseName+"/qcSystemEntire.pdb",self.system)
-        energy = self.system.Energy()
-
     #=========================================================================
     def Run_Simulation(self,_parameters):
         '''
@@ -336,24 +293,11 @@ class SimulationProject:
         '''
         logfile.Footer()
 
-    def Unit_Test(self):
-        '''
-        '''
-        pass
+    
+#==========================================================================================
+def Unit_Test(self):
+    '''
+    '''
+    pass
         
-#==============================================================================
-if __name__ == "__main__":
-    #----------------------------------------------------
-    '''
-    Fast test
-    scratch_path = os.path.join("TestsScratch")
-    ex_path      = "examples"
-    timTop       = os.path.join(ex_path,"TIM","7tim.top")
-    timCrd       = os.path.join(ex_path,"TIM","7tim.crd")
-    balapkl      = os.path.join(ex_path,"bala","bAla.pkl")
-    meth         = os.path.join(ex_path,"pdb","methane.pdb")
-    #----------------------------------------------------
-    test1 = SimulationProject() #default initialization
-    test2 = SimulationProject.From_PKL(balapkl,_FolderName="bala_test")
-    print(test2.Energy)
-    '''
+
