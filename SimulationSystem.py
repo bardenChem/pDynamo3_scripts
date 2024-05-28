@@ -69,7 +69,7 @@ class SimulationSystem:
         return(self)
     #=================================================================================== 
     @classmethod
-    def From_Force_Field(selfClass,_parameters):
+    def From_Force_Field(selfClass,_topologyFile,_coordinateFile):
         '''
         Initialize project from force field topology and coordinate files.
         '''
@@ -83,14 +83,14 @@ class SimulationSystem:
         return(self)     
     #===================================================================================
     @classmethod
-    def From_Gromacs(selfClass,_parameters):
+    def From_Gromacs(selfClass,_topologyFile,_coordinateFile):
         '''
         '''
         self = selfClass()
-        fileName     = os.path.join                                ( dataPath, label + "_" + ff )
-        parameters   = GromacsParameterFileReader.PathToParameters ( fileName + ".top" )
-        self.system  = GromacsDefinitionsFileReader.PathToSystem   ( fileName + ".top", parameters = parameters )
-        self.system.coordinates3 = ImportCoordinates3              ( fileName + ".gro" )
+        parameters   = GromacsParameterFileReader.PathToParameters ( _topologyFile )
+        self.system  = GromacsDefinitionsFileReader.PathToSystem   ( _topologyFile, parameters = parameters )
+        self.system.coordinates3 = ImportCoordinates3              ( _coordinateFile )
+        self.baseName = os.path.basename(_coordinateFile[:-4])
         return(self)        
     #===================================================================================
     @classmethod
@@ -119,7 +119,6 @@ class SimulationSystem:
         self.protein = True
         return(self) 
     #====================================================================================
-    @property
     def Check(self):
         '''
         Calculates single point energy.
@@ -172,7 +171,7 @@ class SimulationSystem:
         if self.DEBUG: self.Energy
     
     #=========================================================================
-    def Set_QC_Method(self,_parameters,_DEBUG=false):
+    def Set_QC_Method(self,_parameters,_DEBUG=False):
         '''
         '''        
         _parameters["active_system"] = self.system 
@@ -181,10 +180,11 @@ class SimulationSystem:
         newLabel = self.system.label + "QC_system_"
         if "Hamiltonian" in _parameters: newLabel += _parameters["Hamiltonian"] 
         if "functional" in _parameters: newLabel  += _parameters["functional"] 
+        self.system.label += newLabel
         self.system = qs.system
 
     #=========================================================================
-    def Set_Reaction_Coordinates(self,_parameters):
+    def Set_Reaction_crd(self,_parameters):
         '''
         '''
         pass
