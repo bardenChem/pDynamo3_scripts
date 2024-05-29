@@ -65,6 +65,7 @@ class SimulationSystem:
         self.system         = ImportSystem(_pklPath)
         _name               = os.path.basename(_pklPath)
         self.baseName       = _name[:-4]
+        self.NBmodel        = self.system.nbModel
         # test if is quantum, if hass mmModel and NbModel
         return(self)
     #=================================================================================== 
@@ -79,6 +80,7 @@ class SimulationSystem:
         self.system.DefineNBModel = self.NBmodel
         self.system.coordinates3  = ImportCoordinates3(_coordinateFile)               
         _name                     = os.path.basename(_topologyFile)
+        self.NBModel              = self.system.nbModel
         self.baseName             = _name[:-4]        
         return(self)     
     #===================================================================================
@@ -91,6 +93,7 @@ class SimulationSystem:
         self.system  = GromacsDefinitionsFileReader.PathToSystem   ( _topologyFile, parameters = parameters )
         self.system.coordinates3 = ImportCoordinates3              ( _coordinateFile )
         self.baseName = os.path.basename(_coordinateFile[:-4])
+        self.NBmodel  = self.system.nbModel
         return(self)        
     #===================================================================================
     @classmethod
@@ -135,15 +138,17 @@ class SimulationSystem:
             _radius    :
         '''
         #---------------------------------------------------
-        oldSystem = copySystem(self.system)
+        oldSystem = Clone(self.system)
         #---------------------------------------------------
         atomref      = AtomSelection.FromAtomPattern( oldSystem, _centerAtom )
         core         = AtomSelection.Within(oldSystem,atomref,_radius)
         core2        = AtomSelection.ByComponent(oldSystem,core)
         #---------------------------------------------------
-        newLabel     = self.label + "_pruned"
-        self.system  = PruneByAtom( oldSystem,Selection(core2) )
+        newLabel    = self.label + "_pruned"
+        self.system = None
+        self.system = PruneByAtom( oldSystem,Selection(core2) )
         self.system.DefineNBModel( self.NBmodel )        
+        self.label  = newLabel
     #======================================================================================
     def Setting_Free_Atoms(self,_centerAtom,_radius,_DEBUG=False):
         '''
@@ -152,34 +157,26 @@ class SimulationSystem:
             _centerAtom:
             _radius    :
         '''
-        newSystem = copySystem(self.system)
-        self.systemCoutCurr += 1
         #-----------------------------------------------------
-        atomref = AtomSelection.FromAtomPattern( newSystem, _centerAtom )
-        core    = AtomSelection.Within(newSystem,atomref,_radius)
-        mobile  = AtomSelection.ByComponent(newSystem,core)        
+        atomref = AtomSelection.FromAtomPattern(self.system, _centerAtom)
+        core    = AtomSelection.Within(self.system,atomref,_radius)
+        mobile  = AtomSelection.ByComponent(self.system,core)        
         #-----------------------------------------------------
-        newLabel= self.system.label + "_fixed"
-        if _DEBUG:
-            MobileSys = PruneByAtom( newSystem, Selection(mobile) )
-            ExportSystem("MobileSystemCheck.pdb",MobileSys)
-        #------------------------------------------------------
-        self.systems = newSystem
-        self.systems.freeAtoms = mobile       
-        self.system.DefineNBModel( self.NBmodel )
-        self.system = self.systems[newLabel]
-        if self.DEBUG: self.Energy
-    
+        newLabel= self.system.label + "_fixed"       
+        #------------------------------------------------------        
+        self.system.freeAtoms = mobile       
+        self.system.label     = newLabel     
     #=========================================================================
     def Set_QC_Method(self,_parameters,_DEBUG=False):
         '''
         '''        
         _parameters["active_system"] = self.system 
         qs =  QuantumMethods.From_Parameters(_parameters)
+        if not "method_class" in _parameters: _parameters["method_class"] = "SMO"
         if _DEBUG: qs.Export_QC_System()
         newLabel = self.system.label + "QC_system_"
         if "Hamiltonian" in _parameters: newLabel += _parameters["Hamiltonian"] 
-        if "functional" in _parameters: newLabel  += _parameters["functional"] 
+        if "functional"  in _parameters: newLabel += _parameters["functional"] 
         self.system.label += newLabel
         self.system = qs.system
 

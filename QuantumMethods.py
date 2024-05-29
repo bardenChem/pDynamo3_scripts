@@ -38,6 +38,7 @@ class QuantumMethods:
 		self.qcSystem       = None 
 		self.system         = None
 		self.qcModel        = None
+
 	#==================================================
 	@classmethod
 	def From_Parameters(selfClass,_parameters):
@@ -50,6 +51,9 @@ class QuantumMethods:
 		self.methodClass = _parameters["method_class"]
 		if "region" in _parameters: self.Hybrid = True
 
+		if not "QCcharge" in _parameters: _parameters["QCcharge"] = 0
+		if not "multiplicity" in _parameters: _parameters["multiplicity"] = 1
+		NBmodel = self.system.nbModel
 		#---------------------------------------------
 		if self.Hybrid:
 			atomlist = []
@@ -60,24 +64,22 @@ class QuantumMethods:
 					for i in range( len(sel) ):
 						self.selection.append( sel[i] ) 
 			self.selection = Selection.FromIterable(self.selection) 
-
-			NBmodel = self.system.nbModel
 			self.system.nbModel = None
-       	#--------------------
+       	#---------------------------------------------------------------------------------
 		self.Set_Converger()
 		self.system.electronicState = ElectronicState.WithOptions( charge = _parameters["QCcharge"],
 																   multiplicity = _parameters["multiplicity"] )
-		#----------------------------
+		#---------------------------------------------------------------------------------
 		if self.methodClass == "SMO":
 			self.qcModel = QCModelMNDO.WithOptions( hamiltonian = _parameters["Hamiltonian"],
 												    converger=self.converger )
-		#...................................
+		#.................................................................................
 		elif self.methodClass == "abinitio":
 			self.qcModel = QCModelDFT.WithOptions(converger   = self.converger 			 ,
 												  functional  = _parameters["functional"],
 												  orbitalBasis= _parameters["basis"] 	 ,
 												  fitBasis    = _parameters["fit_basi"]  )
-		#...................................
+		#.................................................................................
 		elif self.methodClass == "ORCA":
 			options =  "\n% output\n"
 			options += "print [ p_mos ] 1\n"
@@ -87,7 +89,7 @@ class QuantumMethods:
                                             		deleteJobFiles  = False                      							  ,
                                             		scratch         =_parameters["scratch"]                                   )
 			NBmodel  = NBModelORCA.WithDefaults()
-		#...................................
+		#..................................................................................
 		elif self.methodClass == "DFTB":
 			self.qcModel = QCModelDFTB.WithOptions( deleteJobFiles = False   ,
 			                                		randomScratch  = True    ,
@@ -95,7 +97,7 @@ class QuantumMethods:
 			                                 		skfPath        = _parameters["skfPath"],
 			                                 		useSCC         = True    )
 			NBmodel = NBModelDFTB.WithDefaults()
-		#...................................
+		#...................................................................................
 		elif self.methodClass == "pySCF":
 			pass
 		#------------------------------------------------------------------------
@@ -115,7 +117,7 @@ class QuantumMethods:
 		ExportSystem( os.path.join( baseName,"qcSystem.pdb"), self.qcSystem ) 
 		ExportSystem( os.path.join( baseName,"qcSystem.pkl"), self.qcSystem )
 	#-----------------------------------------
-	def Set_Converger(self,_parameters=None):
+	def Set_Converger(self):
 		'''
 		'''
 		EnergyTolerance  = 3.0e-4

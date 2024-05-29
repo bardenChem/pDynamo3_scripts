@@ -25,7 +25,7 @@ class Scripts:
 
 		if _projectFolder: self.projectFolder = os.getcwd()		
 		if not os.path.exists(self.projectFolder): os.makedirs(self.projectFolder)
-
+		
 
 	#-----------------------------------------
 	@classmethod
@@ -48,7 +48,7 @@ class Scripts:
 		#Load system based on Input_Type using a dictionary for clarity
 		input_methods = {
 			"geometry": SimulationSystem.From_Coordinates,
-			"force_field": SimulationSystem.From_Force_Field,
+			"amber": SimulationSystem.From_Force_Field,
 			"gromacs": SimulationSystem.From_Gromacs,
 			"pkl": SimulationSystem.From_PKL,
 		}
@@ -58,7 +58,7 @@ class Scripts:
 			load_function = input_methods[input_type]
 			if input_type == "geometry":
 				_system4load = load_function(_parameters["crd_file"])
-			elif input_type == "force_field":
+			elif input_type == "amber":
 				_system4load = load_function(_parameters["top_file"], _parameters["crd_file"])
 			elif input_type == "gromacs":
 				_system4load = load_function(_parameters["top_file"], _parameters["crd_file"])
@@ -70,10 +70,11 @@ class Scripts:
 		# Handle potential issues with missing keys or invalid values
 			raise ValueError(f"Error loading system: {e}") from e  # Chain the original exception
 	
+		self.activeSystem = _system4load
 		#------------------------------------
 		if "set_energy_model" in _parameters:
 			if _parameters["set_energy_model"] == "QM":
-				self.activeSystem.Set_QC_Method(_parameters,_DEBUG=_debug)
+				self.activeSystem.Set_QC_Method(_parameters,_DEBUG=_debug_ok)
 		if "spherical_prune" in _parameters:			
 			self.activeSystem.Spherical_Pruning(_parameters["spherical_prune"],float(_parameters["spherical_prune_radius"]))
 		if "set_fixed_atoms" in _parameters:
@@ -81,7 +82,6 @@ class Scripts:
 		if "set_reaction_coordinate" in _parameters:
 			self.activeSystem.Setting_Reaction_crd(_parameters)
 		#-----------------------------------
-		self.activeSystem = _system4load
 		self.system_historic.append(_system4load)
 		self.activeSystem.Check()
 		self.SaveSystem()
