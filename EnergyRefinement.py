@@ -74,58 +74,7 @@ class EnergyRefinement:
 			self.indexArrayY   = pymp.shared.array( (self.ylen,self.xlen) , dtype='uint8')
 		self.SMOenergies   = None
 	
-	#=====================================================================================
-	def GetQCCharge(self,_system):
-		'''
-		'''
-		qc_charge=0.0
-		mmCharges = _system.mmState.charges
-		for i in range( len(mmCharges) ): qc_charge += mmCharges[i]			
-		return( round(qc_charge) )
-	#=====================================================================================
-	def ChangeQCRegion(self,_centerAtom,_radius,_crd3=None):
-		'''
-		Redefine QC selection from a given atomic coordinates with a certain radius
-		Parameters:
-			_centerAtom:
-			_radius    :
-		'''
-		qcModel = None
-		if type(_centerAtom) == list:  
-			atom_list = [] 		
-			for i in self.molecule.atoms.items:
-				x    = self.molecule.coordinates3[i.index, 0] 
-				y    = self.molecule.coordinates3[i.index, 1]
-				z    = self.molecule.coordinates3[i.index, 2]
-				xd   = (x-_centerAtom[0])**2
-				yd   = (y-_centerAtom[1])**2
-				zd   = (z-_centerAtom[2])**2
-				dist = np.sqrt( xd+yd+zd ) 
-				if dist < _radius:
-					atom_list.append(i.index)
-
-			sel              = Selection.FromIterable(atom_list)
-			newSelection 	 = AtomSelection.ByComponent(self.molecule,sel)
-			newSystem    	 = PruneByAtom(self.molecule, Selection(newSelection) )		
-			self.charge  	 = self.GetQCCharge(newSystem)
-			self.pureQCAtoms = list(newSelection)	
-		#-------------------------------------------------------------------
-		else:
-			sel              = Selection.FromIterable([_centerAtom])
-			newSelection  	 = AtomSelection.Within(self.molecule,sel,_radius)
-			newSelection 	 = AtomSelection.ByComponent(self.molecule,newSelection)
-			newSystem    	 = PruneByAtom(self.molecule, Selection(newSelection) )		
-			self.charge  	 = self.GetQCCharge(newSystem)
-			self.pureQCAtoms = list(newSelection)	
-
-		if self.molecule.qcModel == None: qcModel = QCModelMNDO.WithOptions( hamiltonian = "am1" )
-		else: qcModel = self.molecule.qcModel
-			#-------------------------------------------------------------------------------
-		self.molecule.electronicState = ElectronicState.WithOptions( charge = self.charge, multiplicity = self.multiplicity )
-		self.molecule.DefineQCModel(qcModel, qcSelection=Selection(self.pureQCAtoms) )
-		self.molecule.Summary()		
-        #---------------------------------------------------
-        
+	
 	#=====================================================================================
 	def RunInternalSMO(self,_methods,_NmaxThreads):
 		'''

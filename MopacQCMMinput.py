@@ -16,36 +16,48 @@ class MopacQCMMinput:
 	Class to set methods to creat inputs for run QC/MM in mopac
 	'''
 	#---------------------------------------------------------
-	def __init__(self,_system,_baseName,_coordName,_keyWords,_hamiltonian):
+	def __init__(self,_parameters):
 		'''
 		'''
-		self.molecule 		= _system
-		self.baseName       = _baseName
-		self.coordName      = _coordName
-		self.keywords 		= _keyWords
-		self.QCatoms  		= []
-		self.QCcharge 		= 0
-		self.multiplicity 	= 1
+		self.system 		= _parameters["active_system"]
+		self.baseName       = _parameters["basename"]
+		self.QCatoms  		= []		
 		self.gradVectors 	= []
 		self.molinFile      = None 
 		self.inputFile 		= None
 		self.atomsDict		= {}
-		self.Hamiltonian    = _hamiltonian
+		self.pars           = None
+		self.charges        = []
 
-		if hasattr(self.molecule,"mmState"): 
-			self.charges = self.molecule.mmState.charges
-		else: self.charges[len(self.molecule.atoms)]
+		self.Check_Pars(_parameters)
+
+		if hasattr(self.system,"mmState"): 
+			self.charges = self.system.mmState.charges
+		else: self.charges[len(self.system.atoms)]
 		
-		for i in self.molecule.atoms.items:
+		for i in self.system.atoms.items:
 			symbol = GetAtomicSymbol( i.atomicNumber )
 			index  = i.index
-			x      = self.molecule.coordinates3[i.index, 0]
-			y      = self.molecule.coordinates3[i.index, 1]
-			z      = self.molecule.coordinates3[i.index, 2]
+			x      = self.system.coordinates3[i.index, 0]
+			y      = self.system.coordinates3[i.index, 1]
+			z      = self.system.coordinates3[i.index, 2]
 			self.atomsDict[index] = [ symbol,x,y,z,self.charges[index] ]
+		self.QCatoms = list(self.system.qcState.qcAtoms)
+		self.BAatoms = list(self.system.qcState.boundaryAtoms)
 
-		self.QCatoms		= list(self.molecule.qcState.qcAtoms)
-		self.BAatoms		= list(self.molecule.qcState.boundaryAtoms)
+	#------------------------------------------------------------------
+	def Check_Pars(self,_parameters):
+		'''
+		'''
+		self.pars = { 
+			"cood_name":"none" ,
+			"Hamiltonian":"am1",
+			"QCcharge":0       ,
+			"multiplicity":1   ,
+			"keywords":[]      , 
+		}
+		for key in _parameters.keys(): self.pars[key] = _parameters[key]
+
 	#==================================================================
 	def CalculateGradVectors(self):
 		'''
@@ -54,12 +66,12 @@ class MopacQCMMinput:
 		PHI      = 0.0 
 		distance = 0.0
 		indx     = 0
-		if hasattr(self.molecule,"mmState"): 		
+		if hasattr(self.system,"mmState"): 		
 			#----------------------------------		
 			for j in range( len(self.QCatoms) ):
 				indx = 0 
-				for i in self.molecule.atoms.items:						 
-					distance = self.molecule.coordinates3.Distance( indx, self.QCatoms[j] )
+				for i in self.system.atoms.items:						 
+					distance = self.system.coordinates3.Distance( indx, self.QCatoms[j] )
 					if not indx == self.QCatoms[j]:
 						PHI 	+= self.charges[indx]/ distance
 						indx    += 1
@@ -69,24 +81,28 @@ class MopacQCMMinput:
 				PHI=0		
 		
 	#===================================================================
-	def write_input(self,_chg,_mult):
+	def write_input(self,_crd_name):
 		'''
 		Write the input files and grad vectors file
 		'''
+		#-----------------------------------------------------
 		MULT        = "singlet"
-		if 	 _mult == 2: MULT = "doublet"
-		elif _mult == 3: MULT = "triplet"
-		elif _mult == 4: MULT = "quartet"
-		elif _mult == 5: MULT = "quintet"
-		
-		sequence = getattr( self.molecule, "sequence", None )
+		if 	 self.pars["multiplicity"] == 2: MULT = "doublet"
+		elif self.pars["multiplicity"] == 3: MULT = "triplet"
+		elif self.pars["multiplicity"] == 4: MULT = "quartet"
+		elif self.pars["multiplicity"] == 5: MULT = "quintet"
+		#-----------------------------------------------------	
+		# creating files objects and setting paths	
 		mol_file_name = os.path.join( self.baseName,"mol.in")
-		self.mop_file_name = os.path.join(self.baseName, os.path.basename(self.coordName[:-4]) + "_" + self.Hamiltonian+ ".mop" )
+		self.mop_file_name = os.path.join(self.baseName, _crd_name + "_" + self.pars["Hamiltonian"]+ ".mop" )
 		mol_file  = open( mol_file_name, "w" )
 		mop_file  = open( self.mop_file_name, "w" )
+		# Getting info to write PDB file 
+		sequence = getattr( self.system, "sequence", None )
 		if sequence is not None: pdb_file  = open( self.mop_file_name[:-4]+".pdb","w")
+		# Writting the files
 		molInText = "\n{} 0\n".format( len(self.QCatoms) )
-		mop_text  = self.Hamiltonian + " 1SCF charge={} {} ".format(_chg,MULT)
+		mop_text  = self.pars["Hamiltonian"] + " 1SCF charge={} {} ".format(_chg,MULT)
 		pdb_text  = ""
 		for _key in self.keywords:
 			mop_text += _key
@@ -118,7 +134,7 @@ class MopacQCMMinput:
 		for i in self.QCatoms:
 			molInText += "{} {} {} {} {}\n".format(self.atomsDict[i][0],self.atomsDict[i][1],self.atomsDict[i][2],self.atomsDict[i][3],self.gradVectors[idx])
 			idx += 1
-
+		# writing to objects
 		mop_file.write(mop_text)
 		mop_file.close()
 		mol_file.write(molInText)

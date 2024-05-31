@@ -63,6 +63,41 @@ class Simulation:
 			self.baseFolder = self.parameters["folder"]
 			if not os.path.exists(self.parameters["folder"]):
 				os.makedirs(self.parameters["folder"])
+
+	#======================================================================
+	def Update_Parameters(self):
+		'''
+		'''
+
+		self.er_pars = {
+
+		}
+
+		self.go_pars = {
+
+		}
+
+		self.scan_pars = {
+
+		}
+
+		self.md_pars = {
+
+		}
+
+		self.fe_pars = {
+
+		}
+
+		self.thermo_pars = {
+
+		}
+
+		self.path_finder = {
+
+		}
+		
+
 	#=======================================================================
 	def Execute(self):
 		'''

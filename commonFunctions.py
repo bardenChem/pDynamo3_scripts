@@ -211,7 +211,6 @@ def GetAtomicSymbol(atomN):
     ls = list( atomic_dic )
     _symbol = ls[atomN-1]
     return(_symbol)
-
 #=========================================================================================
 def GetFrameIndex(fname):
     '''

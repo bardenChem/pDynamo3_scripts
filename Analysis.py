@@ -32,6 +32,11 @@ class Analysis:
 		self.molecule   = _parameters["active_system"]
 		self.baseFolder = _parameters["folder"]
 
+		#check parameters
+		if not "analysis_type" in self.parameters:
+			raise KeyError("Missing required parameter: analysis_type")
+		
+
 	#=========================================================================
 	def Execute(self):
 		'''
