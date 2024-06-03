@@ -23,7 +23,8 @@ class Scripts:
 		self.system_historic = []
 		self.projectFolder   = os.getcwd()
 
-		if _projectFolder: self.projectFolder = os.getcwd()		
+		if not _projectFolder: self.projectFolder = os.getcwd()
+		else: self.projectFolder = os.path.join( os.getcwd(), _projectFolder )		
 		if not os.path.exists(self.projectFolder): os.makedirs(self.projectFolder)
 		
 
@@ -79,22 +80,24 @@ class Scripts:
 			self.activeSystem.Spherical_Pruning(_parameters["spherical_prune"],float(_parameters["spherical_prune_radius"]))
 		if "set_fixed_atoms" in _parameters:
 			self.activeSystem.Setting_Free_Atoms(_parameters["spherical_prune"],float(_parameters["free_atoms_radius"]))
-		if "set_reaction_coordinate" in _parameters:
+		if "set_reaction_crd" in _parameters:
 			self.activeSystem.Setting_Reaction_crd(_parameters)
+		if "set_initial_crd" in _parameters:
+			self.activeSystem.system.coordinates3 = ImportCoordinates3(_parameters["set_initial_crd"])
 		#-----------------------------------
 		self.system_historic.append(_system4load)
 		self.activeSystem.Check()
-		self.SaveSystem()
 
 	#-----------------------------------------
 	def Run_Simulation(self,_parameters):
 		'''
 		'''
-		_parameters["active_system"] = self.activeSystem
+		_parameters["active_system"] = self.activeSystem.system
+		_parameters["project_folder"]= self.projectFolder
 		self.system_historic.append(self.activeSystem) 
 		#----------------------------------------------- 
 		_Run_Simulation   = Simulation(_parameters)
-		self.activeSystem = _Run_Simulation.Execute()		 
+		self.activeSystem.system = _Run_Simulation.Execute()
 
 	#-----------------------------------------
 	def Run_Individual_Analysis(self,_parameters):
@@ -104,7 +107,7 @@ class Scripts:
 		self.system_historic.append(self.activeSystem) 
 		#--------------------------------------------
 		_Analysis = Analysis(_parameters)
-		self.activeSystem = _Analysis.Execute()
+		_Analysis.Execute()
 		
 	#-----------------------------------------
 	def PrintSystems(self):
@@ -163,6 +166,7 @@ class Scripts:
 				savePathPkl = os.path.join(self.projectFolder,_baseName+".pkl")
 				savePathPkl = savePathPkl[:-4] + "_#{}.pkl".format(i)
 		#----------------------------------------------------------------
+		self.activeSystem.system.Summary()
 		Pickle( savePathPkl,self.activeSystem.system )
 		ExportSystem( savePathPdb,self.activeSystem.system )
 #==============================================================

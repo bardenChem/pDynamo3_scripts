@@ -113,7 +113,6 @@ class Analysis:
 
 		if  "in_point" in self.parameters: EA.Path_From_PES(in_point,fin_point)
 
-
 	#=========================================================================
 	def PMFAnalysis(self):
 		'''

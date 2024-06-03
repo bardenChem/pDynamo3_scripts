@@ -21,6 +21,8 @@ from pScientific               import *
 from pScientific.Arrays        import *                                     
 from pScientific.Geometry3     import *                 
 from pSimulation               import *
+
+from TrajectoryAnalysis  import TrajectoryAnalysis
 #*********************************************************************************
 class GeometrySearcher:
     '''
@@ -298,9 +300,17 @@ class GeometrySearcher:
         #----------------------------------------------------------------------
         if self.saveFormat == ".dcd" or self.saveFormat == ".mdcrd":
             if self.saveFormat != self.trajectoryName:
-                traj_save = os.path.splitext(self.trajectoryName)[0] + self.saveFormat
-                try: Duplicate(self.trajectoryName,traj_save,self.molecule)
+                try:
+                    traj_save = os.path.splitext(self.trajectoryName)[0] + self.saveFormat
+                    Duplicate(self.trajectoryName,traj_save,self.molecule)
                 except: pass
+                import glob            
+                xsi = len( glob.glob( os.path.join( self.trajectoryName,"*.pkl") ) )
+                trajAn = TrajectoryAnalysis(self.trajectoryName,self.molecule,xsi)
+                _qc_mm = False                
+                trajAn.CalculateRG_RMSD(qc_mm=False)
+                trajAn.PlotRG_RMS()
+
     #===========================================================================================
     def Print(self):
         '''

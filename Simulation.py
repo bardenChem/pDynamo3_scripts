@@ -58,16 +58,19 @@ class Simulation:
 		'''
 		self.molecule   = _parameters["active_system"]
 		self.parameters = _parameters
-		self.baseFolder = None
-		if "folder" in self.parameters:			
-			self.baseFolder = self.parameters["folder"]
-			if not os.path.exists(self.parameters["folder"]):
-				os.makedirs(self.parameters["folder"])
+		self.baseFolder = _parameters["project_folder"]
+		
 
 	#======================================================================
 	def Update_Parameters(self):
 		'''
 		'''
+
+		self.general = {
+			"restart":False,
+			"NmaxThreads":1,
+
+		}
 
 		self.er_pars = {
 
@@ -120,7 +123,8 @@ class Simulation:
 		elif self.parameters["simulation_type"] == "Steep_Path_Searcher":			self.ReactionSearchers()				
 		elif self.parameters["simulation_type"] == "Simulating_Annealing":			self.SimulatingAnnealing()		
 		elif self.parameters["simulation_type"] == "Steered_Molecular_Dynamics":	self.SMD()		
-		elif self.parameters["simulation_type"] == "Monte_Carlo":					self.MonteCarlo()				
+		elif self.parameters["simulation_type"] == "Monte_Carlo":					self.MonteCarlo()
+		return(self.molecule)				
 		
 	#=================================================================================================================
 	def EnergyRefine(self):
@@ -192,10 +196,13 @@ class Simulation:
 		_traj_name = None
 		if "optmizer" 		 in self.parameters: _Optimizer = self.parameters["optmizer"]
 		if "trajectory_name" in self.parameters: _traj_name = self.parameters["trajectory_name"]
+		print(_traj_name)
 		Gopt = GeometrySearcher(self.molecule,self.baseFolder,_trajName=_traj_name)		
 		Gopt.ChangeDefaultParameters(self.parameters)
 		Gopt.Minimization(_Optimizer)
 		Gopt.Finalize()
+		self.molecule = Gopt.molecule
+
 	#==================================================================
 	def RelaxedSurfaceScan(self, plot = True):
 		'''

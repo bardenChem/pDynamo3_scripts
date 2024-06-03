@@ -48,9 +48,9 @@ class QuantumMethods:
 	def Check_Parameters(self,_parameters):
 		'''
 		'''
-		self.pars {
+		self.pars = {
 			"methodClass":"SMO",
-			"region":None
+			"region":None,
 			"QCcharge":0,
 			"multiplicity":1,
 			"functional":"HF",
