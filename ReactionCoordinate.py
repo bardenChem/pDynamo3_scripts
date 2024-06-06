@@ -23,6 +23,7 @@ class ReactionCoordinate:
 			multipleDistance
 			Angle
 			Dihedral
+			Thether
 		'''
 		self.atomsSel	    = _atoms
 		self.atoms          = []
@@ -111,7 +112,7 @@ class ReactionCoordinate:
 		if set_pars: 
 			if self.Type == "multipleDistance":
 				#.-------------------------------------------------
-				if self.massConstraint:			
+				if self.massConstraint == "True":			
 					#------------------------------------------------
 					atomic_n1 = _molecule.atoms.items[ self.atoms[0] ].atomicNumber
 					atomic_n3 = _molecule.atoms.items[ self.atoms[2] ].atomicNumber

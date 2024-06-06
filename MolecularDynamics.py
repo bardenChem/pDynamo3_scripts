@@ -38,7 +38,7 @@ class MD:
     Class to set up Molecular Dynamics Sumulations.
     '''
     #.---------------------------------------
-    def __init__(self,_system,_baseFolder,_integrator,_trajName="production"):
+    def __init__(self,_system,_baseFolder,_parameters):
         '''
         Default constructor. 
         Receives a list of paramters to set the simulations.
@@ -46,53 +46,35 @@ class MD:
         #Important parameters that are recurrently wanted to be change by the user
         self.molecule               = _system
         self.baseName               = _baseFolder 
-        self.trajName               = _trajName
-        self.trajectoryNameSoft     = os.path.join(_baseFolder,self.trajName+".ptRes") # this naming scheme makes sense for the umbrella sampling runs
+        self.trajName               = _parameters["trajectory_name"]
+        self.trajectoryNameSoft     = os.path.join(_baseFolder,self.trajName+".ptRes")
         self.trajectoryNameCurr     = os.path.join(_baseFolder,self.trajName+".ptGeo")
         self.trajectory             = None
         self.trajectorySoft         = None
-        self.algorithm              = _integrator
+        self.algorithm              = _parameters["MD_method"]
         self.saveFormat             = None # binary file format to save the trajectory
-        self.Nsteps                 = 20000 
-        self.timeStep               = 0.001
-        self.temperature            = 300.15
+        self.Nsteps                 = _parameters["production_nsteps"] 
+        self.timeStep               = _parameters["timeStep"]
+        self.temperature            = _parameters["temperature"]
         self.pressureControl        = False
-        self.samplingFactor         = 0
-        self.logFreq                = 200
-        self.seed                   = 3029202042
+        self.samplingFactor         = _parameters["sampling_factor"]
+        self.logFreq                = _parameters["log_frequency"]
+        self.seed                   = _parameters["seed"]
         self.softConstraint         = False # boolean flags signlizing whether the system has soft constraints or not              
         #Default constants less acessible by the users
-        self.collFreq               = 25.0 
-        self.pressureCoupling       = 2000.0       
-        self.temperatureScaleFreq   = 10
-        self.pressure               = 1.0   
-        self.temperatureScaleOption = "linear"
-        self.startTemperature       = 10  
-        self.DEBUG                  = False 
-        self.NDIM                   = 1             
+        self.collFreq               = _parameters["coll_freq"]
+        self.pressureCoupling       = _parameters["pressure_coupling"]    
+        self.pressure               = _parameters["pressure"]  
+        self.temperatureScaleOption = _parameters["temperature_scale_option"]
+        self.startTemperature       = _parameters["start_temperature"]
+        self.DEBUG                  = _parameters["Debug"]
+        self.NDIM                   = _parameters["NmaxThreads"]
         #Setting parameters based on information that we collected on the instance construction
         self.RNG                    = NormalDeviateGenerator.WithRandomNumberGenerator ( RandomNumberGenerator.WithSeed ( self.seed ) )
         if not os.path.exists(_baseFolder): os.makedirs(_baseFolder)
-    #===============================================================================    
-    def ChangeDefaultParameters(self,_parameters):
-        '''
-        Class method to set more specifc parameters.           
-        '''     
-        if "temperature"                in _parameters: self.temperature            = _parameters["temperature"]   
-        if "start_temperature"          in _parameters: self.startTemperature       = _parameters["start_temperature"]
-        if "coll_freq"                  in _parameters: self.collFreq               = _parameters["coll_freq"]
-        if "pressure"                   in _parameters: self.pressure               = _parameters["pressure"]
-        if "pressure_coupling"          in _parameters: self.pressureCoupling       = _parameters["pressure_coupling"] 
-        if "temperature_scale"          in _parameters: self.temperatureScaleFreq   = _parameters["temperature_scale"]
-        if "timeStep"                   in _parameters: self.timeStep               = _parameters["timeStep"]
-        if "sampling_factor"            in _parameters: self.samplingFactor         = _parameters["sampling_factor"]
-        if "log_frequency"              in _parameters: self.logFrequency           = _parameters["log_frequency"]
-        if "temperature_scale_option"   in _parameters: self.temperatureScaleOption = _parameters["temperature_scale_option"]
-        if "Debug"                      in _parameters: self.DEBUG                  = _parameters["Debug"]
-        if "save_format"                in _parameters: self.saveFormat             = _parameters["save_format"]
-        if "seed"                       in _parameters:
-            self.seed = _parameters["seed"]
-            self.RNG  = NormalDeviateGenerator.WithRandomNumberGenerator ( RandomNumberGenerator.WithSeed ( self.seed ) )
+
+        if _parameters["pressure_coupling"] == "True": self.pressureControl = True 
+
     #=============================================================================================    
     def HeatingSystem(self,_nsteps,_samplingFactor):
         '''
@@ -149,7 +131,7 @@ class MD:
                                                 steps                       = self.nsteps               ,
                                                 timeStep                    = self.timeStep             ,
                                                 temperatureScaleFrequency   = self.temperatureScaleFreq ,
-                                                temperatureScaleOption      = "constant"                ,
+                                                temperatureScaleOption      = self.temperatureScaleOption,
                                                 trajectories                = trajectory_list           ,
                                                 temperatureStart            = self.temperature          )
 
@@ -200,7 +182,7 @@ class MD:
                                         timeStep                = self.timeStep         ,
                                         temperatureControl      = True                  ,
                                         temperature             = self.temperature      , 
-                                        temperatureCoupling     = 0.1                   ) 
+                                        temperatureCoupling     = self.temperatureCoupling   ) 
     
     #======================================================================================
     def runLangevin(self):
@@ -228,6 +210,8 @@ class MD:
             if self.saveFormat != self.trajName:
                 traj_save = os.path.join(self.baseName,self.trajName + self.saveFormat)
                 Duplicate(self.trajectoryNameCurr,traj_save,self.molecule)
+
+        
     #=====================================================================================
     def Print(self):
         '''

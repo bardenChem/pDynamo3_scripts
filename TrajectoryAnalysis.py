@@ -272,8 +272,13 @@ class TrajectoryAnalysis:
 		#---------------------------------------------------------------------------
 		try:
 			import seaborn as sns
-			g = sns.jointplot(x=self.RG,y=self.RMS,kind="kde",cmap="plasma",shade=True,height=4)
-			g.set_axis_labels("Radius of Gyration $\AA$","RMSD $\AA$",fontsize=4)
+			std_rg  = np.var(self.RG)
+			std_rms = np.var(self.RMS)
+			self.RG  = self.RG/std_rg
+			self.RMS = self.RMS/std_rms
+
+			g = sns.jointplot(x=self.RG,y=self.RMS,kind="kde",cmap="plasma",shade=True)
+			g.set_axis_labels("Radius of Gyration $\AA$","RMSD $\AA$")
 			plt.savefig( os.path.join( self.trajFolder,"rg_rmsd_biplot.png") )
 			if SHOW:
 				plt.show()

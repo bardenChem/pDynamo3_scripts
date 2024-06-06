@@ -81,7 +81,8 @@ class Scripts:
 		if "set_fixed_atoms" in _parameters:
 			self.activeSystem.Setting_Free_Atoms(_parameters["spherical_prune"],float(_parameters["free_atoms_radius"]))
 		if "set_reaction_crd" in _parameters:
-			self.activeSystem.Setting_Reaction_crd(_parameters)
+			for rc in range(0,_parameters["set_reaction_crd"]):
+				self.activeSystem.Set_Reaction_crd( _parameters["atoms_rc"+str(rc+1)],_parameters )
 		if "set_initial_crd" in _parameters:
 			self.activeSystem.system.coordinates3 = ImportCoordinates3(_parameters["set_initial_crd"])
 		#-----------------------------------
@@ -92,7 +93,7 @@ class Scripts:
 	def Run_Simulation(self,_parameters):
 		'''
 		'''
-		_parameters["active_system"] = self.activeSystem.system
+		_parameters["active_system"] = self.activeSystem
 		_parameters["project_folder"]= self.projectFolder
 		self.system_historic.append(self.activeSystem) 
 		#----------------------------------------------- 

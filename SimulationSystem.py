@@ -30,6 +30,7 @@ from pBabel            import ExportSystem                    , \
                               GromacsParameterFileReader      , \
                               ImportCoordinates3              , \
                               ImportSystem
+from ReactionCoordinate import ReactionCoordinate
 #==========================================================================
 
 #**************************************************************************
@@ -181,10 +182,21 @@ class SimulationSystem:
         self.system = qs.system
 
     #=========================================================================
-    def Set_Reaction_crd(self,_parameters):
+    def Set_Reaction_crd(self,atoms_rc,_parameters):
         '''
         '''
-        pass
+        _atom_pat = []
+        for atom in atoms_rc:
+            _atom_pat.append( AtomSelection.FromAtomPattern(self.system, atom)[0] )
+            
+        _rc = ReactionCoordinate(_atom_pat                   ,
+                                _parameters["mass_constraint"],
+                                _parameters["type"]           )
+        _rc.GetRCLabel(self.system)
+
+        self.ReactionCoordinates.append(_rc)
+        self.ReactionCoordinates[-1].Print()
+        
 
 #================================================================================
 

@@ -19,10 +19,10 @@ from pSimulation               import PruneByAtom
 from pMolecule.MMModel         import *
 from pMolecule.NBModel         import *                                     
 from pMolecule.QCModel         import *
-import pyscf
-
+from addOns.pySCF import NBModelPySCF , \
+                             QCModelPySCF
 import MopacQCMMinput
-
+import pyscf
 #==============================================================
 class QuantumMethods:
 	'''
@@ -49,7 +49,7 @@ class QuantumMethods:
 		'''
 		'''
 		self.pars = {
-			"methodClass":"SMO",
+			"method_class":"SMO",
 			"region":None,
 			"QCcharge":0,
 			"multiplicity":1,
@@ -65,6 +65,7 @@ class QuantumMethods:
 			"pySCF_method":"RHF"
 		}
 		for key in _parameters.keys(): self.pars[key] = _parameters[key]
+		self.methodClass = self.pars["method_class"]
 
 	#==================================================
 	@classmethod
@@ -77,7 +78,7 @@ class QuantumMethods:
 		self.Check_Parameters(_parameters)
 		self.system = _parameters["active_system"]
 		NBmodel     = self.system.nbModel
-		if "region" in self.pars: self.Hybrid = True		
+		if self.pars["region"]: self.Hybrid = True		
 		#---------------------------------------------
 		if self.Hybrid:
 			atomlist = []
@@ -131,7 +132,7 @@ class QuantumMethods:
 			nbModel = NBModelPySCF.WithDefaults( )
 			qcModel = QCModelPySCF.WithOptions( deleteJobFiles = False       ,
 											    functional     = self.pars["functional"],
-                                         		method         = self.pars["pysf_method"],
+                                         		method         = self.pars["pySCF_method"],
                                                 mf_kwargs      = { 'diis'    : pyscf.scf.ADIIS ( ) }, 
                                          		mole_kwargs    = { 'verbose' : 0 } ,
                                          		orbitalBasis   = self.pars["basis"])
