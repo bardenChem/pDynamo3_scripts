@@ -24,6 +24,8 @@ from pScientific.Symmetry       import *
 from pScientific.Statistics     import *
 from pScientific.Arrays         import *
 from pSimulation                import *
+
+
 #=====================================================================
 class TrajectoryAnalysis:
 	'''
@@ -48,13 +50,16 @@ class TrajectoryAnalysis:
 		self.label_RC2  = None 
 		self.RCs        = {}
 
+		self.trajectory = None
 
 		if self.trajFolder[-4:] == ".dcd":			
 			Duplicate(self.trajFolder,self.trajFolder[:-4]+".ptGeo",self.molecule)
 			self.trajFolder = self.trajFolder[:-4]+".ptGeo"
-
-		self.trajectory = ImportTrajectory( self.trajFolder , self.molecule )
-		self.trajectory.ReadHeader()
+			self.trajectory = ImportTrajectory( self.trajFolder , self.molecule )
+		elif self.trajFolder[-6:] == ".ptGeo":
+			self.trajectory = ImportTrajectory( self.trajFolder , self.molecule )
+		
+		self.trajectory.ReadHeader()		
 
     #=================================================
 	def CalculateRG_RMSD(self,qc_mm=False,protein=False):
@@ -62,7 +67,7 @@ class TrajectoryAnalysis:
 		Get Radius of Gyration and Root Mean Square distance for the trajectory
 		'''
 		masses    = Array.FromIterable ( [ atom.mass for atom in self.molecule.atoms ] )
-		self.crd3 = Unpickle(os.path.join(self.trajFolder,"frame0.pkl"))[0]		
+		self.crd3 = Unpickle(os.path.join(self.trajFolder,"frame0.pkl"))[0]
 		system  = None 
 		rg0     = None
 		try:

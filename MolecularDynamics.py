@@ -66,8 +66,9 @@ class MD:
         self.pressureCoupling       = _parameters["pressure_coupling"]    
         self.pressure               = _parameters["pressure"]  
         self.temperatureScaleOption = _parameters["temperature_scale_option"]
+        self.temperatureScaleFreq   = 100
         self.startTemperature       = _parameters["start_temperature"]
-        self.DEBUG                  = _parameters["Debug"]
+        self.DEBUG                  = False
         self.NDIM                   = _parameters["NmaxThreads"]
         #Setting parameters based on information that we collected on the instance construction
         self.RNG                    = NormalDeviateGenerator.WithRandomNumberGenerator ( RandomNumberGenerator.WithSeed ( self.seed ) )
@@ -95,17 +96,20 @@ class MD:
                                               timeStep                  = self.timeStep                          ,
                                               trajectories              = [(self.trajectory,self.samplingFactor)],
                                               temperatureScaleFrequency = self.temperatureScaleFreq              ,
-                                              temperatureScaleOption    = self.temperatureScaleOption            ,
+                                              temperatureScaleOption    = "linear"            ,
                                               temperatureStart          = self.startTemperature                  ,
                                               temperatureStop           = self.temperature                       )            
     #===============================================================================================    
-    def RunProduction(self,_prodSteps,_samplingFactor,_Restricted=False):
+    def RunProduction(self,_prodSteps,_samplingFactor,_Restricted=False,_equi=False):
         '''
         Run a molecular dynamics simulation for data collection.
         '''
         self.softConstraint     = _Restricted
         self.nsteps             = _prodSteps
         self.samplingFactor     = _samplingFactor
+        
+        if _equi: self.trajectoryNameCurr = os.path.join(self.baseName,self.trajName+"equilibration.ptGeo") 
+        else    : self.trajectoryNameCurr = os.path.join(self.baseName,self.trajName+"production.ptGeo") 
 
         self.trajectory = ExportTrajectory( self.trajectoryNameCurr, self.molecule, log=None )
         if not os.path.exists( self.trajectoryNameCurr ): os.makedirs( self.trajectoryNameCurr )
@@ -205,7 +209,7 @@ class MD:
     #====================================================================================
     def Finalize(self):
         '''
-        '''
+        '''        
         if self.saveFormat == ".dcd" or self.saveFormat == ".mdcrd":
             if self.saveFormat != self.trajName:
                 traj_save = os.path.join(self.baseName,self.trajName + self.saveFormat)

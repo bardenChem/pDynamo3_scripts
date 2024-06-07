@@ -56,12 +56,12 @@ class Simulation:
 		'''
 		Deafault constructor
 		'''
-		self.molecule.system   = _parameters["active_system"]
-		self.Iniate_Parameters()
-		self.parameters = _parameters
+		self.molecule = _parameters["active_system"]
+		self.parameters = None
+		self.Iniate_Parameters(_parameters)
 		self.baseFolder = _parameters["project_folder"]
 	#======================================================================
-	def Iniate_Parameters(self):
+	def Iniate_Parameters(self,_parameters):
 		'''		
 		Initiate parameters attrubute dict and the deafult values of each entry.
 		'''	
@@ -74,8 +74,8 @@ class Simulation:
 			"sampling_factor":0,
 			"save_format":".dcd",
 			"adaptative":"False",
-			"trajectory_name"
-			"seed":3029202049
+			"trajectory_name":"trajectory",
+			"seed":3029202049,
 			#parameters energy refinement
 			"xnbins":0,
 			"ynbins":0,
@@ -101,17 +101,20 @@ class Simulation:
 			"nsteps_rc2":0,
 			#molecular dynamics parameters
 			"MD_method":"LeapFrog",
-			"protocol":"production",
 			"pressure":1.0,
 			"pressure_coupling":2000,
 			"pressure_control":"False",
-			"temperature_scale_option":"linear",
+			"temperature_scale_option":"constant",
 			"temperature_scale":10.0,
 			"timeStep":0.001,
 			"coll_freq":25.0,
 			"start_temperature":20.0,
 			"equilibration_nsteps":0,
+			"heating_nsteps":0,
 			"production_nsteps":0,
+			"sampling_heating":0,
+			"sampling_equilibration":0,
+			"sampling_production":0,
 			#restriction parameters
 			"force_constants":[],
 			#free energy parameters
@@ -128,6 +131,11 @@ class Simulation:
 			"fixed_terminal_images":None,
 			"RMS_growing_intial_string":None,
 		}
+
+		for key in _parameters.keys():
+			self.parameters[key] = _parameters[key]
+
+
 	#=======================================================================
 	def Execute(self):
 		'''
@@ -232,17 +240,30 @@ class Simulation:
 	def MolecularDynamics(self):
 		'''
 		Set up and execute molecular dynamics simulations		
-		'''		
-		MDrun = MD(self.molecule.system,self.baseFolder,self.parameters["trajectory_name"])		
-		MDrun.ChangeDefaultParameters(self.parameters)
+		'''				
+		MDrun = MD(self.molecule.system,self.baseFolder,self.parameters)		
 		sampling = 0 
 		show = False
-		if "sampling_factor" in self.parameters: sampling = self.parameters["sampling_factor"]
-		#---------------------------------------------------------------
-		if "protocol" in self.parameters:
-			if   self.parameters["protocol"] == "heating":  MDrun.HeatingSystem(self.parameters['nsteps'],sampling)
-			elif self.parameters["protocol"] == "sampling": MDrun.RunProduction(self.parameters['nsteps'],sampling)
-			#------------------------------------------------------------
+		
+		if self.parameters["heating_nsteps"] 	   > 0: 
+			MDrun.HeatingSystem(self.parameters["heating_nsteps"],self.parameters["sampling_heating"])
+			if self.parameters["sampling_heating"] > 0:
+				_trajAN = TrajectoryAnalysis(MDrun.trajectoryNameCurr,MDrun.molecule,MDrun.timeStep*MDrun.nsteps)
+				_trajAN.CalculateRG_RMSD()
+				_trajAN.PlotRG_RMS()
+		if self.parameters["equilibration_nsteps"] > 0: 
+			MDrun.RunProduction(self.parameters["equilibration_nsteps"],self.parameters["sampling_equilibration"],_equi=True)
+			if self.parameters["sampling_equilibration"] > 0:
+				_trajAN = TrajectoryAnalysis(MDrun.trajectoryNameCurr,MDrun.molecule,MDrun.timeStep*MDrun.nsteps)
+				_trajAN.CalculateRG_RMSD()
+				_trajAN.PlotRG_RMS()
+		if self.parameters["production_nsteps"]    > 0: 
+			MDrun.RunProduction(self.parameters["production_nsteps"],self.parameters["sampling_production"])
+			if self.parameters["sampling_production"] > 0:
+				_trajAN = TrajectoryAnalysis(MDrun.trajectoryNameCurr,MDrun.molecule,MDrun.timeStep*MDrun.nsteps)
+				_trajAN.CalculateRG_RMSD()
+				_trajAN.PlotRG_RMS()		
+		#------------------------------------------------------------
 		MDrun.Finalize()			
 	#==================================================================
 	def RestrictedMolecularDynamics(self):
