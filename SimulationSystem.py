@@ -66,6 +66,7 @@ class SimulationSystem:
         self.system         = ImportSystem(_pklPath)
         _name               = os.path.basename(_pklPath)
         self.baseName       = _name[:-4]
+        if not self.system.nbModel: self.system.nbModel = NBModelCutOff.WithDefaults()         
         self.NBmodel        = self.system.nbModel
         # test if is quantum, if hass mmModel and NbModel
         return(self)
@@ -78,10 +79,10 @@ class SimulationSystem:
         self = selfClass()
         self.NBmodel = NBModelCutOff.WithDefaults()      
         self.system               = ImportSystem(_topologyFile)
-        self.system.DefineNBModel = self.NBmodel
+        self.system.DefineNBModel( NBModelCutOff.WithDefaults () )
+        self.NBmodel = self.system.nbModel
         self.system.coordinates3  = ImportCoordinates3(_coordinateFile)               
         _name                     = os.path.basename(_topologyFile)
-        self.NBModel              = self.system.nbModel
         self.baseName             = _name[:-4]        
         return(self)     
     #===================================================================================
@@ -117,7 +118,7 @@ class SimulationSystem:
         self.system      = ImportSystem(_coordinateFile, modelNumber = _modelNumber, useComponentLibrary = True)
         self.MMmodel = MMModelOPLS.WithParameterSet("protein")
         self.NBmodel = NBModelCutOff.WithDefaults()
-        self.system.DefineNBModel(self.NBmodel)                     
+        self.system.nbModel = self.NBmodel                     
         _name        = os.path.basenem(_coordinateFile)
         self.baseName= _name[:-4]
         self.protein = True
@@ -127,8 +128,8 @@ class SimulationSystem:
         '''
         Calculates single point energy.
         '''
-        self.system.Summary()
         self.refEnergy = self.system.Energy(doGradients = True)
+        self.system.Summary()
         return self.refEnergy    
     #====================================================================================
     def Spherical_Pruning(self,_centerAtom,_radius):
@@ -170,7 +171,8 @@ class SimulationSystem:
     #=========================================================================
     def Set_QC_Method(self,_parameters,_DEBUG=False):
         '''
-        '''        
+        '''
+        if len(self.quantumRegion) > 0: _parameters["region"] = self.quantumRegion
         _parameters["active_system"] = self.system 
         qs =  QuantumMethods.From_Parameters(_parameters)
         if not "method_class" in _parameters: _parameters["method_class"] = "SMO"
@@ -181,6 +183,23 @@ class SimulationSystem:
         self.system.label += newLabel
         self.system = qs.system
 
+    #=========================================================================
+    def Set_QCMM_Region(self,_pat_list,_centerAtom=None,_radius=None):
+        '''
+            lig = AtomSelection.FromAtomPattern(proj.system,"*:LIG.248:*")
+
+        '''
+        if len(_pat_list) > 0:
+            for pat in _pat_list:
+                _sel =  AtomSelection.FromAtomPattern(self.system,pat)
+                self.quantumRegion += _sel
+
+        if _centerAtom:
+            atomRef = AtomSelection.FromAtomPattern(self.system,_centerAtom)
+            core    = AtomSelection.Within(self.system,atomref,_radius)
+            self.quantumRegion = AtomSelection.ByComponent(self.system,core) 
+
+        self.quantumRegion = list(self.quantumRegion)
     #=========================================================================
     def Set_Reaction_crd(self,atoms_rc,_parameters):
         '''

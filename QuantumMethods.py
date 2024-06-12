@@ -16,8 +16,7 @@ from pMolecule import *
 from pBabel                    import *                                     
 from pCore                     import *                                     
 from pSimulation               import PruneByAtom
-from pMolecule.MMModel         import *
-from pMolecule.NBModel         import *                                     
+                           
 from pMolecule.QCModel         import *
 from addOns.pySCF import NBModelPySCF , \
                              QCModelPySCF
@@ -77,7 +76,7 @@ class QuantumMethods:
 		self = selfClass()
 		self.Check_Parameters(_parameters)
 		self.system = _parameters["active_system"]
-		NBmodel     = self.system.nbModel
+		NBmodel     = None
 		if self.pars["region"]: self.Hybrid = True		
 		#---------------------------------------------
 		if self.Hybrid:
@@ -99,6 +98,7 @@ class QuantumMethods:
 		if self.methodClass == "SMO":
 			self.qcModel = QCModelMNDO.WithOptions( hamiltonian = self.pars["Hamiltonian"],
 												    converger=self.converger )
+			
 		#.................................................................................
 		elif self.methodClass == "abinitio":
 			_gridIntegrator = DFTGridIntegrator.WithOptions(accuracy = DFTGridAccuracy.Medium,
@@ -129,18 +129,21 @@ class QuantumMethods:
 			NBmodel = NBModelDFTB.WithDefaults()
 		#...................................................................................
 		elif self.methodClass == "pySCF":			
-			nbModel = NBModelPySCF.WithDefaults( )
+			NBmodel = NBModelPySCF.WithDefaults( )			
 			qcModel = QCModelPySCF.WithOptions( deleteJobFiles = False       ,
 											    functional     = self.pars["functional"],
                                          		method         = self.pars["pySCF_method"],
                                                 mf_kwargs      = { 'diis'    : pyscf.scf.ADIIS ( ) }, 
                                          		mole_kwargs    = { 'verbose' : 0 } ,
                                          		orbitalBasis   = self.pars["basis"])
+
 			 
 		#------------------------------------------------------------------------
+		
 		if self.Hybrid: self.system.DefineQCModel( self.qcModel, qcSelection=self.selection )
-		else: self.system.DefineQCModel(self.qcModel)
-		self.system.DefineNBModel( NBmodel )
+		else: self.system.DefineQCModel(self.qcModel)		
+		self.system.DefineNBModel(NBmodel)
+		self.system.Energy(doGradients=True)
 		return(self)
         
 	#----------------------------------------------------------------------------

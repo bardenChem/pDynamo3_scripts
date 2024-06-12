@@ -73,9 +73,6 @@ class Scripts:
 	
 		self.activeSystem = _system4load
 		#------------------------------------
-		if "set_energy_model" in _parameters:
-			if _parameters["set_energy_model"] == "QM":
-				self.activeSystem.Set_QC_Method(_parameters,_DEBUG=_debug_ok)
 		if "spherical_prune" in _parameters:			
 			self.activeSystem.Spherical_Pruning(_parameters["spherical_prune"],float(_parameters["spherical_prune_radius"]))
 		if "set_fixed_atoms" in _parameters:
@@ -85,6 +82,19 @@ class Scripts:
 				self.activeSystem.Set_Reaction_crd( _parameters["atoms_rc"+str(rc+1)],_parameters )
 		if "set_initial_crd" in _parameters:
 			self.activeSystem.system.coordinates3 = ImportCoordinates3(_parameters["set_initial_crd"])
+		if "set_qc_region" in _parameters:
+			if _parameters["set_qc_region"] == "yes":
+				_residue_list = []
+				_centerAtom = None
+				_radius = None
+				if "residue_patterns" in _parameters: _residue_list = _parameters["residue_patterns"]
+				if "center_atom"      in _parameters: _centerAtom   = _parameters["center_atom"]
+				if "radius"           in _parameters: _radius       = _parameters["radius"]
+				self.activeSystem.Set_QCMM_Region(_residue_list,_centerAtom,_radius)
+		if "set_energy_model" in _parameters:
+			if _parameters["set_energy_model"] == "QM":
+				self.activeSystem.Set_QC_Method(_parameters,_DEBUG=_debug_ok)
+
 		#-----------------------------------
 		self.system_historic.append(_system4load)
 		self.activeSystem.Check()
