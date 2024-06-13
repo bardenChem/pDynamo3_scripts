@@ -18,8 +18,8 @@ def Run_Test():
 	test_01.SaveSystem()
 	#test load gromacs topology and coordinate files 
 	_parameters["Input_Type"] = "gromacs"
-	_parameters["crd_file"] = os.path.join("data","crambin.gro")
-	_parameters["top_file"] = os.path.join("data","crambin.top")	
+	_parameters["crd_file"] = os.path.join("data","1atp_peptide.gro")
+	_parameters["top_file"] = os.path.join("data","1atp_peptide.top")	
 	test_02 = Scripts("test_01")
 	test_02.Set_System(_parameters)
 	test_02.SaveSystem()
@@ -32,6 +32,13 @@ def Run_Test():
 	test_03.SaveSystem()
 	#test load pkl and test spherical pruning and fixed atoms
 
+	_parameters["Input_Type"] = "protein"
+	_parameters["pdb_file"]   = "data/1l2y.pdb"
+	test_04 = Scripts("test_01")
+	test_04.Set_System(_parameters)
+	test_04.SaveSystem()
+	
+	#test load pkl from amber FF and test spherical pruning and fixed atoms
 	_parameters = {
 		"Input_Type":"pkl",
 		"pkl_file":"test_01/7tim.pkl",
@@ -45,8 +52,12 @@ def Run_Test():
 		"mass_constraint":"true",
 		"type":"distance"	
 	}	
-	test_04 = Scripts("test_01")
-	test_04.Set_System(_parameters)
-	test_04.SaveSystem()
+	test_05 = Scripts("test_01")
+	test_05.Set_System(_parameters)
+	test_05.SaveSystem("7tim_pruned_and_fix.pkl")
+
+	
+
+
 #===================================
 if __name__ == '__main__': Run_Test()

@@ -47,9 +47,6 @@ class SimulationSystem:
         self.baseName            = None
         self.label               = _label
         self.system              = None # Instance of the System pDnamo class
-        self.NBmodel             = None 
-        self.QCmodel             = None
-        self.MMmodel             = None
         self.Hybrid              = None 
         self.quantumRegion       = []
         self.protein             = False 
@@ -66,22 +63,26 @@ class SimulationSystem:
         self.system         = ImportSystem(_pklPath)
         _name               = os.path.basename(_pklPath)
         self.baseName       = _name[:-4]
-        if not self.system.nbModel: self.system.nbModel = NBModelCutOff.WithDefaults()         
-        self.NBmodel        = self.system.nbModel
+        if not self.system.nbModel: self.system.DefineNBModel( NBModelCutOff.WithDefaults() )        
+            if self.system.symmetryParameters is not None: 
+                self.system.DefineNBModel( NBModelCutOff.WithDefaults( ) )
+            else:
+             self.system.DefineNBModel( NBModelFull.WithDefaults( ) )
+
         # test if is quantum, if hass mmModel and NbModel
         return(self)
     #=================================================================================== 
     @classmethod
-    def From_Force_Field(selfClass,_topologyFile,_coordinateFile):
+    def From_AMBER(selfClass,_topologyFile,_coordinateFile):
         '''
         Initialize project from force field topology and coordinate files.
         '''
         self = selfClass()
         self.NBmodel = NBModelCutOff.WithDefaults()      
         self.system               = ImportSystem(_topologyFile)
+        self.system.coordinates3  = ImportCoordinates3(_coordinateFile)
         self.system.DefineNBModel( NBModelCutOff.WithDefaults () )
         self.NBmodel = self.system.nbModel
-        self.system.coordinates3  = ImportCoordinates3(_coordinateFile)               
         _name                     = os.path.basename(_topologyFile)
         self.baseName             = _name[:-4]        
         return(self)     
@@ -94,8 +95,11 @@ class SimulationSystem:
         parameters   = GromacsParameterFileReader.PathToParameters ( _topologyFile )
         self.system  = GromacsDefinitionsFileReader.PathToSystem   ( _topologyFile, parameters = parameters )
         self.system.coordinates3 = ImportCoordinates3              ( _coordinateFile )
+        if self.system.symmetryParameters is not None: self.system.DefineNBModel ( NBModelCutOff.WithDefaults ( ) )
+        else                                         : self.system.DefineNBModel ( NBModelFull.WithDefaults   ( ) )
         self.baseName = os.path.basename(_coordinateFile[:-4])
         self.NBmodel  = self.system.nbModel
+        self.system.nbModel.Summary()
         return(self)        
     #===================================================================================
     @classmethod
@@ -116,10 +120,9 @@ class SimulationSystem:
         '''
         self = selfClass()
         self.system      = ImportSystem(_coordinateFile, modelNumber = _modelNumber, useComponentLibrary = True)
-        self.MMmodel = MMModelOPLS.WithParameterSet("protein")
-        self.NBmodel = NBModelCutOff.WithDefaults()
-        self.system.nbModel = self.NBmodel                     
-        _name        = os.path.basenem(_coordinateFile)
+        self.system.DefineMMModel( MMModelOPLS.WithParameterSet("protein") )
+        self.system.DefineNBModel( NBModelCutOff.WithDefaults() )                   
+        _name        = os.path.basename(_coordinateFile)
         self.baseName= _name[:-4]
         self.protein = True
         return(self) 

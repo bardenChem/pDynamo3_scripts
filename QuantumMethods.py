@@ -18,6 +18,7 @@ from pCore                     import *
 from pSimulation               import PruneByAtom
                            
 from pMolecule.QCModel         import *
+
 from addOns.pySCF import NBModelPySCF , \
                              QCModelPySCF
 import MopacQCMMinput
@@ -137,6 +138,7 @@ class QuantumMethods:
                                          		mole_kwargs    = { 'verbose' : 0 } ,
                                          		orbitalBasis   = self.pars["basis"])
 
+
 			 
 		#------------------------------------------------------------------------
 		
@@ -145,6 +147,11 @@ class QuantumMethods:
 		self.system.DefineNBModel(NBmodel)
 		self.system.Energy(doGradients=True)
 		return(self)
+	#----------------------------------------------------------------------------
+	def Set_pySCF():
+		'''
+		'''
+
         
 	#----------------------------------------------------------------------------
 	def Export_QC_System(self,baseName = None):

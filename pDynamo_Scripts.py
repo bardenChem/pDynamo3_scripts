@@ -49,9 +49,10 @@ class Scripts:
 		#Load system based on Input_Type using a dictionary for clarity
 		input_methods = {
 			"geometry": SimulationSystem.From_Coordinates,
-			"amber": SimulationSystem.From_Force_Field,
+			"amber": SimulationSystem.From_AMBER,
 			"gromacs": SimulationSystem.From_Gromacs,
 			"pkl": SimulationSystem.From_PKL,
+			"protein":SimulationSystem.Protein_From_Coordinates,
 		}
 
 		try:
@@ -65,6 +66,8 @@ class Scripts:
 				_system4load = load_function(_parameters["top_file"], _parameters["crd_file"])
 			elif input_type == "pkl":
 				_system4load = load_function(_parameters["pkl_file"])
+			elif input_type == "protein":
+				_system4load = load_function(_parameters["pdb_file"])
 			else: raise ValueError(f"Unsupported Input_Type: {input_type}")
 
 		except (KeyError, TypeError) as e:
@@ -178,7 +181,7 @@ class Scripts:
 				savePathPkl = savePathPkl[:-4] + "_#{}.pkl".format(i)
 		#----------------------------------------------------------------
 		self.activeSystem.system.Summary()
-		Pickle( savePathPkl,self.activeSystem.system )
+		ExportSystem( savePathPkl,self.activeSystem.system )
 		ExportSystem( savePathPdb,self.activeSystem.system )
 #==============================================================
 
