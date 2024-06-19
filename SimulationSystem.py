@@ -63,7 +63,7 @@ class SimulationSystem:
         self.system         = ImportSystem(_pklPath)
         _name               = os.path.basename(_pklPath)
         self.baseName       = _name[:-4]
-        if not self.system.nbModel: self.system.DefineNBModel( NBModelCutOff.WithDefaults() )        
+        if not self.system.nbModel:      
             if self.system.symmetryParameters is not None: 
                 self.system.DefineNBModel( NBModelCutOff.WithDefaults( ) )
             else:
@@ -150,9 +150,10 @@ class SimulationSystem:
         core2        = AtomSelection.ByComponent(oldSystem,core)
         #---------------------------------------------------
         newLabel    = self.label + "_pruned"
+        NBmodel     = self.system.nbModel
         self.system = None
         self.system = PruneByAtom( oldSystem,Selection(core2) )
-        self.system.DefineNBModel( self.NBmodel )        
+        self.system.DefineNBModel( NBmodel )      
         self.label  = newLabel
     #======================================================================================
     def Setting_Free_Atoms(self,_centerAtom,_radius,_DEBUG=False):
@@ -177,7 +178,8 @@ class SimulationSystem:
         '''
         if len(self.quantumRegion) > 0: _parameters["region"] = self.quantumRegion
         _parameters["active_system"] = self.system 
-        qs =  QuantumMethods.From_Parameters(_parameters)
+        qs =  QuantumMethods(_parameters)
+        qs.Set_QC_Syste()
         if not "method_class" in _parameters: _parameters["method_class"] = "SMO"
         if _DEBUG: qs.Export_QC_System()
         newLabel = self.system.label + "QC_system_"

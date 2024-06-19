@@ -26,25 +26,20 @@ def Run_Test():
 		_parameters["Hamiltonian"] = smo
 		test_01 = Scripts()
 		test_01.Set_System(_parameters)
-	#------------------------------------
-	'''
-	_parameters["method_class"]="DFTB"
-	_parameters["Hamiltonian"] ="DFTB"
-	test_02 = Scripts()
-	test_02.Set_System(_parameters)
-	#-----------------------------------
-	_parameters["method_class"]="orca"
+	#------------------------------------	
+	_parameters["method_class"]="ORCA"
 	_parameters["functional"]  ="HF"
 	_parameters["basis"]       ="6-31G*"
 	test_03 = Scripts()
 	test_03.Set_System(_parameters)	
-	#---------------------------------
-	'''
+	input()
+	#--------------------------------
 	_parameters["method_class"]="pySCF"
 	_parameters["functional"]  ="b3lyp"
 	_parameters["basis"]       ="6-31G*"
 	test_04 = Scripts()
 	test_04.Set_System(_parameters)
+	input()
 	#----------------------------------
 	_parameters["method_class"]="abinitio"
 	_parameters["basis"]       ="dgauss-dzvp"

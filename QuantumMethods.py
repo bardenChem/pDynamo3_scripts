@@ -28,7 +28,7 @@ class QuantumMethods:
 	'''
 	Classe to set up quantum chemical method to the system.
 	'''	
-	def __init__(self):
+	def __init__(self,_parameters):
 		'''
 		Default constructor
 		'''
@@ -43,6 +43,26 @@ class QuantumMethods:
 		self.system         = None
 		self.qcModel        = None
 		self.pars           = None
+
+		self.Check_Parameters(_parameters)
+		self.system = _parameters["active_system"]
+		NBmodel     = None
+		if self.pars["region"]: self.Hybrid = True		
+		#---------------------------------------------
+		if self.Hybrid:
+			atomlist = []
+			for sel in self.pars["region"]:
+				if type(sel) == int:
+					self.selection.append(sel)
+				elif type(self.pars["region"]) == list:
+					for i in range( len(sel) ):
+						self.selection.append( sel[i] ) 
+			self.selection = Selection.FromIterable(self.selection) 
+		#---------------------------------------------       	
+		self.convergerLevel = self.pars["converger"]
+		self.Set_Converger()
+		self.system.electronicState = ElectronicState.WithOptions( charge = self.pars["QCcharge"],
+																   multiplicity = self.pars["multiplicity"] )
 
 	#--------------------------------------------------
 	def Check_Parameters(self,_parameters):
@@ -68,7 +88,6 @@ class QuantumMethods:
 		self.methodClass = self.pars["method_class"]
 
 	#==================================================
-	@classmethod
 	def From_Parameters(selfClass,_parameters):
 		'''
 		Create object setting the quantum chemical method.
@@ -89,70 +108,96 @@ class QuantumMethods:
 					for i in range( len(sel) ):
 						self.selection.append( sel[i] ) 
 			self.selection = Selection.FromIterable(self.selection) 
-			self.system.nbModel = None
-       	#---------------------------------------------------------------------------------
+			
+       	
 		self.convergerLevel = self.pars["converger"]
 		self.Set_Converger()
 		self.system.electronicState = ElectronicState.WithOptions( charge = self.pars["QCcharge"],
 																   multiplicity = self.pars["multiplicity"] )
-		#---------------------------------------------------------------------------------
-		if self.methodClass == "SMO":
-			self.qcModel = QCModelMNDO.WithOptions( hamiltonian = self.pars["Hamiltonian"],
+	#------------------------------------------------------
+	def Set_QC_System(self):
+		'''
+		'''
+		if   self.methodClass == "SMO":     self.Set_SMO_internal()
+		elif self.methodClass == "pySCF":   self.Set_pySCF() 
+		elif self.methodClass == "abinitio":self.Set_Abinitio()
+		elif self.methodClass == "ORCA":    self.Set_ORCA()
+
+	#------------------------------------------------------
+	def Set_SMO_internal(self):
+		'''
+		'''
+		NBmodel        = self.system.nbModel
+		self.system.nbModel = None
+		self.qcModel = QCModelMNDO.WithOptions( hamiltonian = self.pars["Hamiltonian"],
 												    converger=self.converger )
-			
-		#.................................................................................
-		elif self.methodClass == "abinitio":
-			_gridIntegrator = DFTGridIntegrator.WithOptions(accuracy = DFTGridAccuracy.Medium,
+
+
+		if self.Hybrid: self.system.DefineQCModel( self.qcModel, qcSelection=self.selection )
+		else          : self.system.DefineQCModel( self.qcModel )		
+		
+		self.system.DefineNBModel( NBmodel, assignQCMMModels=self.Hybrid )
+
+	#--------------------------------------------------------
+	def Set_pySCF(self):
+		'''
+		'''
+		NBmodel = NBModelPySCF.WithDefaults( )			
+		qcModel = QCModelPySCF.WithOptions( deleteJobFiles = False       ,
+											functional     = self.pars["functional"],
+                                            method         = self.pars["pySCF_method"],
+                                            mf_kwargs      = { 'diis'    : pyscf.scf.ADIIS ( ) }, 
+                                            mole_kwargs    = { 'verbose' : 0 } ,
+                                            orbitalBasis   = self.pars["basis"] )
+
+		if self.Hybrid: self.system.DefineQCModel( self.qcModel, qcSelection=self.selection )
+		else          : self.system.DefineQCModel( self.qcModel )		
+		
+		self.system.DefineNBModel( NBmodel, assignQCMMModels=self.Hybrid )
+
+	#--------------------------------------------------------
+	def Set_Abinitio(self):
+		'''
+		'''
+		NBmodel             = self.system.nbModel
+		self.system.nbModel = None
+
+		_gridIntegrator = DFTGridIntegrator.WithOptions(accuracy = DFTGridAccuracy.Medium,
 															inCore   = True                  )
 
-			self.qcModel = QCModelDFT.WithOptions(converger   	 = self.converger 		  ,
+		self.qcModel = QCModelDFT.WithOptions(converger   	 = self.converger 		  ,
 												  functional     = self.pars["functional"],
 												  orbitalBasis	 = self.pars["basis"] 	  ,
 												  gridIntegrator = _gridIntegrator        ,
 												  fitBasis       = self.pars["fit_basis"] )
-		#.................................................................................
-		elif self.methodClass == "ORCA":
-			options =  "\n% output\n"
-			options += "print [ p_mos ] 1\n"
-			options += "print [ p_overlap ] 5\n"
-			options += "end # output"
-			self.qcModel = QCModelORCA.WithOptions( keywords = [ self.pars["functional"],self.pars["basis"],options ], 
-                                            		deleteJobFiles  = False                      							  ,
-                                            		scratch         =self.pars["scratch"]                                   )
-			NBmodel  = NBModelORCA.WithDefaults()
-		#..................................................................................
-		elif self.methodClass == "DFTB":
-			self.qcModel = QCModelDFTB.WithOptions( deleteJobFiles = False   ,
-			                                		randomScratch  = True    ,
-			                                 		scratch        = self.pars["scratch"],
-			                                 		skfPath        = self.pars["skfPath"],
-			                                 		useSCC         = True    )
-			NBmodel = NBModelDFTB.WithDefaults()
-		#...................................................................................
-		elif self.methodClass == "pySCF":			
-			NBmodel = NBModelPySCF.WithDefaults( )			
-			qcModel = QCModelPySCF.WithOptions( deleteJobFiles = False       ,
-											    functional     = self.pars["functional"],
-                                         		method         = self.pars["pySCF_method"],
-                                                mf_kwargs      = { 'diis'    : pyscf.scf.ADIIS ( ) }, 
-                                         		mole_kwargs    = { 'verbose' : 0 } ,
-                                         		orbitalBasis   = self.pars["basis"])
 
-
-			 
-		#------------------------------------------------------------------------
 		
 		if self.Hybrid: self.system.DefineQCModel( self.qcModel, qcSelection=self.selection )
-		else: self.system.DefineQCModel(self.qcModel)		
-		self.system.DefineNBModel(NBmodel)
-		self.system.Energy(doGradients=True)
-		return(self)
-	#----------------------------------------------------------------------------
-	def Set_pySCF():
-		'''
-		'''
+		else          : self.system.DefineQCModel( self.qcModel )		
+		
+		self.system.DefineNBModel( NBmodel, assignQCMMModels=self.Hybrid )
 
-        
+
+	#.................................................................................
+	def Set_ORCA(self):
+
+		options =  "\n% output\n"
+		options += "print [ p_mos ] 1\n"
+		options += "print [ p_overlap ] 5\n"
+		options += "end # output"
+		
+		NBmodel  = NBModelORCA.WithDefaults()
+		self.qcModel = QCModelORCA.WithOptions( keywords = [ self.pars["functional"],self.pars["basis"],options ], 
+                                            		deleteJobFiles  = False                      							  ,
+                                            		scratch         =self.pars["scratch"]                                   )
+		
+		if self.Hybrid: self.system.DefineQCModel( self.qcModel, qcSelection=self.selection )
+		else          : self.system.DefineQCModel( self.qcModel )		
+		
+		self.system.DefineNBModel( NBmodel, assignQCMMModels=self.Hybrid )
+
+
+			         
 	#----------------------------------------------------------------------------
 	def Export_QC_System(self,baseName = None):
 		'''
