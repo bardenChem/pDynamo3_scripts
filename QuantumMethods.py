@@ -18,6 +18,8 @@ from pCore                     import *
 from pSimulation               import PruneByAtom
                            
 from pMolecule.QCModel         import *
+from pMolecule.NBModel import NBModelORCA
+
 
 from addOns.pySCF import NBModelPySCF , \
                              QCModelPySCF
@@ -127,14 +129,16 @@ class QuantumMethods:
 	def Set_SMO_internal(self):
 		'''
 		'''
-		NBmodel        = self.system.nbModel
+		NBmodel             = self.system.nbModel
 		self.system.nbModel = None
 		self.qcModel = QCModelMNDO.WithOptions( hamiltonian = self.pars["Hamiltonian"],
 												    converger=self.converger )
 
 
-		if self.Hybrid: self.system.DefineQCModel( self.qcModel, qcSelection=self.selection )
-		else          : self.system.DefineQCModel( self.qcModel )		
+		if self.Hybrid: 
+			self.system.DefineQCModel( self.qcModel, qcSelection=self.selection )
+			self.system.DefineNBModel( NBmodel, assignQCMMModels=self.Hybrid )
+		else: self.system.DefineQCModel( self.qcModel )		
 		
 		self.system.DefineNBModel( NBmodel, assignQCMMModels=self.Hybrid )
 
@@ -180,7 +184,8 @@ class QuantumMethods:
 
 	#.................................................................................
 	def Set_ORCA(self):
-
+		'''
+		'''
 		options =  "\n% output\n"
 		options += "print [ p_mos ] 1\n"
 		options += "print [ p_overlap ] 5\n"
@@ -188,15 +193,13 @@ class QuantumMethods:
 		
 		NBmodel  = NBModelORCA.WithDefaults()
 		self.qcModel = QCModelORCA.WithOptions( keywords = [ self.pars["functional"],self.pars["basis"],options ], 
-                                            		deleteJobFiles  = False                      							  ,
-                                            		scratch         =self.pars["scratch"]                                   )
+                                            	deleteJobFiles  = False                      			     ,
+                                            	scratch         = self.pars["scratch"]                       )
 		
-		if self.Hybrid: self.system.DefineQCModel( self.qcModel, qcSelection=self.selection )
-		else          : self.system.DefineQCModel( self.qcModel )		
-		
-		self.system.DefineNBModel( NBmodel, assignQCMMModels=self.Hybrid )
-
-
+		if self.Hybrid: 
+			self.system.DefineQCModel( self.qcModel, qcSelection=self.selection )
+			self.system.DefineNBModel( NBmodel, assignQCMMModels=True )
+		else: self.system.DefineQCModel( self.qcModel )		
 			         
 	#----------------------------------------------------------------------------
 	def Export_QC_System(self,baseName = None):

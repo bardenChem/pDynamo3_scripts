@@ -178,8 +178,8 @@ class SimulationSystem:
         '''
         if len(self.quantumRegion) > 0: _parameters["region"] = self.quantumRegion
         _parameters["active_system"] = self.system 
-        qs =  QuantumMethods(_parameters)
-        qs.Set_QC_Syste()
+        qs = QuantumMethods(_parameters)
+        qs.Set_QC_System()
         if not "method_class" in _parameters: _parameters["method_class"] = "SMO"
         if _DEBUG: qs.Export_QC_System()
         newLabel = self.system.label + "QC_system_"
