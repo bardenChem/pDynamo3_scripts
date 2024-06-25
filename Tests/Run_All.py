@@ -7,10 +7,10 @@ test_01.py -- Set/save systems with Molecular Mechanics Force Field.
 test_02.py -- Set/save systems with Quantum Mechanics methods.
 test_03.py -- Geometry Optimizations algoritims and Analysis. 
 test_04.py -- Molecular Dynamics Algoritims and Analysis (test parallel version, AKA sampling format).
-test_05.py -- Internal Energy Refinement. 
-test_06.py -- Set/save QM/MM systems. 
+test_05.py -- Unidimensional Relaxed Scans.
+test_06.py -- Energy Refinement
 test_07.py -- Building System with OPLS 
-test_08.py -- Set/save protein systems
+test_08.py -- Set/save protein system
 test_09.py -- Modeling protein system ( pDynamo examples )
 test_10.py -- Restricted Molecular Dynamics.
 test_11.py -- Unidimensional Relaxed Scans.  

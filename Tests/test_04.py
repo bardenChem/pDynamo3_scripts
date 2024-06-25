@@ -7,7 +7,7 @@ import os, sys
 #===================================
 def Run_Test():
 	'''
-	Test geometry optimization algorithms
+	Test molecular dynamics algorithms
 	'''
 
 	integrators = ["Verlet", "LeapFrog", "Langevin"]	

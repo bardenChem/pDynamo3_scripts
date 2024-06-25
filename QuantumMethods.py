@@ -84,38 +84,12 @@ class QuantumMethods:
 			"converger":"standard",
 			"center_atom":-1,
 			"new_radius_qc":0.0,
-			"pySCF_method":"RHF"
+			"pySCF_method":"RHF",
+			"NmaxThreads":1
 		}
 		for key in _parameters.keys(): self.pars[key] = _parameters[key]
 		self.methodClass = self.pars["method_class"]
-
-	#==================================================
-	def From_Parameters(selfClass,_parameters):
-		'''
-		Create object setting the quantum chemical method.
-		Returns the system with quantum chemical enabled.
-		'''
-		self = selfClass()
-		self.Check_Parameters(_parameters)
-		self.system = _parameters["active_system"]
-		NBmodel     = None
-		if self.pars["region"]: self.Hybrid = True		
-		#---------------------------------------------
-		if self.Hybrid:
-			atomlist = []
-			for sel in self.pars["region"]:
-				if type(sel) == int:
-					self.selection.append(sel)
-				elif type(self.pars["region"]) == list:
-					for i in range( len(sel) ):
-						self.selection.append( sel[i] ) 
-			self.selection = Selection.FromIterable(self.selection) 
-			
-       	
-		self.convergerLevel = self.pars["converger"]
-		self.Set_Converger()
-		self.system.electronicState = ElectronicState.WithOptions( charge = self.pars["QCcharge"],
-																   multiplicity = self.pars["multiplicity"] )
+	
 	#------------------------------------------------------
 	def Set_QC_System(self):
 		'''
@@ -186,7 +160,8 @@ class QuantumMethods:
 	def Set_ORCA(self):
 		'''
 		'''
-		options =  "\n% output\n"
+		options =  "\n%PAL NPROCS {} END".format(self.pars["NmaxThreads"])
+		options += "\n% output\n"
 		options += "print [ p_mos ] 1\n"
 		options += "print [ p_overlap ] 5\n"
 		options += "end # output"

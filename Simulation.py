@@ -218,20 +218,18 @@ class Simulation:
 		By the defualt the PKLs were saved on a child folder from the base path passed in the parameters, named "ScanTraj.ptGeo"
 		The trajectory can be saved as files of the formats allowed by pDynamo 3.0		
 		'''
+		scan = SCAN(self.molecule.system,self.baseFolder,_Optmizer,ADAPTATIVE=_Adaptative)
+		scan.ChangeDefaultParameters(self.parameters)	
+
 		#--------------------------------------------------------------------
 		scan = SCAN(self.molecule.system,self.baseFolder,_Optmizer,ADAPTATIVE=_Adaptative)
 		scan.ChangeDefaultParameters(self.parameters)	
 		#--------------------------------------------------------------------
-		rc1 = ReactionCoordinate( self.parameters["ATOMS_RC1"], MCR1, _type=rcType1 )
-		rc1.GetRCLabel(self.molecule.system)
-		rc1.SetInformation(self.molecule.system,dincre1,_dminimum=dminimum_RC1,_sigma_pk1_pk3=sigma_pk1pk3_rc1,_sigma_pk3_pk1=sigma_pk3pk1_rc1)
-		scan.SetReactionCoord(rc1)
-		rc2 = None
-		if nDims == 2:
-			rc2 = ReactionCoordinate( self.parameters["ATOMS_RC2"], MCR2, _type=rcType2 )
-			rc2.GetRCLabel(self.molecule.system)
-			rc2.SetInformation(self.molecule.system,dincre2,_dminimum=dminimum_RC2,_sigma_pk1_pk3=sigma_pk1pk3_rc2,_sigma_pk3_pk1=sigma_pk3pk1_rc2)
-			scan.SetReactionCoord(rc2)
+		self.molecule.reactionCoordinates[0].SetInformation(self.molecule.system,self.parameters["dincre_rc1"])
+		scan.SetReactionCoord(self.molecule.reactionCoordinates[0])
+		if self.molecule.rcs == 2:
+			self.molecule.reactionCoordinates(self.molecule.system,self.parameters["dincre_rc2"])
+			scan.SetReactionCoord(self.reactionCoordinates[1])
 			scan.Run2DScan(self.parameters["nsteps_RC1"], self.parameters["nsteps_RC2"] )
 		else: scan.Run1DScan(self.parameters["nsteps_RC1"])		
 		scan.Finalize()				

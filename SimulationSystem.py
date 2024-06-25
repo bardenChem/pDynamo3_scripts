@@ -50,8 +50,9 @@ class SimulationSystem:
         self.Hybrid              = None 
         self.quantumRegion       = []
         self.protein             = False 
-        self.ReactionCoordinates = [] 
+        self.reactionCoordinates = [] 
         self.refEnergy           = 0.0 
+        self.rcs                 = 0 
 
     #===================================================================================
     @classmethod
@@ -218,8 +219,9 @@ class SimulationSystem:
                                 _parameters["type"]           )
         _rc.GetRCLabel(self.system)
 
-        self.ReactionCoordinates.append(_rc)
-        self.ReactionCoordinates[-1].Print()
+        self.reactionCoordinates.append(_rc)
+        self.reactionCoordinates[-1].Print()
+        self.rcs +=1 
         
 
 #================================================================================
