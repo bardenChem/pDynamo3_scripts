@@ -72,7 +72,7 @@ class SCAN:
         #------------------------------------------------------------------------  
         #set the parameters dict for the geometry search classes
         self.GeoOptPars =   { "maxIterations":self.maxIt  ,
-                              "rmsGradient"  : self.rmsGT   }
+                              "rmsGradient"  :self.rmsGT   }
     #===========================================================================================
     def ChangeDefaultParameters(self,_parameters):
         '''
@@ -87,12 +87,12 @@ class SCAN:
         if "maxIterations"    in _parameters: self.GeoOptPars["maxIterations"] = _parameters["maxIterations"]
         if "log_frequency"    in _parameters: self.GeoOptPars["log_frequency"] = _parameters["log_frequency"]
         if "NmaxThreads"      in _parameters: self.nprocs                      = _parameters["NmaxThreads"]        
-        if "force_constant_1" in _parameters: self.forceC[0]  = _parameters["force_constant_1"]
-        if "force_constant_2" in _parameters: self.forceC[1]  = _parameters["force_constant_2"] 
         if "save_format"      in _parameters: self.saveFormat = _parameters["save_format"] 
-        if "force_constant"   in _parameters: 
-            self.forceC[0] = _parameters["force_constant"]
-            self.forceC[1] = _parameters["force_constant"]     
+        if "force_constants"  in _parameters:
+            cnt=0
+            for fc in self.parameters["force_constants"]:
+                self.forceC[cnt] = fc
+                cnt +=1
         #-----------------------------------------------------------------
 
         if not "system_name"         in self.parameters: self.parameters["system_name"]     = self.molecule.label
@@ -173,10 +173,9 @@ class SCAN:
         self.sigma_a3_a1[ndim]      = _RC.weight31
         self.DMINIMUM[ndim]         = _RC.minimumD
         self.massConstraint         = _RC.massConstraint
-        if len(_RC.atoms) == 3:
-            self.multipleDistance[ndim] = True
-        elif len(_RC.atoms) == 4:
-            self.dihedral = True
+
+        if len(_RC.atoms)   == 3: self.multipleDistance[ndim] = True
+        elif len(_RC.atoms) == 4: self.dihedral = True
     #===============================================================================================
     def Run1DScan(self,_nsteps):
         '''
@@ -185,7 +184,6 @@ class SCAN:
         if not os.path.exists( os.path.join( self.baseName, self.trajFolder +".ptGeo" ) ):  os.makedirs(  os.path.join( self.baseName,self.trajFolder +".ptGeo"  ) )
 
         text_line = "{0:>3s} {1:>15s} {2:>15s}".format('x','RC1','Energy' )
-        #self.text += "x RC1 Energy\n"
         self.text += text_line+"\n"
         
         self.logfile.add_text_Line("")

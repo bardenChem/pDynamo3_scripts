@@ -190,7 +190,7 @@ class QuantumMethods:
 		'''
 		EnergyTolerance  = 3.0e-4
 		DensityTolerance = 1.0e-8
-		MaxIterations    = 500 
+		MaxIterations    = 1000 
 
 		if self.convergerLevel == "Very_Loose":
 			EnergyTolerance  = 1.0e-4

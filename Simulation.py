@@ -74,7 +74,7 @@ class Simulation:
 			"sampling_factor":0,
 			"save_format":".dcd",
 			"adaptative":"False",
-			"trajectory_name":"trajectory",
+			"trajectory_name":"trajectory.ptGeo",
 			"seed":3029202049,
 			#parameters energy refinement
 			"xnbins":0,
@@ -85,12 +85,11 @@ class Simulation:
 			"functional":"HF",
 			"Software":"internal",
 			#parameters geometry opt
-			"trajectory_name":"none",
 			"max_iter":500,
 			"log_frequency":20,
 			"save_pdb":False,
 			"rmsGradient":0.1,
-			"optimizer":"ConjugatedGradient",
+			"optmizer":"ConjugatedGradient",
 			#scan parameters
 			"rc_1":None,
 			"rc_2":None,
@@ -132,9 +131,7 @@ class Simulation:
 			"RMS_growing_intial_string":None,
 		}
 
-		for key in _parameters.keys():
-			self.parameters[key] = _parameters[key]
-
+		for key in _parameters.keys(): self.parameters[key] = _parameters[key]
 
 	#=======================================================================
 	def Execute(self):
@@ -200,14 +197,12 @@ class Simulation:
 		'''
 		Set up and execture the search of local minima for the system passed						
 		'''
-		_Optimizer = "ConjugatedGradient"
 		_traj_name = None
 		if "optmizer" 		 in self.parameters: _Optimizer = self.parameters["optmizer"]
 		if "trajectory_name" in self.parameters: _traj_name = self.parameters["trajectory_name"]
-		print(_traj_name)
 		Gopt = GeometrySearcher(self.molecule.system,self.baseFolder,_trajName=_traj_name)		
 		Gopt.ChangeDefaultParameters(self.parameters)
-		Gopt.Minimization(_Optimizer)
+		Gopt.Minimization(self.parameters["optmizer"])
 		Gopt.Finalize()
 		self.molecule.system = Gopt.molecule
 
@@ -218,11 +213,10 @@ class Simulation:
 		By the defualt the PKLs were saved on a child folder from the base path passed in the parameters, named "ScanTraj.ptGeo"
 		The trajectory can be saved as files of the formats allowed by pDynamo 3.0		
 		'''
-		scan = SCAN(self.molecule.system,self.baseFolder,_Optmizer,ADAPTATIVE=_Adaptative)
-		scan.ChangeDefaultParameters(self.parameters)	
+		scan = SCAN(self.molecule.system,self.baseFolder,self.parameters)
 
 		#--------------------------------------------------------------------
-		scan = SCAN(self.molecule.system,self.baseFolder,_Optmizer,ADAPTATIVE=_Adaptative)
+		scan = SCAN(self.molecule.system,self.baseFolder,self.parameters["optmizer"])
 		scan.ChangeDefaultParameters(self.parameters)	
 		#--------------------------------------------------------------------
 		self.molecule.reactionCoordinates[0].SetInformation(self.molecule.system,self.parameters["dincre_rc1"])

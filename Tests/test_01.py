@@ -54,7 +54,7 @@ def Run_Test():
 	}	
 	test_05 = Scripts("test_01")
 	test_05.Set_System(_parameters)
-	test_05.SaveSystem("7tim_pruned_and_fix.pkl")
+	test_05.SaveSystem("7tim_pruned_and_fix")
 
 	
 

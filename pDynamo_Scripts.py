@@ -102,6 +102,13 @@ class Scripts:
 		self.system_historic.append(_system4load)
 		self.activeSystem.Check()
 
+	#-----------------------------------------------
+	def Modify_System(self,_parameters):
+		'''
+		'''
+		pass
+
+
 	#-----------------------------------------
 	def Run_Simulation(self,_parameters):
 		'''

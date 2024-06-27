@@ -63,12 +63,12 @@ class GeometrySearcher:
         if "Debug"          in _parameters: self.DEBUG          = _parameters["Debug"]
     #======================================================================================
     # Main minimization class method
-    def Minimization(self,_optimizer):
+    def Minimization(self,_optmizer):
         '''
         Execute the minimization routine for search of geometry corresponding to local minima
         '''
         #------------------------------------------------------------------
-        self.optAlg = _optimizer                 
+        self.optAlg = _optmizer                 
         # run the minimization for the chosen algorithm
         if   self.optAlg == "ConjugatedGradient": self.RunConjugatedGrad()
         elif self.optAlg == "SteepestDescent"   : self.RunSteepestDescent()
@@ -187,9 +187,7 @@ class GeometrySearcher:
         if "RMS_growing_intial_string"  in _parameters: rmsGIS        = _parameters["RMS_growing_intial_string"]
         if "spline_redistribution"      in _parameters: useSpline     = _parameters["spline_redistribution"]
 
-        self.trajectoryName = os.path.join(self.baseName,self.trajectoryName+".ptGeo")
-        #Note: is interesting to think in a window were the user select the initial and final coords
-        # here we excpect to ibe in pkl probably from a scan or optimization already done using the software
+        self.trajectoryName = os.path.join(self.baseName,self.trajectoryName+".ptGeo")        
         if "init_coord"  in _parameters: self.InitCrd3D  = ImportCoordinates3( _parameters["init_coord"], log=None  )
         if "final_coord" in _parameters: self.finalCrd3D = ImportCoordinates3( _parameters["final_coord"], log=None )
         trajectory = None

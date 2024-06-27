@@ -37,15 +37,21 @@ def Run_Test():
 
 	test_02 = Scripts("test_02")
 	test_02.Set_System(_parameters)
-	test_02.SaveSystem("1atp_peptide_qmmm.pkl")
+	test_02.SaveSystem("1atp_peptide_qmmm")
 
 	#test QC/MM from AMBER
 	_parameters["residue_patterns"] = ["*:LIG.248:*","*:GLU.164:*","*:HIE.94:*"]
 	_parameters["pkl_file"]         = "test_01/7tim.pkl"
 	test_03 = Scripts("test_02")
 	test_03.Set_System(_parameters)
-	test_03.SaveSystem("7tim_qcmm_am1.pkl")
+	test_03.SaveSystem("7tim_qcmm_am1")
 
+
+	_parameters["pkl_file"]        = "test_01/7tim_pruned_and_fix.pkl"
+	test_03 = Scripts("test_02")
+	_parameters["Hamiltonian"]="rm1"
+	test_03.Set_System(_parameters)
+	test_03.SaveSystem("7tim_qcmm_rm1_pruned")
 
 	#test QC/MM com AMBER carregado de pkl
 
