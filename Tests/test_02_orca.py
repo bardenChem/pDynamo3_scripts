@@ -25,36 +25,31 @@ def Run_Test():
 		"NmaxThreads":1
 	}
 	
-	try:
-		test_02 = Scripts("test_02_orca_cyclohex")
-		test_02.Set_System(_parameters)	
-		test_02.SaveSystem()
-	except: pass
+	test_02 = Scripts("test_02_orca_cyclohex")
+	test_02.Set_System(_parameters)	
+	test_02.SaveSystem()
 	#-------------------------------
 	#test QC/MM from gromacs
-	try:
-		_parameters["Input_Type"]      ="pkl"
-		_parameters["pkl_file"]        ="test_01/1atp_peptide.pkl"
-		_parameters["set_qc_region"]   ="yes"
-		_parameters["residue_patterns"]=["*:ARG.19:*"]
-		_parameters["QCcharge"]        = 1
-		_parameters["scratch"]		   = "test_02_orca_qmmm_1atp"
+	_parameters["Input_Type"]      ="pkl"
+	_parameters["pkl_file"]        ="test_01/1atp_peptide.pkl"
+	_parameters["set_qc_region"]   ="yes"
+	_parameters["residue_patterns"]=["*:ARG.19:*"]
+	_parameters["QCcharge"]        = 1
+	_parameters["scratch"]		   = "test_02_orca_qmmm_1atp"
 
-		test_03 = Scripts("test_02_orca_qmmm_1atp")
-		test_03.Set_System(_parameters)
-		test_03.SaveSystem()
-	except: pass
+	test_03 = Scripts("test_02_orca_qmmm_1atp")
+	test_03.Set_System(_parameters)
+	test_03.SaveSystem()
 
-	try:
-		#test QC/MM from AMBER
-		_parameters["residue_patterns"]= ["*:LIG.248:*","*:GLU.164:*","*:HIE.94:*"]
-		_parameters["pkl_file"]        = "test_01/7tim.pkl"
-		_parameters["scratch"]		   = "test_02_orca_qmmm_tim"
+	#test QC/MM from AMBER
+	_parameters["residue_patterns"]= ["*:LIG.248:*","*:GLU.164:*","*:HIE.94:*"]
+	_parameters["pkl_file"]        = "test_01/7tim.pkl"
+	_parameters["scratch"]		   = "test_02_orca_qmmm_tim"
+	_parameters["QCcharge"]        = -3
 
-		test_04 = Scripts("test_02_orca_qmmm_tim")
-		test_04.Set_System(_parameters)
-		test_04.SaveSystem()
-	except: pass
+	test_04 = Scripts("test_02_orca_qmmm_tim")
+	test_04.Set_System(_parameters)
+	test_04.SaveSystem()
 
 
 

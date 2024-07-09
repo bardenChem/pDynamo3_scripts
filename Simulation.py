@@ -19,7 +19,7 @@ else:                       sys.path.append(os.path.join("/home/igorchem/easyhyb
 #-----------------------------------------------------------------------------------------------------
 #Loading own libraries
 #-------------------------------------------------------------
-from EnergyAnalysis     	import EnergyAnalysis
+from EnergyAnalysis         import EnergyAnalysis
 from TrajectoryAnalysis 	import TrajectoryAnalysis
 #-------------------------------------------------------------
 from GeometrySearcher 	    import GeometrySearcher
@@ -168,13 +168,16 @@ class Simulation:
 		dimensions[0] =  self.parameters["xnbins"]
 		nmaxthreads   = 1 
 		_trajfolder   = "single"
+		_type = "1DRef"
+		if self.parameters["ynbins"] > 0: _type = "2DRef"
+
 		if "ynbins"        in self.parameters: dimensions[1] = self.parameters["ynbins"]
 		if "restart"       in self.parameters: _Restart      = self.parameters["restart"]
 		if "NmaxThreads"   in self.parameters: nmaxthreads   = self.parameters["NmaxThreads"]
 		if "source_folder" in self.parameters: _trajfolder   = self.parameters["source_folder"] 
 		#------------------------------------------------------------------
-		ER = EnergyRefinement(self.molecule.system.system  	,
-							  _trajfolder  					,
+		ER = EnergyRefinement(self.molecule.system,
+							  _trajfolder  		  ,
 							  self.parameters["folder"]     ,
 							  dimensions                    ,
 							  self.parameters["charge"]     ,
@@ -190,8 +193,15 @@ class Simulation:
 				for key in self.parameters["mopac_keywords"]: _mopacKeyWords.append(key)
 			ER.RunMopacSMO(self.parameters["methods_lists"],_mopacKeyWords)
 		#------------------------------------------------------------
-		ER.WriteLog()
-
+		
+		log_path = ER.WriteLog()		
+		EA = EnergyAnalysis(self.parameters["xnbins"],self.parameters["ynbins"],_type=_type)		
+		EA.ReadLog(log_path)
+		crd2_label = None
+		#--------------------------------------------------------
+		crd1_label = self.molecule.reactionCoordinates[0].label
+		if   _type == "1DRef": EA.MultPlot1D(crd1_label)
+		elif _type == "2DRef": EA.MultPlot2D(14,crd1_label,crd2_label)	
 	#==================================================================
 	def GeometryOptimization(self):
 		'''
@@ -213,8 +223,9 @@ class Simulation:
 		By the defualt the PKLs were saved on a child folder from the base path passed in the parameters, named "ScanTraj.ptGeo"
 		The trajectory can be saved as files of the formats allowed by pDynamo 3.0		
 		'''
+		_type = "1D"
 		scan = SCAN(self.molecule.system,self.baseFolder,self.parameters)
-
+		crd2_label = None
 		#--------------------------------------------------------------------
 		scan = SCAN(self.molecule.system,self.baseFolder,self.parameters["optmizer"])
 		scan.ChangeDefaultParameters(self.parameters)	
@@ -222,21 +233,27 @@ class Simulation:
 		self.molecule.reactionCoordinates[0].SetInformation(self.molecule.system,self.parameters["dincre_rc1"])
 		scan.SetReactionCoord(self.molecule.reactionCoordinates[0])
 		if self.molecule.rcs == 2:
-			self.molecule.reactionCoordinates(self.molecule.system,self.parameters["dincre_rc2"])
-			scan.SetReactionCoord(self.reactionCoordinates[1])
-			scan.Run2DScan(self.parameters["nsteps_RC1"], self.parameters["nsteps_RC2"] )
-		else: scan.Run1DScan(self.parameters["nsteps_RC1"])		
-		scan.Finalize()				
-		
+			self.molecule.reactionCoordinates[1].SetInformation(self.molecule.system,self.parameters["dincre_rc2"])
+			scan.SetReactionCoord(self.molecule.reactionCoordinates[1])
+			scan.Run2DScan(self.parameters["nsteps_rc1"], self.parameters["nsteps_rc2"] )
+			_type = "2D"
+			crd2_label = self.molecule.reactionCoordinates[1].label
+		else: scan.Run1DScan(self.parameters["nsteps_rc1"])
+		log_path = scan.Finalize()
+
+		EA = EnergyAnalysis(self.parameters["nsteps_rc1"],self.parameters["nsteps_rc2"],_type=_type)		
+		EA.ReadLog(log_path)
+		#--------------------------------------------------------
+		crd1_label = self.molecule.reactionCoordinates[0].label
+		if   _type == "1D": EA.Plot1D(crd1_label)
+		elif _type == "2D":	EA.Plot2D(14,crd1_label,crd2_label)		
 	#==================================================================================	
 	def MolecularDynamics(self):
 		'''
 		Set up and execute molecular dynamics simulations		
 		'''				
 		MDrun = MD(self.molecule.system,self.baseFolder,self.parameters)		
-		sampling = 0 
-		show = False
-		
+
 		if self.parameters["heating_nsteps"] 	   > 0: 
 			MDrun.HeatingSystem(self.parameters["heating_nsteps"],self.parameters["sampling_heating"])
 			if self.parameters["sampling_heating"] > 0:
@@ -264,46 +281,26 @@ class Simulation:
 		'''
 		#----------------------------------------------------------------
 		restraints = RestraintModel()
-		self.molecule.system.DefineRestraintModel( restraints )
-		sampling = 0 		
-		MCR1 = False
-		MCR2 = False
-		dminimum_RC1 = None
-		dminimum_RC2 = None
-		sigma_pk1pk3_rc1 = None
-		sigma_pk3pk1_rc1 = None
-		sigma_pk1pk3_rc2 = None
-		sigma_pk3pk1_rc2 = None
-
-		if "MC_RC1" in self.parameters:	MCR1 = self.parameters["MC_RC1"]
-		if "MC_RC2" in self.parameters:	MCR2 = self.parameters["MC_RC2"]
-
-		if "sampling_factor" in self.parameters: sampling = self.parameters["sampling_factor"]
-		#--------------------
-		rcType1 = "Distance"
-		rcType2 = "Distance"
-		if "dminimum_RC1" 	  in self.parameters: dminimum_RC1     = self.parameters["dminimum_RC1"] 	
-		if "dminimum_RC2" 	  in self.parameters: dminimum_RC2     = self.parameters["dminimum_RC2"] 
-		if "sigma_pk1pk3_rc1" in self.parameters: sigma_pk1pk3_rc1 = self.parameters["sigma_pk1pk3_rc1"]
-		if "sigma_pk3pk1_rc1" in self.parameters: sigma_pk3pk1_rc1 = self.parameters["sigma_pk3pk1_rc1"]	
-		if "sigma_pk1pk3_rc2" in self.parameters: sigma_pk1pk3_rc2 = self.parameters["sigma_pk1pk3_rc2"]
-		if "sigma_pk3pk1_rc2" in self.parameters: sigma_pk3pk1_rc2 = self.parameters["sigma_pk3pk1_rc2"]
-		if "rc_type_1"        in self.parameters: rcType1          = self.parameters["rc_type_1"]
-		if "rc_type_2"        in self.parameters: rcType2          = self.parameters["rc_type_2"]
+		self.molecule.system.DefineRestraintModel( restraints )		
+		rcs = []
+		rc1 = self.molecule.reactionCoordinates[0]
+		rc1.SetInformation(self.molecule.system,self.parameters["dincre_rc1"])
+		rc1.GetRCLabel(self.molecule.system)
+		rc1.SetInformation(self.molecule.system,0.0,)
+		rcs.append(rc1)
 		#-------------------------------------------------------------------
 		restrainDimensions = self.parameters['ndim']
-		forcK_1 = self.parameters["force_constant_1"]
+		forcK_1 = self.parameters["force_constants"][0]
 		#-------------------------------------------------------------------
-		rc1 = ReactionCoordinate(self.parameters["ATOMS_RC1"],MCR1,_type=rcType1)
-		rc1.GetRCLabel(self.molecule.system)
-		rc1.SetInformation(self.molecule.system,0.0,_dminimum=dminimum_RC1,_sigma_pk1_pk3=sigma_pk1pk3_rc1,_sigma_pk3_pk1=sigma_pk3pk1_rc1)
+		
 		nDims = self.parameters['ndim']
 		rc2 = None
 		if nDims == 2:
-			rc2 = ReactionCoordinate(self.parameters["ATOMS_RC2"],MCR2,_type=rcType2)
+			rc2 = self.molecule.reactionCoordinates[1]
+			rc2.SetInformation(self.molecule.system,self.parameters["dincre_rc2"])
 			rc2.GetRCLabel(self.molecule.system)
-			rc2.SetInformation(self.molecule.system,0.0,_dminimum=dminimum_RC2,_sigma_pk1_pk3=sigma_pk1pk3_rc2,_sigma_pk3_pk1=sigma_pk3pk1_rc2)
-			forcK_2 = self.parameters["force_constant_2"]
+			rc2.SetInformation(self.molecule.system,0.0)
+			forcK_2 = self.parameters["force_constant"][1]
 		#-------------------------------------------------------------------
 		distance = rc1.minimumD
 		rmodel = RestraintEnergyModel.Harmonic( distance, forcK_1 )
@@ -326,14 +323,33 @@ class Simulation:
 			elif rc2.nAtoms == 4:
 				rmodel = RestraintEnergyModel.Harmonic( distance, forcK_2, period = 360.0 )
 				restraint = RestraintDihedral.WithOptions( energyModel=rmodel, point1=rc2.atoms[0],point2=rc2.atoms[1],point3=rc2.atoms[2],point4=rc2.atoms[3] )	
-			restraints['M2'] =  restraint		
+			restraints['M2'] =  restraint	
+			rcs.append(rc2)	
 		#----------------------------------------------------------------
 		traj_name = "trajectory"
 		if "trajectory_name" in self.parameters: traj_name = self.parameters["trajectory_name"]
-		MDrun = MD(self.molecule.system,self.baseFolder,self.parameters['MD_method'],traj_name)
-		MDrun.ChangeDefaultParameters(self.parameters)
-		MDrun.RunProduction(self.parameters['nsteps'],sampling,_Restricted=True)
-		MDrun.Finalize()		
+		
+		MDrun = MD(self.molecule.system,self.baseFolder,self.parameters)
+		if self.parameters["heating_nsteps"] 	   > 0: 
+			MDrun.HeatingSystem(self.parameters["heating_nsteps"],self.parameters["sampling_heating"])
+			if self.parameters["sampling_heating"] > 0:
+				_trajAN = TrajectoryAnalysis(MDrun.trajectoryNameCurr,MDrun.molecule,MDrun.timeStep*MDrun.nsteps)
+				_trajAN.CalculateRG_RMSD()
+				_trajAN.PlotRG_RMS()
+		if self.parameters["equilibration_nsteps"] > 0: 
+			MDrun.RunProduction(self.parameters["equilibration_nsteps"],self.parameters["sampling_equilibration"],_equi=True)
+			if self.parameters["sampling_equilibration"] > 0:
+				_trajAN = TrajectoryAnalysis(MDrun.trajectoryNameCurr,MDrun.molecule,MDrun.timeStep*MDrun.nsteps)
+				_trajAN.CalculateRG_RMSD()
+				_trajAN.PlotRG_RMS()
+		if self.parameters["production_nsteps"]    > 0: 
+			MDrun.RunProduction(self.parameters["production_nsteps"],self.parameters["sampling_production"])
+			if self.parameters["sampling_production"] > 0:
+				_trajAN = TrajectoryAnalysis(MDrun.trajectoryNameCurr,MDrun.molecule,MDrun.timeStep*MDrun.nsteps)
+				_trajAN.CalculateRG_RMSD()
+				_trajAN.PlotRG_RMS()	
+				_trajAN.DistancePlots(rcs)
+				_trajAN.ExtractFrames()
 
 	#=======================================================================
 	def UmbrellaSampling(self):

@@ -13,7 +13,7 @@ def Prepare_MM_System():
 		"simulation_type":"Geometry_Optimization",
 		"save_format":".dcd",
 		"save_frequency":20,
-		"rmsGradient":1,
+		"rmsGradient":2.0,
 		"maxIterations":2200,
 		"folder":"test_03",
 		"trajectory_name":"opt_full_tim.ptGeo"
@@ -42,7 +42,7 @@ def Prepare_Prune_System():
 		"free_atoms_radius":20.0,
 		"save_format":".dcd",
 		"save_frequency":20,
-		"rmsGradient":0.1,
+		"rmsGradient":1,
 		"maxIterations":2200,
 		"trajectory_name":"opt_pruned_tim.ptGeo"		
 	}
@@ -54,30 +54,97 @@ def Prepare_Prune_System():
 
 
 #-----------------------------------------------
-def Set_QC_MM():
+def Set_QC_MM(_hamiltonian="am1"):
 	'''
 	'''
 	_qc_mmpars = {
 		"Input_Type":"pkl",
 		"pkl_file":"test_05/7tim_optMM.pkl",
 		"set_energy_model":"QM",
-		"Hamiltonian":"am1",
+		"Hamiltonian":_hamiltonian,
 		"method_class":"SMO",
 		"set_qc_region":"yes",
 		"residue_patterns":["*:LIG.248:*","*:GLU.164:*","*:HIE.94:*"],
-		"QCcharge":1,
+		"QCcharge":-3,
 		"save_format":".dcd",
 		"save_frequency":20,
 		"rmsGradient":0.1,
 		"maxIterations":2200,
-		"trajectory_name":"opt_qcmm_tim.ptGeo",
+		"trajectory_name":"opt_qcmm_tim_"+_hamiltonian+".ptGeo",
 		"simulation_type":"Geometry_Optimization"
 	}
 
-	test_03_c = Scripts("test_05")
+	test_03_c = Scripts("test_05/qcmm_opt"+_hamiltonian)
 	test_03_c.Set_System(_qc_mmpars)
 	test_03_c.Run_Simulation(_qc_mmpars)
-	test_03_c.SaveSystem("7tim_qcmm_opt_PF")
+	test_03_c.SaveSystem("7tim_"+_hamiltonian+"_opt_PF")
+
+def Set_QC_MM_multiple(methods):
+	'''
+	'''
+	SMOmodels = methods	
+
+	for smo in SMOmodels:
+		Set_QC_MM(smo)
+
+#-------------------------------------------------
+def Simple_Distance(_hamiltonian):
+	'''
+	'''
+	system_parameters = {
+		"Input_Type":"pkl",		
+		"pkl_file":os.path.join("test_05","qcmm_opt"+_hamiltonian,"7tim_"+_hamiltonian+"_opt_PF.pkl"),		
+		"set_reaction_crd":1,
+		"atoms_rc1":["*:LIG.*:C02","*:LIG.*:H02"],
+		#"atoms_rc1":["*:LIG.*:C02","*:LIG.*:H02","*:GLU.164:OE2"],
+		#"atoms_rc2":["*:LIG.*:O06","*:HIE.94:HE2","*:HIE.94:NE2"],
+		"type":"Distance",
+		"mass_constraint":"True",
+	}		
+	scan1_parameters = {
+		"simulation_type":"Relaxed_Surface_Scan",
+		"dincre_rc1":0.1,
+		"nsteps_rc1":16,
+		"maxIterations":2200,
+		"optmizer":"SteepestDescent",
+		"force_constants":[4000.0,4000.0]
+	}
+	#test simple distance
+	test_01 = Scripts("test_05/Simple_Distance_"+_hamiltonian)
+	test_01.Set_System(system_parameters)
+	test_01.Run_Simulation(scan1_parameters)
+	test_01.SaveSystem("Simple_DistanceScan")
+
+
+#-------------------------------------------------
+def Multiple_Distance(_hamiltonian):
+	'''
+	'''
+	system_parameters = {
+		"Input_Type":"pkl",		
+		"pkl_file":os.path.join("test_05","qcmm_opt"+_hamiltonian,"7tim_"+_hamiltonian+"_opt_PF.pkl"),		
+		"set_reaction_crd":1,
+		"atoms_rc1":["*:LIG.*:C02","*:LIG.*:H02","*:GLU.164:OE2"],
+		#"atoms_rc2":["*:LIG.*:O06","*:HIE.94:HE2","*:HIE.94:NE2"],
+		"type":"multipleDistance",
+		"maxIterations":2200,
+		"mass_constraint":"True",
+	}		
+	scan1_parameters = {
+		"simulation_type":"Relaxed_Surface_Scan",
+		"dincre_rc1":0.1,
+		"optmizer":"SteepestDescent",
+		"maxIterations":2200,
+		"nsteps_rc1":20,
+		"force_constants":[4000.0,4000.0]
+
+	}
+	#test simple distance
+	test_01 = Scripts("test_05/Multiple_Distance_"+_hamiltonian)
+	test_01.Set_System(system_parameters)
+	test_01.Run_Simulation(scan1_parameters)
+	test_01.SaveSystem("Multiple_DistanceScan")
+
 
 #-----------------------------------------------
 def Run_Test():
@@ -90,31 +157,16 @@ def Run_Test():
 	
 	if not os.path.exists( os.path.join("test_05","7tim_optMM.pkl") ):
 		Prepare_Prune_System()
-
-	if not os.path.exists( os.path.join("test_05","7tim_qcmm_opt_PF.pkl") ):
-		Set_QC_MM()	
-
 	
-	system_parameters = {
-		"Input_Type":"pkl",		
-		"pkl_file":os.path.join("test_03","7tim_qcmm_opt_PF.pkl"),		
-		"set_reaction_crd":1,
-		"atoms_rc1":["*:LIG.*:C02","*:LIG.*:H02"],
-		#"atoms_rc1":["*:LIG.*:C02","*:LIG.*:H02","*:GLU.164:OE2"],
-		#"atoms_rc2":["*:LIG.*:O06","*:HIE.94:HE2","*:HIE.94:NE2"],
-		"type":"distance",
-		"mass_constraint":"true",
-	}		
-	scan1_parameters = {
-		"simulation_type":"Relaxed_Surface_Scan",
-		"dincre_RC1":0.1,
-		"nsteps_RC1":12
-	}
-	
-	#test simple distance
-	test_01 = Scripts("test_05")
-	test_01.Set_System(system_parameters)
-	test_01.Run_Simulation(scan1_parameters)	
+	SMOmodels = ["am1","rm1","pm3","pm6","am1dphot","pddgpm3"]
+	#SMOmodels = ["am1"]
+
+	for smo in SMOmodels:
+		Set_QC_MM(smo)
+
+	for smo in SMOmodels:
+		Simple_Distance(smo)		
+		Multiple_Distance(smo)
 	
 #===================================
 if __name__ == '__main__': Run_Test()

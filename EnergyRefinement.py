@@ -14,7 +14,7 @@ from commonFunctions import *
 from pMolecule import *
 from pMolecule.QCModel import *
 
-from MopacQCMMinput import *
+from MopacQCMMinput import MopacQCMMinput
 import os, glob, sys, shutil
 import numpy as np 
 
@@ -98,7 +98,8 @@ class EnergyRefinement:
 				with pymp.Parallel(_NmaxThreads) as p:
 					for i in p.range( len(self.fileLists) ):
 						_qc_parameters["Hamiltonian"] = smo
-						qcSystem = QuantumMethods.From_Parameters(_qc_parameters)	
+						qcSystem = QuantumMethods(_qc_parameters)
+						qcSystem.Set_QC_System()	
 						qcSystem.system.coordinates3 = ImportCoordinates3( self.fileLists[i],log=None )
 						lsFrames= GetFrameIndex(self.fileLists[i][:-4])						
 						if self.ylen > 0:
@@ -177,13 +178,24 @@ class EnergyRefinement:
 		NBmodel          = self.molecule.nbModel	
 		_mopacKeys       = _keyWords
 		
+		mop_pars = { 
+			"active_system":self.molecule   ,
+			"basename":self.baseName        ,
+			"cood_name":"none"              ,
+			"Hamiltonian":"am1"             ,
+			"QCcharge":self.charge          ,
+			"multiplicity":self.multiplicity,
+			"keywords":_keyWords            , 
+		}
 
 		for smo in _methods:
 			for i in range( len(self.fileLists) ):				
 				self.molecule.coordinates3 = ImportCoordinates3(self.fileLists[i],log=None)
-				mop = MopacQCMMinput(self.molecule,self.baseName,self.fileLists[i],_mopacKeys,smo)
+				mop_pars["Hamiltonian"]    = smo 
+				mop_pars["cood_name"]      = self.fileLists[i]
+				mop = MopacQCMMinput.MopacQCMMinput(mop_pars)
 				mop.CalculateGradVectors()
-				mop.write_input(self.charge,self.multiplicity)
+				mop.write_input(os.path.basename(mop_pars["cood_name"]))
 				mop.Execute()				
 				lsFrames = []
 				if self.fileLists[i] == "single.pkl": lsFrames.append(0)
@@ -378,6 +390,7 @@ class EnergyRefinement:
 		logFile = open(_filename,'w')
 		logFile.write(self.text)
 		logFile.close()
+		return(_filename)
 		#----------------------------
 		#filesTmp = glob.glob( self.baseName+"/*.eTmp" )
 		#for ftpm in filesTmp: os.remove(ftpm)		

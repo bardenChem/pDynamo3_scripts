@@ -10,6 +10,9 @@
 
 from commonFunctions import *
 from pMolecule import *
+from pBabel import ImportCoordinates3
+from pCore import Unpickle
+
 #************************************************************
 class MopacQCMMinput:
 	'''
@@ -34,6 +37,9 @@ class MopacQCMMinput:
 		if hasattr(self.system,"mmState"): 
 			self.charges = self.system.mmState.charges
 		else: self.charges[len(self.system.atoms)]
+
+		if self.pars["cood_name"]:
+			self.system.coordinates3 = Unpickle(self.pars["cood_name"])
 		
 		for i in self.system.atoms.items:
 			symbol = GetAtomicSymbol( i.atomicNumber )
@@ -50,7 +56,7 @@ class MopacQCMMinput:
 		'''
 		'''
 		self.pars = { 
-			"cood_name":"none" ,
+			"cood_name": None ,
 			"Hamiltonian":"am1",
 			"QCcharge":0       ,
 			"multiplicity":1   ,
@@ -102,9 +108,9 @@ class MopacQCMMinput:
 		if sequence is not None: pdb_file  = open( self.mop_file_name[:-4]+".pdb","w")
 		# Writting the files
 		molInText = "\n{} 0\n".format( len(self.QCatoms) )
-		mop_text  = self.pars["Hamiltonian"] + " 1SCF charge={} {} ".format(_chg,MULT)
+		mop_text  = self.pars["Hamiltonian"] + " 1SCF charge={} {} ".format(self.pars["QCcharge"],MULT)
 		pdb_text  = ""
-		for _key in self.keywords:
+		for _key in self.pars["keywords"]:
 			mop_text += _key
 			mop_text += " "
 		#-------------------
@@ -117,10 +123,10 @@ class MopacQCMMinput:
 		A2res = "UKN"
 		for i in self.QCatoms:
 			if sequence is not None:
-				a1    = self.molecule.atoms.items[i]
+				a1    = self.system.atoms.items[i]
 				A1res = a1.parent.label.split(".")
 				if i in self.BAatoms:
-					a2    = self.molecule.atoms.items[ self.QCatoms[cnt+1] ]
+					a2    = self.system.atoms.items[ self.QCatoms[cnt+1] ]
 					A2res = a2.parent.label.split(".")	
 					pdb_text +=  "ATOM {0:6} {1:4} {2:2} {3:<1} {4:<7} {5:7.3f} {6:7.3f} {7:7.3f} {8:>5.2f} {9:>4.2f} \n".format(cnt,"H",A2res[0],"A",A2res[1],self.atomsDict[i][1],self.atomsDict[i][2],self.atomsDict[i][3],1.00,0.00)
 				else:
@@ -148,7 +154,8 @@ class MopacQCMMinput:
 		'''
 
 		command = mopac_path + " " + self.mop_file_name 
-		if os.path.exists(command): os.system(command)
+		if os.path.exists(mopac_path): 
+			os.system(command)
 		else: 
 			mopac_path =  "/opt/apps/mopac/2016/bin/mopac "
 			command = mopac_path + self.mop_file_name

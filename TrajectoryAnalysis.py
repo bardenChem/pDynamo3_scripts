@@ -77,9 +77,9 @@ class TrajectoryAnalysis:
 			self.molecule.coordinates3 = self.crd3
 		energy0 = self.molecule.Energy(log=None)
 		if qc_mm:
-				system= Selection( list(self.molecule.qcState.pureQCAtoms) )
-				# . Calculate the radius of gyration.
-				rg0 = self.crd3.RadiusOfGyration(selection = system, weights = masses)
+			system= Selection( list(self.molecule.qcState.pureQCAtoms) )
+			# . Calculate the radius of gyration.
+			rg0 = self.crd3.RadiusOfGyration(selection = system, weights = masses)
 		elif protein:
 			system  = AtomSelection.FromAtomPattern ( self.molecule, "*:*:CA" )		
 			# . Calculate the radius of gyration.
@@ -142,6 +142,8 @@ class TrajectoryAnalysis:
 		ax1.set_xlabel("Distance $\AA$")
 		ax1.set_ylabel("G(r)")
 		plt.savefig(self.trajFolder+"_"+_selection_name+"_rdf.png")
+		plt.close()
+		fig1.clf()
 
 	#-----------------------------------------------------------------------------------------------------
 	def Calculate_SD(self,_selection,_selection_name=""):
@@ -161,8 +163,8 @@ class TrajectoryAnalysis:
 		ax1.set_xlabel("Time (ps)")
 		ax1.set_ylabel("Dself")
 		plt.savefig(self.trajFolder+"_"+_selection_name+"_sdf.png")
-
-
+		plt.close()
+		fig1.clf()
 	#--------------------------------------------------
 	def ExtractFrames(self):
 		'''			
@@ -242,13 +244,13 @@ class TrajectoryAnalysis:
 		ExportSystem( os.path.join( self.trajFolder,"mostFrequentRC1RC2.pdb"), self.molecule,log=None  )
 		ExportSystem( os.path.join( self.trajFolder,"mostFrequentRC1RC2.pkl"), self.molecule,log=None )
 
-
 		try:
 			import seaborn as sns
 			g=sns.jointplot(x=distances1,y=distances2,kind="kde",cmap="plasma",shade=True,height=6,widht=8)
 			g.set_axis_labels(rc_1[0].label,rc_2[0].label)
 			plt.savefig( os.path.join( self.trajFolder,label_text+"_Biplot.png"),dpi=1000 )
 			if SHOW: plt.show()
+			plt.close()
 		except:
 			print("Error in importing seaborn package!\nSkipping biplot distribution plot!")
 			pass
@@ -266,6 +268,9 @@ class TrajectoryAnalysis:
 		ax1.set_ylabel("Radius of Gyration $\AA$")
 		plt.savefig( os.path.join( self.trajFolder,"analysis_mdRG.png") )
 		if SHOW: plt.show()
+		plt.clf()
+		plt.close()
+		fig1.clf()
 
 		fig2, (ax2) = plt.subplots(nrows=1)
 		#--------------------------------------------------------------------------
@@ -273,7 +278,10 @@ class TrajectoryAnalysis:
 		ax2.set_xlabel("Time (ps)")
 		ax2.set_ylabel("RMSD $\AA$")
 		plt.savefig( os.path.join( self.trajFolder,"analysis_mdRMSD.png") )
-		if SHOW: plt.show()        
+		if SHOW: plt.show() 
+		plt.clf()  
+		plt.close() 
+		fig2.clf()    
 		#---------------------------------------------------------------------------
 		try:
 			import seaborn as sns
@@ -285,18 +293,22 @@ class TrajectoryAnalysis:
 			g = sns.jointplot(x=self.RG,y=self.RMS,kind="kde",cmap="plasma",shade=True)
 			g.set_axis_labels("Radius of Gyration $\AA$","RMSD $\AA$")
 			plt.savefig( os.path.join( self.trajFolder,"rg_rmsd_biplot.png") )
-			if SHOW:
-				plt.show()
+			if SHOW: plt.show()
+			plt.close()
+
 		except:
 			print("Error in importing seaborn package!\nSkipping biplot distribution plot!")
 			pass
 		#---------------------------------------------------------------------------
-		fig1, (ax1) = plt.subplots(nrows=1)
+		fig, (ax1) = plt.subplots(nrows=1)
 		plt.plot(n, self.energies)
 		ax1.set_xlabel("Time (ps)")
 		ax1.set_ylabel("Energy kJ/mol")
 		plt.savefig(self.trajFolder+"_MDenergy.png")
 		if SHOW: plt.show()
+		plt.clf()
+		plt.close()
+		fig.clf()
 
 	#=========================================================================
 	def DistancePlots(self,RCs,SHOW=False):
@@ -342,7 +354,12 @@ class TrajectoryAnalysis:
 		plt.xlabel("Time (ps)")
 		plt.ylabel("Distances $\AA$")
 		plt.legend()
-		plt.savefig(self.trajFolder+"_DA.png",dpi=1000)		
+		plt.savefig(self.trajFolder+"_DA.png",dpi=1000)
+		plt.clf()
+		plt.close()
+		fig2.clf()
+
+		self.ExtractFrames_biplot(self.RCs["0"],self.RCs["1"])
 
 	#=========================================================================
 	def Save_DCD(self):

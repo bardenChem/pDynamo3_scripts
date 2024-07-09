@@ -106,7 +106,7 @@ class QuantumMethods:
 		NBmodel             = self.system.nbModel
 		self.system.nbModel = None
 		self.qcModel = QCModelMNDO.WithOptions( hamiltonian = self.pars["Hamiltonian"],
-												    converger=self.converger )
+												converger=self.converger )
 
 
 		if self.Hybrid: 
@@ -160,16 +160,23 @@ class QuantumMethods:
 	def Set_ORCA(self):
 		'''
 		'''
-		options =  "\n%PAL NPROCS {} END".format(self.pars["NmaxThreads"])
-		options += "\n% output\n"
+		options = "\n% output\n"
 		options += "print [ p_mos ] 1\n"
 		options += "print [ p_overlap ] 5\n"
-		options += "end # output"
-		
+		options += "end # output\n"
+		options +="%maxcore 1000\n"
+		options +="%pal\n"
+		options +="nprocs 2\n"
+		options +="end\n"
+		_keyWords = [ self.pars["functional"],
+					  self.pars["basis"],
+					  #"PAL{}".format(self.pars["NmaxThreads"]),
+					  options ]
+
 		NBmodel  = NBModelORCA.WithDefaults()
-		self.qcModel = QCModelORCA.WithOptions( keywords = [ self.pars["functional"],self.pars["basis"],options ], 
-                                            	deleteJobFiles  = False                      			     ,
-                                            	scratch         = self.pars["scratch"]                       )
+		self.qcModel = QCModelORCA.WithOptions( keywords = _keyWords                  , 
+                                            	deleteJobFiles  = False               ,
+                                            	scratch         = self.pars["scratch"])
 		
 		if self.Hybrid: 
 			self.system.DefineQCModel( self.qcModel, qcSelection=self.selection )

@@ -73,6 +73,7 @@ class EnergyAnalysis:
 		energyTmp = []
 		#----------------------------------
 		if self.Type == "1D":
+			self.energies1D = []
 			for line in reading:
 				if i > 0:
 					lns = line.split()
@@ -256,8 +257,10 @@ class EnergyAnalysis:
 		#--------------------------------------------
 		plt.savefig(self.baseName+".png",dpi=1000)
 		#---------------------------------------------
-		if SHOW: plt.show()	
+		if SHOW: plt.show()
+		plt.clf()
 		plt.close()
+
 	#===============================================
 	def MultPlot1D(self,label,SHOW=False):
 		'''
@@ -274,7 +277,8 @@ class EnergyAnalysis:
 		plt.legend()
 		plt.savefig(self.baseName+".png",dpi=1000)
 		#---------------------------------------------
-		if SHOW: plt.show()		
+		if SHOW: plt.show()	
+		plt.clf()	
 		plt.close()
 	#===============================================
 	def Plot2D(self,contourlines,crd1label,crd2label,_xlim=None,_ylim=None,SHOW=False,_figS=[7,5]):
@@ -335,7 +339,9 @@ class EnergyAnalysis:
 		plotName = self.baseName + _method[:5]
 		plt.savefig(plotName+".png",dpi=1000)
 		if SHOW: plt.show()
+		plt.clf()
 		plt.close()
+		fig.clf()
 	#----------------------------------------------------------------------------------------
 	def MultPlot2D(self,contourlines,crd1label,crd2label,_xlim=None,_ylim=None,SHOW=False):
 		'''
@@ -360,9 +366,8 @@ class EnergyAnalysis:
 		plt.savefig(self.baseName+".png",dpi=1000)
 		#---------------------------------------------
 		if SHOW: plt.show()	
+		plt.clf()
 		plt.close()
-	
-
 	#----------------------------------------------------------------------------------------
 	def Path_From_PES(self, in_point,fin_point):
 		''''
@@ -402,7 +407,6 @@ class EnergyAnalysis:
 			cp[1] += dirs[ind][1]
 			path.append(cp)
 
-		print(path)
 		return(path)
 
 #=====================================================================

@@ -56,6 +56,9 @@ class ReactionCoordinate:
 			A1 = _molecule.atoms.items[ self.atoms[0] ]
 			A2 = _molecule.atoms.items[ self.atoms[1] ]
 			A3 = _molecule.atoms.items[ self.atoms[2] ]
+			print(A1.label)
+			print(A2.label)
+			print(A3.label)
 			if not sequence == None:
 				A1res = A1.parent.label.split(".")
 				A2res = A2.parent.label.split(".")
@@ -80,6 +83,8 @@ class ReactionCoordinate:
 			else: 
 				self.label  = A1.label + "-" + A2.label			
 				self.label2 = A1.label + "-" + A2.label 
+			print(A1.label)
+			print(A2.label)
 
 		#.--------------------------
 		elif self.Type == "Dihedral":
@@ -140,6 +145,7 @@ class ReactionCoordinate:
 		'''
 		print( "Printing reaction coordinate information:")
 		print( "\tAtoms Indices: {}".format(self.atoms) )
+		print( "\tLabel: {}".format(self.label2) )
 		print( "\tType: {}".format(self.Type) )
 		print( "\tWeight N1:{} ".format(self.weight13) )
 		print( "\tWeight N2:{} ".format(self.weight31) )

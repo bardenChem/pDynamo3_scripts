@@ -132,11 +132,11 @@ class SimulationSystem:
         '''
         Calculates single point energy.
         '''
-        self.refEnergy = self.system.Energy(doGradients = True)
+        self.refEnergy = self.system.Energy(doGradients = False)
         self.system.Summary()
         return self.refEnergy    
     #====================================================================================
-    def Spherical_Pruning(self,_centerAtom,_radius):
+    def Spherical_Pruning(self,_centerAtom,_radius,_DEBUG=False):
         '''
         Perform a spherical pruning from a certain atom center coordinates.
         Parameters:
@@ -156,6 +156,8 @@ class SimulationSystem:
         self.system = PruneByAtom( oldSystem,Selection(core2) )
         self.system.DefineNBModel( NBmodel )      
         self.label  = newLabel
+        
+
     #======================================================================================
     def Setting_Free_Atoms(self,_centerAtom,_radius,_DEBUG=False):
         '''
@@ -172,7 +174,7 @@ class SimulationSystem:
         newLabel= self.system.label + "_fixed"       
         #------------------------------------------------------        
         self.system.freeAtoms = mobile       
-        self.system.label     = newLabel     
+        self.system.label     = newLabel  
     #=========================================================================
     def Set_QC_Method(self,_parameters,_DEBUG=False):
         '''
@@ -190,7 +192,7 @@ class SimulationSystem:
         self.system = qs.system
 
     #=========================================================================
-    def Set_QCMM_Region(self,_pat_list,_centerAtom=None,_radius=None):
+    def Set_QCMM_Region(self,_pat_list,_centerAtom=None,_radius=None,_DEBUG=False):
         '''
             lig = AtomSelection.FromAtomPattern(proj.system,"*:LIG.248:*")
 
@@ -213,9 +215,11 @@ class SimulationSystem:
         _atom_pat = []
         for atom in atoms_rc:
             _atom_pat.append( AtomSelection.FromAtomPattern(self.system, atom)[0] )
-            
+        
+        mc = False
+        if _parameters["mass_constraint"] == "True": mc = True
         _rc = ReactionCoordinate(_atom_pat                   ,
-                                _parameters["mass_constraint"],
+                                mc,
                                 _parameters["type"]           )
         _rc.GetRCLabel(self.system)
 

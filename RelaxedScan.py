@@ -4,10 +4,7 @@
 
 #FILE = RelaxedScan.py
 
-##############################################################
-#-----------------...EasyHybrid 3.0...-----------------------#
-#-----------Credits and other information here---------------#
-##############################################################
+
 #=============================================================
 import pymp
 import numpy as np 
@@ -756,23 +753,16 @@ class SCAN:
                 print(self.saveFormat)
                 trajName = os.path.join( self.baseName, self.trajFolder+self.saveFormat )
                 trajpath = os.path.join( self.baseName, self.trajFolder+".ptGeo" )
-                Duplicate( trajpath, trajName, self.molecule )
-        #..................................................
-        
-        if self.logfile:
-            if self.saveFormat == None: self.saveFormat = "None"
-            trajName = os.path.join( self.baseName, self.trajFolder+self.saveFormat )
-            trajpath = os.path.join( self.baseName, self.trajFolder+".ptGeo" )
-            
-            
-            print(self.baseName, self.trajFolder)
-            #self.logfile.save_logfile("datafile", "/home/fernando")
-            self.logfile.save_logfile(self.trajFolder, trajpath)
-            
+                Duplicate( trajpath, trajName, self.molecule )           
+                
+
         textLog = open( os.path.join(self.baseName,self.trajFolder+".log"), "w" ) 
         textLog.write(self.text)
         textLog.close() 
-        #..................................................
+
+
+        return( os.path.join(self.baseName,self.trajFolder+".log") )
+        
 
     #========================================================================================
     def Print(self):
