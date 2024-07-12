@@ -60,6 +60,13 @@ class QuantumMethods:
 					for i in range( len(sel) ):
 						self.selection.append( sel[i] ) 
 			self.selection = Selection.FromIterable(self.selection) 
+
+
+		newSelection           = AtomSelection.ByComponent(self.system,self.selection)
+		newSystem    		   = PruneByAtom(self.system, Selection(newSelection) )	
+		ExportSystem("qcSystem_Debug.pdb",newSystem)	
+		self.pars["QCcharge"]  = self.GetQCCharge(newSystem)
+		print(self.selection)
 		#---------------------------------------------       	
 		self.convergerLevel = self.pars["converger"]
 		self.Set_Converger()
@@ -164,14 +171,16 @@ class QuantumMethods:
 		options += "print [ p_mos ] 1\n"
 		options += "print [ p_overlap ] 5\n"
 		options += "end # output\n"
-		options +="%maxcore 1000\n"
-		options +="%pal\n"
-		options +="nprocs 2\n"
-		options +="end\n"
+		#options +="%maxcore 1000\n"
+		#options +="%pal\n"
+		#options +="nprocs 2\n"
+		#options +="end\n"
 		_keyWords = [ self.pars["functional"],
 					  self.pars["basis"],
 					  #"PAL{}".format(self.pars["NmaxThreads"]),
 					  options ]
+
+		print(self.pars["QCcharge"],self.system.electronicState.charge)
 
 		NBmodel  = NBModelORCA.WithDefaults()
 		self.qcModel = QCModelORCA.WithOptions( keywords = _keyWords                  , 
@@ -224,11 +233,11 @@ class QuantumMethods:
 												  	   densityTolerance  = DensityTolerance,
 												  	   maximumIterations = MaxIterations   )
 	#-------------------------------------------------------------------
-	def GetQCCharge(self):
+	def GetQCCharge(self,_system):
 		'''
 		'''
 		qc_charge=0.0
-		mmCharges = self.system.mmState.charges
+		mmCharges = _system.mmState.charges
 		for i in range( len(mmCharges) ): qc_charge += mmCharges[i]			
 		return( round(qc_charge) )
 	#--------------------------------------------------------------------

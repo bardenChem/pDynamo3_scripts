@@ -182,6 +182,7 @@ class Simulation:
 							  dimensions                    ,
 							  self.parameters["charge"]     ,
 							  self.parameters["multiplicity"])
+		
 		#------------------------------------------------------------------
 		if 	 self.parameters["Software"] == "pDynamo"   : ER.RunInternalSMO(self.parameters["methods_lists"],nmaxthreads)
 		elif self.parameters["Software"] == "pDynamoDFT": ER.RunInternalDFT(self.parameters["functional"],self.parameters["basis"],nmaxthreads)

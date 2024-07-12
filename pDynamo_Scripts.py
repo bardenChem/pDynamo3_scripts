@@ -86,13 +86,13 @@ class Scripts:
 		if "set_initial_crd" in _parameters:
 			self.activeSystem.system.coordinates3 = ImportCoordinates3(_parameters["set_initial_crd"])
 		if "set_qc_region" in _parameters:
-			if _parameters["set_qc_region"] == "yes":
-				_residue_list = []
-				_centerAtom = None
-				_radius = None
-				if "residue_patterns" in _parameters: _residue_list = _parameters["residue_patterns"]
-				if "center_atom"      in _parameters: _centerAtom   = _parameters["center_atom"]
-				if "radius"           in _parameters: _radius       = _parameters["radius"]
+			_residue_list = []
+			_centerAtom = None
+			_radius = None
+			if "residue_patterns" in _parameters: _residue_list = _parameters["residue_patterns"]
+			if "center_atom"      in _parameters: _centerAtom   = _parameters["center_atom"]
+			if "radius"           in _parameters: _radius       = _parameters["radius"]
+			if _parameters["set_qc_region"] == "yes":				
 				self.activeSystem.Set_QCMM_Region(_residue_list,_centerAtom,_radius)
 		if "set_energy_model" in _parameters:
 			if _parameters["set_energy_model"] == "QM":

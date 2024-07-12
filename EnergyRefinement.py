@@ -100,7 +100,7 @@ class EnergyRefinement:
 						_qc_parameters["Hamiltonian"] = smo
 						qcSystem = QuantumMethods(_qc_parameters)
 						qcSystem.Set_QC_System()	
-						qcSystem.system.coordinates3 = ImportCoordinates3( self.fileLists[i],log=None )
+						qcSystem.system.coordinates3 = ImportCoordinates3( self.fileLists[i], log=None )
 						lsFrames= GetFrameIndex(self.fileLists[i][:-4])						
 						if self.ylen > 0:
 							try: self.energiesArray[ lsFrames[1], lsFrames[0] ]    = qcSystem.system.Energy(log=None)
@@ -293,9 +293,9 @@ class EnergyRefinement:
 		'''
 		Perform energy refinement using the interface available on the pDynamo with the ORCA software, enabling QC(QM)/MM potential.
 		Parameters:
-			_NmaxThreads: Number of maximum threds to be used in the parallel section
 		'''
-		self.methods.append(_method+"/"+_base)
+		print(_method,_base)
+		self.methods.append(_method+_base)
 		self.restart = _restart		
 		if self.restart: self.SetRestart4Orca()	
 		self.SMOenergies = {}			

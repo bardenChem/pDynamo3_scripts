@@ -204,7 +204,7 @@ class SimulationSystem:
 
         if _centerAtom:
             atomRef = AtomSelection.FromAtomPattern(self.system,_centerAtom)
-            core    = AtomSelection.Within(self.system,atomref,_radius)
+            core    = AtomSelection.Within(self.system,atomRef,_radius)
             self.quantumRegion = AtomSelection.ByComponent(self.system,core) 
 
         self.quantumRegion = list(self.quantumRegion)
@@ -224,7 +224,7 @@ class SimulationSystem:
         _rc.GetRCLabel(self.system)
 
         self.reactionCoordinates.append(_rc)
-        self.reactionCoordinates[-1].Print()
+        #self.reactionCoordinates[-1].Print()
         self.rcs +=1 
         
 

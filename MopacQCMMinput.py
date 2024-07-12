@@ -100,7 +100,7 @@ class MopacQCMMinput:
 		#-----------------------------------------------------	
 		# creating files objects and setting paths	
 		mol_file_name = os.path.join( self.baseName,"mol.in")
-		self.mop_file_name = os.path.join(self.baseName, _crd_name + "_" + self.pars["Hamiltonian"]+ ".mop" )
+		self.mop_file_name = os.path.join(self.baseName, _crd_name[:-4] + "_" + self.pars["Hamiltonian"]+ ".mop" )
 		mol_file  = open( mol_file_name, "w" )
 		mop_file  = open( self.mop_file_name, "w" )
 		# Getting info to write PDB file 
@@ -149,7 +149,7 @@ class MopacQCMMinput:
 			pdb_file.write(pdb_text)
 			pdb_file.close()
 	#--------------------------------------------------------
-	def Execute(self, mopac_path="/opt/mopac/MOPAC2016.exe"):
+	def Execute(self, mopac_path="/opt/mopac/bin/mopac"):
 		'''
 		'''
 
