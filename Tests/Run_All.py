@@ -11,6 +11,12 @@ test_05.py -- Unidimensional Relaxed Scans.
 test_06.py -- Bidimensional Relaxed Scans. 
 test_07.py -- QCMM molecular dynamics
 test_08.py -- QCMM restricted molecular dynamics
+test_09.py -- Energy Refinement
+test_10.py -- Energy Refinement with changing quantum region 
+test_11.py -- Unidimensional Umbrella Sampling + WHAM 
+
+
+
 test_08.py -- Set/save protein system
 test_09.py -- Modeling protein system ( pDynamo examples )
 test_10.py -- Restricted Molecular Dynamics. 

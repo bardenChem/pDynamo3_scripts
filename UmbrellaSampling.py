@@ -73,7 +73,7 @@ class US:
         self.angle              = False 
         self.optimize           = OPTIMIZE
         self.GeoOptPars         = { "rmsGradient":0.01,"optmizer":"ConjugatedGradient" }       
-        self.mdParameters = { "temperature": self.temperature }        
+        self.mdParameters = { "temperature": self.temperature, "MD_method": mdMethod }        
 
     #====================================================================
     def ChangeDefaultParameters(self,_parameters):
@@ -95,8 +95,9 @@ class US:
         if "maxIterations"      in _parameters: self.GeoOptPars["maxIterations"]      = _parameters["maxIterations"]
         if "log_frequency_OPT"  in _parameters: self.GeoOptPars["log_frequency"]      = _parameters["log_frequency_OPT"]
         if "rmsGradient"        in _parameters: self.GeoOptPars["rmsGradient"]        = _parameters["rmsGradient"] 
-        if "optimizer"          in _parameters: self.GeoOptPars["optmizer"]           = _parameters["optmizer"]       
-    #==========================================================================
+        if "optimizer"          in _parameters: self.GeoOptPars["optmizer"]           = _parameters["optmizer"]   
+
+            #==========================================================================
     def SetMode(self,_RC):
         '''
         Class method to setup modes to be restrained
@@ -183,12 +184,15 @@ class US:
             temp    = os.path.basename(temp)
             md_path = os.path.join(self.baseName, temp )
             self.mdPaths.append(md_path)
+
         #------------------------------------------------------
         if self.restart:               
             for i in range( len(self.mdPaths) -1 , 0, -1 ):
                 if os.path.exists( self.mdPaths[i] ):
                     self.mdPaths.remove( self.mdPaths[i] ) 
                     self.file_lists.remove( self.file_lists[i] ) 
+
+        
         #-----------------------------------------------------
         if self.angle:self.Run1DSamplingDihedral()
         else:        
@@ -221,9 +225,9 @@ class US:
                     relaxRun.ChangeDefaultParameters(self.GeoOptPars)
                     relaxRun.Minimization( self.GeoOptPars["optmizer"] )
                 #------------------------------------------------------------   
-                mdRun = MD(self.molecule,self.mdPaths[i],self.mdMethod)
+                mdRun = MD(self.molecule,self.mdPaths[i],self.mdParametersd)
                 mdRun.ChangeDefaultParameters(self.mdParameters)
-                mdRun.RunProduction(self.equiNsteps,0,_Restricted=True)
+                mdRun.RunProduction(self.equiNsteps,0,_Restricted=True,_equi=True)
                 mdRun.RunProduction(self.prodNsteps,self.samplingFactor,_Restricted=True)
         #------------------------------------------------------------
         self.molecule.DefineRestraintModel(None)
@@ -256,10 +260,11 @@ class US:
                     relaxRun = GeometrySearcher( self.molecule, self.baseName  )
                     relaxRun.ChangeDefaultParameters(self.GeoOptPars)
                     relaxRun.Minimization( self.GeoOptPars["optmizer"] )
-                #------------------------------------------------------------   
-                mdRun = MD(self.molecule,self.mdPaths[i],self.mdMethod)
+                #------------------------------------------------------------ 
+                self.mdParameters["trajectory_name"] = self.mdPaths[i]                
+                mdRun = MD(self.molecule,self.baseName,self.mdParameters)
                 mdRun.ChangeDefaultParameters(self.mdParameters)
-                mdRun.RunProduction(self.equiNsteps,0,_Restricted=True)
+                mdRun.RunProduction(self.equiNsteps,0,_Restricted=True,_equi=True)
                 mdRun.RunProduction(self.prodNsteps,self.samplingFactor,_Restricted=True)        
         #------------------------------------------------------------
         self.molecule.DefineRestraintModel(None)
@@ -295,7 +300,7 @@ class US:
                 #------------------------------------------------------------  
                 mdRun = MD(self.molecule,self.mdPaths[i],self.mdMethod)
                 mdRun.ChangeDefaultParameters(self.mdParameters)
-                mdRun.RunProduction(self.equiNsteps,0,_Restricted=True)
+                mdRun.RunProduction(self.equiNsteps,0,_Restricted=True,_equi=True)
                 mdRun.RunProduction(self.prodNsteps,self.samplingFactor,_Restricted=True)  
         #---------------------------------------
         self.molecule.DefineRestraintModel(None)
@@ -388,7 +393,7 @@ class US:
                 #------------------------------------------------------------
                 mdRun = MD(self.molecule,self.mdPaths[i],self.mdMethod)
                 mdRun.ChangeDefaultParameters(self.mdParameters)               
-                mdRun.RunProduction(self.equiNsteps,0,_Restricted=True)
+                mdRun.RunProduction(self.equiNsteps,0,_Restricted=True,_equi=True)
                 mdRun.RunProduction(self.prodNsteps,self.samplingFactor,_Restricted=True)  
         #.....................................................................
         self.molecule.DefineRestraintModel(None) 
@@ -435,7 +440,7 @@ class US:
                 if self.adaptative: self.ChangeDefaultParameters()
                 #----------------------------------------------------------------------- 
                 mdRun = MD(self.molecule,self.mdPaths[i],self.mdMethod)
-                mdRun.RunProduction(self.equiNsteps,0,_Restricted=True)
+                mdRun.RunProduction(self.equiNsteps,0,_Restricted=True,_equi=True)
                 mdRun.RunProduction(self.prodNsteps,self.samplingFactor,_Restricted=True)                 
         #---------------------------------------
         self.molecule.DefineRestraintModel(None)
@@ -479,7 +484,7 @@ class US:
                 #-----------------------------------------------------------------------
                 mdRun = MD(self.molecule,self.mdPaths[i],self.mdMethod)
                 mdRun.ChangeDefaultParameters(self.mdParameters)
-                mdRun.RunProduction(self.equiNsteps,0,_Restricted=True)
+                mdRun.RunProduction(self.equiNsteps,0,_Restricted=True,_equi=True)
                 mdRun.RunProduction(self.prodNsteps,self.samplingFactor,_Restricted=True)
         #---------------------------------------
         self.molecule.DefineRestraintModel(None)
@@ -528,7 +533,7 @@ class US:
                 #-----------------------------------------------------------------------  
                 mdRun = MD(self.molecule,self.mdPaths[i],self.mdMethod)
                 mdRun.ChangeDefaultParameters(self.mdParameters)
-                mdRun.RunProduction(self.equiNsteps,0,_Restricted=True)
+                mdRun.RunProduction(self.equiNsteps,0,_Restricted=True,_equi=Trues)
                 mdRun.RunProduction(self.prodNsteps,self.samplingFactor,_Restricted=True)
         #---------------------------------------
         self.molecule.DefineRestraintModel(None)
@@ -556,6 +561,7 @@ class US:
                     shutil.copy(pkl_paths[cnt],newName)
                     cnt+=1
             Duplicate(self.concFolder,self.baseName+".dcd",self.molecule)
+
 
 #==================================================================================#
 #================================END OF THE CLASS==================================#

@@ -1307,7 +1307,6 @@ def pDynamoEnergyRef_2D():
 def pDynamoEnergyRef_abInitio():
 	'''
 	'''
-
 	if not os.path.exists( os.path.join(scratch_path,"QCMMopts","7tim_#4.pkl") ):QCMM_optimizations()
 
 	proj=SimulationProject.From_PKL( os.path.join(scratch_path,"QCMMopts","7tim_#4.pkl"),

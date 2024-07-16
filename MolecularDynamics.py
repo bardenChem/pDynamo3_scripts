@@ -44,6 +44,9 @@ class MD:
         Receives a list of paramters to set the simulations.
         '''        
         #Important parameters that are recurrently wanted to be change by the user
+        
+        print(_parameters)
+        input()
         self.molecule               = _system
         self.baseName               = _baseFolder 
         self.trajName               = _parameters["trajectory_name"]

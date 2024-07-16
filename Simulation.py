@@ -21,6 +21,7 @@ else:                       sys.path.append(os.path.join("/home/igorchem/easyhyb
 #-------------------------------------------------------------
 from EnergyAnalysis         import EnergyAnalysis
 from TrajectoryAnalysis 	import TrajectoryAnalysis
+from Analysis import Analysis
 #-------------------------------------------------------------
 from GeometrySearcher 	    import GeometrySearcher
 from RelaxedScan 			import SCAN
@@ -56,10 +57,18 @@ class Simulation:
 		'''
 		Deafault constructor
 		'''
-		self.molecule = _parameters["active_system"]
+		self.molecule   = _parameters["active_system"]
 		self.parameters = None
 		self.Iniate_Parameters(_parameters)
 		self.baseFolder = _parameters["project_folder"]
+
+		self.restart    = False
+		self.adaptative = False
+		if self.parameters["restart"] 	 == "yes": self.restart    = True
+		if self.parameters["adaptative"] == "yes": self.adaptative = True
+
+
+
 	#======================================================================
 	def Iniate_Parameters(self,_parameters):
 		'''		
@@ -67,13 +76,13 @@ class Simulation:
 		'''	
 		
 		self.parameters = {
-			"restart":"False",
+			"restart":"not",
 			"NmaxThreads":1,
 			"temperature":300.15,
 			"log_frequency":0,
 			"sampling_factor":0,
 			"save_format":".dcd",
-			"adaptative":"False",
+			"adaptative":"not",
 			"trajectory_name":"trajectory.ptGeo",
 			"seed":3029202049,
 			#parameters energy refinement
@@ -117,7 +126,8 @@ class Simulation:
 			#restriction parameters
 			"force_constants":[],
 			#free energy parameters
-			"optimize":"False",
+			"relax":"False",
+			"crd_format":"pkl",
 			#thermo parameters
 			"cycles":10,
 			"mode":0,
@@ -194,7 +204,6 @@ class Simulation:
 				for key in self.parameters["mopac_keywords"]: _mopacKeyWords.append(key)
 			ER.RunMopacSMO(self.parameters["methods_lists"],_mopacKeyWords)
 		#------------------------------------------------------------
-		
 		log_path = ER.WriteLog()		
 		EA = EnergyAnalysis(self.parameters["xnbins"],self.parameters["ynbins"],_type=_type)		
 		EA.ReadLog(log_path)
@@ -357,57 +366,29 @@ class Simulation:
 		'''
 		Set up and execute umbrella sampling simulations and Free energy calculations for reaction path trajectory.		
 		'''
-		#---------------------------------------
-		MCR1 = False
-		MCR2 = False		
-		rcType1 = "Distance"
-		rcType2 = "Distance"
-		#---------------------------------------
-		if "MC_RC1" in self.parameters: MCR1 = True
-		if "MC_RC2" in self.parameters:	MCR2 = True
-		#---------------------------------------
-		_Restart 	     = False
-		_Adaptative      = False
-		_Optimize        = False
-		_crdFormat       = ".pkl"
-		sampling         = 0
-		dminimum_RC1     = None
-		dminimum_RC2     = None
-		sigma_pk1pk3_rc1 = None
-		sigma_pk3pk1_rc1 = None
-		sigma_pk1pk3_rc2 = None
-		sigma_pk3pk1_rc2 = None
-		#-------------------------------------------------------------------------------------------
-		if "dminimum_RC1" 	   in self.parameters: dminimum_RC1     = self.parameters["dminimum_RC1"] 	
-		if "dminimum_RC2" 	   in self.parameters: dminimum_RC2     = self.parameters["dminimum_RC2"] 
-		if "sigma_pk1pk3_rc1"  in self.parameters: sigma_pk1pk3_rc1 = self.parameters["sigma_pk1pk3_rc1"]
-		if "sigma_pk3pk1_rc1"  in self.parameters: sigma_pk3pk1_rc1 = self.parameters["sigma_pk3pk1_rc1"]	
-		if "sigma_pk1pk3_rc2"  in self.parameters: sigma_pk1pk3_rc2 = self.parameters["sigma_pk1pk3_rc2"]
-		if "sigma_pk3pk1_rc2"  in self.parameters: sigma_pk3pk1_rc2 = self.parameters["sigma_pk3pk1_rc2"]
-		if "restart" 	 	   in self.parameters: _Restart         = self.parameters["restart"]
-		if "adaptative"  	   in self.parameters: _Adaptative      = self.parameters["adaptative"]
-		if "optimize"          in self.parameters: _Optimize        = self.parameters["optimize"]
-		if "coordinate_format" in self.parameters: _crdFormat       = self.parameters["coordinate_format"]
-		if "sampling_factor"   in self.parameters: sampling         = self.parameters["sampling_factor"]
 		#------------------------------------------------------------------
-		rc1 = ReactionCoordinate(self.parameters["ATOMS_RC1"],MCR1,_type=rcType1)
+		rc1 = self.molecule.reactionCoordinates[0]
 		rc1.GetRCLabel(self.molecule.system)
-		rc1.SetInformation(self.molecule.system,0.0,_dminimum=dminimum_RC1,_sigma_pk1_pk3=sigma_pk1pk3_rc1,_sigma_pk3_pk1=sigma_pk3pk1_rc1)
+		rc1.SetInformation(self.molecule.system,0.0)
+		_Optimize  = False
+		sampling   = self.parameters["sampling_production"]
+		_crdFormat = self.parameters["crd_format"] 
+		if self.parameters["relax"] == "True": _Optimize = True
 		
 		nDims = self.parameters['ndim']
-		rc2 = None
+		rc2   = None
 		if nDims == 2:
-			rc2 = ReactionCoordinate(self.parameters["ATOMS_RC2"],MCR2,_type=rcType2)
+			rc2 = self.molecule.reactionCoordinates[1]
 			rc2.GetRCLabel(self.molecule.system)
-			rc2.SetInformation(self.molecule.system,0.0,_dminimum=dminimum_RC2,_sigma_pk1_pk3=sigma_pk1pk3_rc2,_sigma_pk3_pk1=sigma_pk3pk1_rc2)
+			rc2.SetInformation(self.molecule.system,0.0)
 		#---------------------------------------
-		USrun = US(self.molecule.system  						  ,
+		USrun = US(self.molecule.system  				  ,
 			       self.baseFolder 						  ,
 			       self.parameters["equilibration_nsteps"],
 			       self.parameters["production_nsteps"]   ,
 			       self.parameters["MD_method"]           ,
-			       RESTART=_Restart                       ,
-			       ADAPTATIVE=_Adaptative                 ,
+			       RESTART=self.restart                   ,
+			       ADAPTATIVE=self.adaptative             ,
 			       OPTIMIZE=_Optimize                     )
 		#---------------------------------------
 		USrun.ChangeDefaultParameters(self.parameters)
@@ -418,7 +399,11 @@ class Simulation:
 			USrun.SetMode(rc2)
 			USrun.Run2DSampling(self.parameters["source_folder"],_crdFormat,sampling)
 		#---------------
-		USrun.Finalize()		
+		USrun.Finalize()
+		self.parameters["active_system"] = self.molecule.system
+		self.parameters["source_folder"] = self.baseFolder
+		WHAM = Analysis(self.parameters)
+		WHAM.PMFAnalysis()		
 	
 	#=========================================================================
 	def NormalModes(self):
