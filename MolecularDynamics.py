@@ -44,9 +44,6 @@ class MD:
         Receives a list of paramters to set the simulations.
         '''        
         #Important parameters that are recurrently wanted to be change by the user
-        
-        print(_parameters)
-        input()
         self.molecule               = _system
         self.baseName               = _baseFolder 
         self.trajName               = _parameters["trajectory_name"]
@@ -60,7 +57,7 @@ class MD:
         self.timeStep               = _parameters["timeStep"]
         self.temperature            = _parameters["temperature"]
         self.pressureControl        = False
-        self.samplingFactor         = _parameters["sampling_factor"]
+        self.samplingFactor         = 100
         self.logFreq                = _parameters["log_frequency"]
         self.seed                   = _parameters["seed"]
         self.softConstraint         = False # boolean flags signlizing whether the system has soft constraints or not              
@@ -72,7 +69,7 @@ class MD:
         self.temperatureScaleFreq   = 100
         self.startTemperature       = _parameters["start_temperature"]
         self.DEBUG                  = False
-        self.NDIM                   = _parameters["NmaxThreads"]
+        #self.NDIM                   = _parameters["NmaxThreads"]
         #Setting parameters based on information that we collected on the instance construction
         self.RNG                    = NormalDeviateGenerator.WithRandomNumberGenerator ( RandomNumberGenerator.WithSeed ( self.seed ) )
         if not os.path.exists(_baseFolder): os.makedirs(_baseFolder)

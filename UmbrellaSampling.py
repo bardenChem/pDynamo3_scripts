@@ -90,7 +90,13 @@ class US:
         if "pressure"           in _parameters: self.mdParameters["pressure"]         = _parameters["pressure"]
         if "pressure_coupling"  in _parameters: self.mdParameters["pressure_coupling"]= _parameters["pressure_coupling"]
         if "seed"               in _parameters: self.mdParameters["seed"]             = _parameters["seed"]
-        if "log_frequency_md"   in _parameters: self.mdParameters["log_frequency"]    = _parameters["log_frequency_md"]
+        if "log_frequency"      in _parameters: self.mdParameters["log_frequency"]    = _parameters["log_frequency"]
+        if "production_nsteps"    in _parameters: self.mdParameters["production_nsteps"]    = _parameters["production_nsteps"]
+        if "equilibration_nsteps" in _parameters: self.mdParameters["equilibration_nsteps"] = _parameters["equilibration_nsteps"]
+        if "sampling_production"  in _parameters: self.mdParameters["sampling_production"]  = _parameters["sampling_production"]
+        if "coll_freq" in _parameters: self.mdParameters["coll_freq"] = _parameters["coll_freq"]
+        if "temperature_scale_option" in _parameters: self.mdParameters["temperature_scale_option"] = _parameters["temperature_scale_option"]
+        if "start_temperature" in _parameters: self.mdParameters["start_temperature"] = _parameters["start_temperature"]
         #parameters for optimization
         if "maxIterations"      in _parameters: self.GeoOptPars["maxIterations"]      = _parameters["maxIterations"]
         if "log_frequency_OPT"  in _parameters: self.GeoOptPars["log_frequency"]      = _parameters["log_frequency_OPT"]
@@ -226,7 +232,6 @@ class US:
                     relaxRun.Minimization( self.GeoOptPars["optmizer"] )
                 #------------------------------------------------------------   
                 mdRun = MD(self.molecule,self.mdPaths[i],self.mdParametersd)
-                mdRun.ChangeDefaultParameters(self.mdParameters)
                 mdRun.RunProduction(self.equiNsteps,0,_Restricted=True,_equi=True)
                 mdRun.RunProduction(self.prodNsteps,self.samplingFactor,_Restricted=True)
         #------------------------------------------------------------
@@ -263,7 +268,6 @@ class US:
                 #------------------------------------------------------------ 
                 self.mdParameters["trajectory_name"] = self.mdPaths[i]                
                 mdRun = MD(self.molecule,self.baseName,self.mdParameters)
-                mdRun.ChangeDefaultParameters(self.mdParameters)
                 mdRun.RunProduction(self.equiNsteps,0,_Restricted=True,_equi=True)
                 mdRun.RunProduction(self.prodNsteps,self.samplingFactor,_Restricted=True)        
         #------------------------------------------------------------
@@ -299,7 +303,6 @@ class US:
                     relaxRun.Minimization( self.GeoOptPars["optmizer"] )
                 #------------------------------------------------------------  
                 mdRun = MD(self.molecule,self.mdPaths[i],self.mdMethod)
-                mdRun.ChangeDefaultParameters(self.mdParameters)
                 mdRun.RunProduction(self.equiNsteps,0,_Restricted=True,_equi=True)
                 mdRun.RunProduction(self.prodNsteps,self.samplingFactor,_Restricted=True)  
         #---------------------------------------
@@ -391,8 +394,7 @@ class US:
                 #------------------------------------------------------------  
                 if self.adaptative: self.ChangeConvergenceParameters()
                 #------------------------------------------------------------
-                mdRun = MD(self.molecule,self.mdPaths[i],self.mdMethod)
-                mdRun.ChangeDefaultParameters(self.mdParameters)               
+                mdRun = MD(self.molecule,self.mdPaths[i],self.mdParameters)
                 mdRun.RunProduction(self.equiNsteps,0,_Restricted=True,_equi=True)
                 mdRun.RunProduction(self.prodNsteps,self.samplingFactor,_Restricted=True)  
         #.....................................................................
