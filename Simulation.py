@@ -401,11 +401,13 @@ class Simulation:
 		#---------------
 		USrun.Finalize()
 		self.parameters["active_system"] = self.molecule.system
+		self.parameters["folder"] = self.baseFolder
 		self.parameters["source_folder"] = self.baseFolder
+		self.parameters["analysis_type"] = "PMF"
 		WHAM = Analysis(self.parameters)
 		WHAM.PMFAnalysis()		
 	
-	#=========================================================================
+	#============ =============================================================
 	def NormalModes(self):
 		'''
 		Simulation preset to calculate the normal modes and to write thr trajectory for a specific mode.			

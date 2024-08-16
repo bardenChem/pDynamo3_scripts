@@ -41,7 +41,7 @@ class PMF:
 		self.text		= ""
 		self.LOG		= open( os.path.join(self.baseName,"FreeEnergy.log") ,"w" ) # free energy log
 		
-		pat = os.path.join( self.srcFolder,"frame*", "production.ptRes" )
+		pat = os.path.join( self.srcFolder,"frame*.ptRes" )
 		self.fileNames = glob.glob ( pat ) # ver como fica o nome dos arquivos de trejetória na nova versão
 		self.fileNames.sort()
 		
@@ -74,7 +74,7 @@ class PMF:
 		#-----------------------------------------------------------------------------------------------
 		text = ""
 		for i in range(len(FE)):
-			lsFrames = GetFrameIndex( self.fileNames[i][:-17] )
+			lsFrames = GetFrameIndex( self.fileNames[i] )
 			if len(lsFrames) > 1:
 				text += "{} {} {}\n".format( lsFrames[0], lsFrames[1] , FE[i] )
 			elif len(lsFrames) == 1:

@@ -62,6 +62,7 @@ class Scripts:
 				_system4load = load_function(_parameters["crd_file"])
 			elif input_type == "amber":
 				_system4load = load_function(_parameters["top_file"], _parameters["crd_file"])
+				print(_parameters["top_file"],_parameters["crd_file"])
 			elif input_type == "gromacs":
 				_system4load = load_function(_parameters["top_file"], _parameters["crd_file"])
 			elif input_type == "pkl":

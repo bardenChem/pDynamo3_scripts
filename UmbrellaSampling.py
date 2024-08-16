@@ -552,7 +552,7 @@ class US:
 
         if self.samplingFactor>0:
             fsize = int(self.prodNsteps/self.samplingFactor)
-            pkl_path = self.baseName + "/frame*/production*/frame*.pkl"
+            pkl_path = self.baseName + "/frame*production.ptGeo/frame*.pkl"
             pkl_paths = glob.glob( pkl_path )
             pkl_paths.sort()             
             newNames = []
@@ -562,7 +562,7 @@ class US:
                     newName = os.path.join(self.concFolder,"frame{}.pkl".format( j + i*fsize ) )
                     shutil.copy(pkl_paths[cnt],newName)
                     cnt+=1
-            Duplicate(self.concFolder,self.baseName+".dcd",self.molecule)
+            Duplicate(self.concFolder,self.baseName+"_concatenated.dcd",self.molecule)
 
 
 #==================================================================================#
