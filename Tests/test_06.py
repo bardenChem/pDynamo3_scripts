@@ -53,8 +53,8 @@ def Mixed_Distance2D(_hamiltonian):
 	}		
 	scan1_parameters = {
 		"simulation_type":"Relaxed_Surface_Scan",
-		"dincre_rc1":0.1,
-		"dincre_rc2":0.1,
+		"dincre_rc1":0.15,
+		"dincre_rc2":0.15,
 		"optmizer":"SteepestDescent",
 		"maxIterations":2200,
 		"nsteps_rc1":16,
@@ -78,7 +78,7 @@ def Multiple_Distance2D(_hamiltonian):
 		"pkl_file":os.path.join("test_05","qcmm_opt"+_hamiltonian,"7tim_"+_hamiltonian+"_opt_PF.pkl"),		
 		"set_reaction_crd":2,
 		"atoms_rc1":["*:LIG.*:C02","*:LIG.*:H02","*:GLU.164:OE2"],
-		"atoms_rc2":["*:LIG.*:O06","*:HIE.94:HE2","*:HIE.94:NE2"],
+		"atoms_rc2":["*:HIE.94:NE2","*:HIE.94:HE2","*:LIG.*:O06"],
 		"type":"multipleDistance",
 		"maxIterations":2200,
 		"mass_constraint":"True",
@@ -87,12 +87,12 @@ def Multiple_Distance2D(_hamiltonian):
 		"simulation_type":"Relaxed_Surface_Scan",
 		"dincre_rc1":0.1,
 		"dincre_rc2":0.1,
-		"optmizer":"SteepestDescent",
+		"optmizer":"ConjugatedGradient",
 		"maxIterations":2200,
-		"nsteps_rc1":16,
-		"nsteps_rc2":16,
-		"NmaxThreads":8,
-		"force_constants":[4000.0,4000.0]
+		"nsteps_rc1":20,
+		"nsteps_rc2":20,
+		"NmaxThreads":10,
+		"force_constants":[2500.0,2500.0]
 
 	}
 	#test simple distance
@@ -115,8 +115,8 @@ def Run_Test():
 	if not os.path.exists( os.path.join("test_05","7tim_optMM.pkl") ):
 		Prepare_Prune_System()	
 
-	Simple_Distance2D("pm6")	
-	Mixed_Distance2D("pm6")
+	#Simple_Distance2D("")	
+	#Mixed_Distance2D("pm6")
 	Multiple_Distance2D("pm6")
 	
 #===================================

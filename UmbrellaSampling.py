@@ -562,7 +562,7 @@ class US:
                     newName = os.path.join(self.concFolder,"frame{}.pkl".format( j + i*fsize ) )
                     shutil.copy(pkl_paths[cnt],newName)
                     cnt+=1
-            Duplicate(self.concFolder,self.baseName+"_concatenated.dcd",self.molecule)
+            Duplicate(self.concFolder, os.path.join(self.concFolder,"_concatenated_US.dcd"),self.molecule)
 
 
 #==================================================================================#

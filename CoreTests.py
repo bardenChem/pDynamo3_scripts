@@ -324,7 +324,6 @@ def TrajectoryAnalysisPlots():
 	traj.Calculate_SD(LIG,_selection_name="LIG")
 	traj.PlotRG_RMS()
 	traj.Save_DCD()
-
 #==============================================================
 def QCMMScanSimpleDistance(_nsteps,_dincre,name="Default"):
 	#---------------------------------------------

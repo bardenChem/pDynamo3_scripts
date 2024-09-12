@@ -64,7 +64,7 @@ def Set_QC_MM(_hamiltonian="am1"):
 		"Hamiltonian":_hamiltonian,
 		"method_class":"SMO",
 		"set_qc_region":"yes",
-		"residue_patterns":["*:LIG.248:*","*:GLU.164:*","*:HIE.94:*"],
+		"residue_patterns":["*:LIG.248:*","*:GLU.164:*","*:HIE.94:*","*:ASN.9:*"],
 		"QCcharge":-3,
 		"save_format":".dcd",
 		"save_frequency":20,

@@ -128,6 +128,8 @@ class Simulation:
 			#free energy parameters
 			"relax":"False",
 			"crd_format":"pkl",
+			"optimize_US":"False",
+			"analysis_only":"False",
 			#thermo parameters
 			"cycles":10,
 			"mode":0,
@@ -370,7 +372,8 @@ class Simulation:
 		rc1 = self.molecule.reactionCoordinates[0]
 		rc1.GetRCLabel(self.molecule.system)
 		rc1.SetInformation(self.molecule.system,0.0)
-		_Optimize  = False
+		_Optimize = False
+		if self.parameters["optimize_US"] == "True": _Optimize  = True
 		sampling   = self.parameters["sampling_production"]
 		_crdFormat = self.parameters["crd_format"] 
 		if self.parameters["relax"] == "True": _Optimize = True
@@ -389,7 +392,7 @@ class Simulation:
 			       self.parameters["MD_method"]           ,
 			       RESTART=self.restart                   ,
 			       ADAPTATIVE=self.adaptative             ,
-			       OPTIMIZE=_Optimize                     )
+			       OPTIMIZE=self.parameters["optimize_US"]                     )
 		#---------------------------------------
 		USrun.ChangeDefaultParameters(self.parameters)
 		USrun.SetMode(rc1)

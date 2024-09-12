@@ -39,9 +39,15 @@ def Run_Test():
 	#------------------------------------
 	test_01 = Scripts("test_11")
 	test_01.Set_System(system_parameters)
-	test_01.Run_Simulation(US_parameters)
+	#test_01.Run_Simulation(US_parameters)
 	test_01.SaveSystem()
 	#-----------------------------------	
+	US_parameters["optmize_US"] = "True"
+	test_01 = Scripts("test_11_opt")
+	test_01.Set_System(system_parameters)
+	test_01.Run_Simulation(US_parameters)
+	test_01.SaveSystem()
+
 	
 	
 #===================================

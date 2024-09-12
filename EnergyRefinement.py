@@ -297,7 +297,7 @@ class EnergyRefinement:
 		print(_method,_base)
 		self.methods.append(_method+_base)
 		self.restart = _restart		
-		if self.restart: self.SetRestart4Orca()	
+		#if self.restart: self.SetRestart4Orca()	
 		self.SMOenergies = {}			
 		#---------------------------------------------------------
 		#Initiate parallel run
