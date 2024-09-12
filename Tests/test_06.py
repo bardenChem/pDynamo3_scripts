@@ -89,10 +89,10 @@ def Multiple_Distance2D(_hamiltonian):
 		"dincre_rc2":0.1,
 		"optmizer":"ConjugatedGradient",
 		"maxIterations":2200,
-		"nsteps_rc1":20,
-		"nsteps_rc2":20,
-		"NmaxThreads":10,
-		"force_constants":[2500.0,2500.0]
+		"nsteps_rc1":16,
+		"nsteps_rc2":16,
+		"NmaxThreads":16,
+		"force_constants":[2000.0,2000.0]
 
 	}
 	#test simple distance
