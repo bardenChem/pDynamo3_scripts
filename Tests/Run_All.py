@@ -13,16 +13,14 @@ test_07.py -- QCMM molecular dynamics
 test_08.py -- QCMM restricted molecular dynamics
 test_09.py -- Energy Refinement
 test_10.py -- Energy Refinement with changing quantum region 
-test_11.py -- Unidimensional Umbrella Sampling + WHAM 
+test_11.py -- Unidimensional Umbrella Sampling + WHAM with and without step optimization
+test_12.py -- Bidimensional Umbrella Sampling + WHAM 
+test_13.py -- Reaction Path Algorithms
 
 
-
-test_08.py -- Set/save protein system
-test_09.py -- Modeling protein system ( pDynamo examples )
-test_10.py -- Restricted Molecular Dynamics. 
-test_13.py -- Dihedral Relaxed Scans. 
-test_14.py -- Unidimensional Umbrella Sampling + WHAM 
-test_15.py -- Bidimensional Umbrella Sampling + WHAM 
+test_xx.py -- Set/save protein system
+test_xx.py -- Modeling protein system ( pDynamo examples )
+test_xx.py -- Dihedral Relaxed Scans. 
 test_16.py -- Reaction Path finder algorithms
 test_17.py -- Normal modes and Thermodynamics 
 test_18.py -- Optimization of transition state  

@@ -188,11 +188,11 @@ class GeometrySearcher:
         if "spline_redistribution"      in _parameters: useSpline     = _parameters["spline_redistribution"]
 
         self.trajectoryName = os.path.join(self.baseName,self.trajectoryName+".ptGeo")        
-        if "init_coord"  in _parameters: self.InitCrd3D  = ImportCoordinates3( _parameters["init_coord"], log=None  )
-        if "final_coord" in _parameters: self.finalCrd3D = ImportCoordinates3( _parameters["final_coord"], log=None )
         trajectory = None
         #-----------------------------------------------------------------------------------------
         if not "traj_source" in _parameters:
+            if "init_coord"  in _parameters: self.InitCrd3D  = ImportCoordinates3( _parameters["init_coord"], log=None  )
+            if "final_coord" in _parameters: self.finalCrd3D = ImportCoordinates3( _parameters["final_coord"], log=None )
             GrowingStringInitialPath(self.molecule              ,
                                     _parameters["traj_bins"]    ,
                                     self.InitCrd3D              ,
