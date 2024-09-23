@@ -117,7 +117,10 @@ def Run_Test():
 
 	#Simple_Distance2D("")	
 	#Mixed_Distance2D("pm6")
-	Multiple_Distance2D("pm6")
+	_methods = ["pm6","pm3","am1","rm1"]
+
+	for smo in _methods:
+		Multiple_Distance2D(smo)
 	
 #===================================
 if __name__ == '__main__': Run_Test()
