@@ -31,7 +31,7 @@ def Run_Test():
 				   "MD_method":"LeapFrog"		      	,
 				   "MC_RC1":True				        ,
 				   "simulation_type":"Umbrella_Sampling",
-				   "NmaxThreads":10		  				,
+				   "NmaxThreads":50		  				,
 				   "xnbins":10                          ,
 				   "ynbins":10                          ,
 				   "xwindows":20                        ,
