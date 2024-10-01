@@ -97,6 +97,7 @@ class US:
         if "coll_freq" in _parameters: self.mdParameters["coll_freq"] = _parameters["coll_freq"]
         if "temperature_scale_option" in _parameters: self.mdParameters["temperature_scale_option"] = _parameters["temperature_scale_option"]
         if "start_temperature" in _parameters: self.mdParameters["start_temperature"] = _parameters["start_temperature"]
+        if "trajectory_name" in _parameters: self.mdParameters["trajectory_name"] = _parameters["trajectory_name"]
         #parameters for optimization
         if "maxIterations"      in _parameters: self.GeoOptPars["maxIterations"]      = _parameters["maxIterations"]
         if "log_frequency_OPT"  in _parameters: self.GeoOptPars["log_frequency"]      = _parameters["log_frequency_OPT"]
@@ -230,7 +231,8 @@ class US:
                     relaxRun = GeometrySearcher( self.molecule, self.baseName  )
                     relaxRun.ChangeDefaultParameters(self.GeoOptPars)
                     relaxRun.Minimization( self.GeoOptPars["optmizer"] )
-                #------------------------------------------------------------   
+                #------------------------------------------------------------  
+                self.mdParameters["trajectory_name"] =  self.mdPaths[i] 
                 mdRun = MD(self.molecule,self.mdPaths[i],self.mdParametersd)
                 mdRun.RunProduction(self.equiNsteps,0,_Restricted=True,_equi=True)
                 mdRun.RunProduction(self.prodNsteps,self.samplingFactor,_Restricted=True)
@@ -269,7 +271,7 @@ class US:
                 self.mdParameters["trajectory_name"] = self.mdPaths[i]                
                 mdRun = MD(self.molecule,self.baseName,self.mdParameters)
                 mdRun.RunProduction(self.equiNsteps,0,_Restricted=True,_equi=True)
-                mdRun.RunProduction(self.prodNsteps,self.samplingFactor,_Restricted=True)        
+                mdRun.RunProduction(self.prodNsteps,self.samplingFactor,_Restricted=True) 
         #------------------------------------------------------------
         self.molecule.DefineRestraintModel(None)
     #==============================================================================
@@ -302,6 +304,7 @@ class US:
                     relaxRun.ChangeDefaultParameters(self.GeoOptPars)
                     relaxRun.Minimization( self.GeoOptPars["optmizer"] )
                 #------------------------------------------------------------  
+                self.mdParameters["trajectory_name"] = self.mdPaths[i] 
                 mdRun = MD(self.molecule,self.mdPaths[i],self.mdMethod)
                 mdRun.RunProduction(self.equiNsteps,0,_Restricted=True,_equi=True)
                 mdRun.RunProduction(self.prodNsteps,self.samplingFactor,_Restricted=True)  
@@ -394,6 +397,7 @@ class US:
                 #------------------------------------------------------------  
                 if self.adaptative: self.ChangeConvergenceParameters()
                 #------------------------------------------------------------
+                self.mdParameters["trajectory_name"] = self.mdPaths[i] 
                 mdRun = MD(self.molecule,self.mdPaths[i],self.mdParameters)
                 mdRun.RunProduction(self.equiNsteps,0,_Restricted=True,_equi=True)
                 mdRun.RunProduction(self.prodNsteps,self.samplingFactor,_Restricted=True)  
@@ -440,7 +444,8 @@ class US:
                     relaxRun.Minimization( self.GeoOptPars["optmizer"] )
                 #-----------------------------------------------------------------------
                 if self.adaptative: self.ChangeDefaultParameters()
-                #----------------------------------------------------------------------- 
+                #-----------------------------------------------------------------------
+                self.mdParameters["trajectory_name"] = self.mdPaths[i] 
                 mdRun = MD(self.molecule,self.mdPaths[i],self.mdMethod)
                 mdRun.RunProduction(self.equiNsteps,0,_Restricted=True,_equi=True)
                 mdRun.RunProduction(self.prodNsteps,self.samplingFactor,_Restricted=True)                 
@@ -484,6 +489,7 @@ class US:
                 if self.adaptative:
                     self.ChangeConvergenceParameters()
                 #-----------------------------------------------------------------------
+                self.mdParameters["trajectory_name"] = self.mdPaths[i] 
                 mdRun = MD(self.molecule,self.mdPaths[i],self.mdMethod)
                 mdRun.ChangeDefaultParameters(self.mdParameters)
                 mdRun.RunProduction(self.equiNsteps,0,_Restricted=True,_equi=True)
@@ -533,6 +539,7 @@ class US:
                     relaxRun.ChangeDefaultParameters(self.GeoOptPars)
                     relaxRun.Minimization( self.GeoOptPars["optmizer"] )
                 #-----------------------------------------------------------------------  
+                self.mdParameters["trajectory_name"] = self.mdPaths[i] 
                 mdRun = MD(self.molecule,self.mdPaths[i],self.mdMethod)
                 mdRun.ChangeDefaultParameters(self.mdParameters)
                 mdRun.RunProduction(self.equiNsteps,0,_Restricted=True,_equi=Trues)
