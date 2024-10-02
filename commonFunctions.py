@@ -220,6 +220,8 @@ def GetFrameIndex(fname):
     idxs = []
     wkstr  = os.path.basename(fname)
     ssplit = wkstr.split("_")
+    print(ssplit)
+    input()
     if len(ssplit) == 0:
         if wkstr[:5] == "frame":
             if "." in wkstr:
