@@ -21,7 +21,6 @@ test_13.py -- Reaction Path Algorithms
 test_xx.py -- Set/save protein system
 test_xx.py -- Modeling protein system ( pDynamo examples )
 test_xx.py -- Dihedral Relaxed Scans. 
-test_16.py -- Reaction Path finder algorithms
 test_17.py -- Normal modes and Thermodynamics 
 test_18.py -- Optimization of transition state  
 test_19.py -- External Programs QC/MM refinement

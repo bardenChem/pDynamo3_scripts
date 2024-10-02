@@ -67,8 +67,6 @@ class Simulation:
 		if self.parameters["restart"] 	 == "yes": self.restart    = True
 		if self.parameters["adaptative"] == "yes": self.adaptative = True
 
-
-
 	#======================================================================
 	def Iniate_Parameters(self,_parameters):
 		'''		
@@ -77,6 +75,7 @@ class Simulation:
 		
 		self.parameters = {
 			"restart":"not",
+			"analysis_only":"not",
 			"NmaxThreads":1,
 			"temperature":300.15,
 			"log_frequency":0,
@@ -396,11 +395,12 @@ class Simulation:
 		#---------------------------------------
 		USrun.ChangeDefaultParameters(self.parameters)
 		USrun.SetMode(rc1)
-		if self.parameters["ndim"]   == 1: 
-			USrun.Run1DSampling(self.parameters["source_folder"],_crdFormat,sampling)
-		elif self.parameters["ndim"] == 2:
-			USrun.SetMode(rc2)
-			USrun.Run2DSampling(self.parameters["source_folder"],_crdFormat,sampling)
+		if self.parameters["analysis_only"] == "not":
+			if self.parameters["ndim"]   == 1: 
+				USrun.Run1DSampling(self.parameters["source_folder"],_crdFormat,sampling)
+			elif self.parameters["ndim"] == 2:
+				USrun.SetMode(rc2)
+				USrun.Run2DSampling(self.parameters["source_folder"],_crdFormat,sampling)
 		#---------------
 		USrun.Finalize()
 		self.parameters["active_system"] = self.molecule.system
