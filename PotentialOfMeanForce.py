@@ -77,6 +77,7 @@ class PMF:
 			lsFrames = GetFrameIndex( self.fileNames[i] )
 			if len(lsFrames) > 1:
 				print(lsFrames)
+				input()
 				text += "{} {} {}\n".format( lsFrames[0], lsFrames[1] , FE[i] )
 			elif len(lsFrames) == 1:
 				text += "{} {}\n".format( lsFrames[0] , FE[i] )
