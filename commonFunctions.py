@@ -231,7 +231,7 @@ def GetFrameIndex(fname):
             idxs.append( int( ssplit[0][5:] ) )
             if "." in ssplit[1]:
                 wkstr = ssplit[1].split(".")
-                idxs.append( int(wkstr) )   
+                idxs.append( int(wkstr[0]) )   
             else: idxs.append( int(ssplit[1]) )
     return(idxs)
 #=========================================================================================
