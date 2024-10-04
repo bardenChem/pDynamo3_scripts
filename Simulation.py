@@ -395,14 +395,13 @@ class Simulation:
 		#---------------------------------------
 		USrun.ChangeDefaultParameters(self.parameters)
 		USrun.SetMode(rc1)
-		if self.parameters["analysis_only"] == "not":
+		if self.parameters["analysis_only"] == "yes":
 			if self.parameters["ndim"]   == 1: 
 				USrun.Run1DSampling(self.parameters["source_folder"],_crdFormat,sampling)
 			elif self.parameters["ndim"] == 2:
 				USrun.SetMode(rc2)
 				USrun.Run2DSampling(self.parameters["source_folder"],_crdFormat,sampling)
-		#---------------
-		USrun.Finalize()
+			USrun.Finalize()
 		self.parameters["active_system"] = self.molecule.system
 		self.parameters["folder"] = self.baseFolder
 		self.parameters["source_folder"] = self.baseFolder
@@ -410,11 +409,11 @@ class Simulation:
 		WHAM = Analysis(self.parameters)
 		WHAM.PMFAnalysis()		
 	
-	#============ =============================================================
+	#==========================================================================
 	def NormalModes(self):
 		'''
 		Simulation preset to calculate the normal modes and to write thr trajectory for a specific mode.			
-		'''	
+		'''
 		mode 		= 0
 		temperature = 300.15
 		Cycles 		= 10 

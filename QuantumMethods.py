@@ -64,7 +64,7 @@ class QuantumMethods:
 
 		newSelection           = AtomSelection.ByComponent(self.system,self.selection)
 		newSystem    		   = PruneByAtom(self.system, Selection(newSelection) )	
-		ExportSystem("qcSystem_Debug.pdb",newSystem)	
+		#ExportSystem("qcSystem_Debug.pdb",newSystem)	
 		self.pars["QCcharge"]  = self.GetQCCharge(newSystem)
 		print(self.selection)
 		#---------------------------------------------       	
