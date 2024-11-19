@@ -49,7 +49,8 @@ class QuantumMethods:
 		self.Check_Parameters(_parameters)
 		self.system = _parameters["active_system"]
 		NBmodel     = None
-		if self.pars["region"]: self.Hybrid = True		
+		if self.pars["region"]: self.Hybrid = True
+
 		#---------------------------------------------
 		if self.Hybrid:
 			atomlist = []
@@ -58,15 +59,19 @@ class QuantumMethods:
 					self.selection.append(sel)
 				elif type(self.pars["region"]) == list:
 					for i in range( len(sel) ):
-						self.selection.append( sel[i] ) 
-			self.selection = Selection.FromIterable(self.selection) 
-
+						self.selection.append( sel[i] )
+			self.selection = Selection.FromIterable(self.selection)
 
 		newSelection           = AtomSelection.ByComponent(self.system,self.selection)
 		newSystem    		   = PruneByAtom(self.system, Selection(newSelection) )	
-		#ExportSystem("qcSystem_Debug.pdb",newSystem)	
-		self.pars["QCcharge"]  = self.GetQCCharge(newSystem)
-		print(self.selection)
+		try:
+			new_charge  = self.GetQCCharge(newSystem)
+			if not new_charge == self.pars["QCcharge"]:
+				if self.pars["correct_QMMM_charge"]:
+					self.pars["QCcharge"] = new_charge
+		except:
+			pass
+
 		#---------------------------------------------       	
 		self.convergerLevel = self.pars["converger"]
 		self.Set_Converger()
@@ -96,7 +101,7 @@ class QuantumMethods:
 		}
 		for key in _parameters.keys(): self.pars[key] = _parameters[key]
 		self.methodClass = self.pars["method_class"]
-	
+
 	#------------------------------------------------------
 	def Set_QC_System(self):
 		'''
@@ -135,8 +140,16 @@ class QuantumMethods:
                                             mole_kwargs    = { 'verbose' : 0 } ,
                                             orbitalBasis   = self.pars["basis"] )
 
-		if self.Hybrid: self.system.DefineQCModel( self.qcModel, qcSelection=self.selection )
-		else          : self.system.DefineQCModel( self.qcModel )		
+		if self.Hybrid: 
+			self.system.DefineQCModel( qcModel, qcSelection=self.selection )
+			print("---------------------")
+			print(qcModel)
+			print(self.system.qcModel)
+		else:	
+			self.system.DefineQCModel( qcModel )		
+			print(qcModel)
+			print(self.system.qcModel)
+			print("---------------------")
 		
 		self.system.DefineNBModel( NBmodel, assignQCMMModels=self.Hybrid )
 
@@ -157,7 +170,9 @@ class QuantumMethods:
 												  fitBasis       = self.pars["fit_basis"] )
 
 		
-		if self.Hybrid: self.system.DefineQCModel( self.qcModel, qcSelection=self.selection )
+		if self.Hybrid: 
+			print(self.qcModel)
+			self.system.DefineQCModel( self.qcModel, qcSelection=self.selection )
 		else          : self.system.DefineQCModel( self.qcModel )		
 		
 		self.system.DefineNBModel( NBmodel, assignQCMMModels=self.Hybrid )

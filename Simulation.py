@@ -84,6 +84,11 @@ class Simulation:
 			"adaptative":"not",
 			"trajectory_name":"trajectory.ptGeo",
 			"seed":3029202049,
+			"QCcharge":0,
+			"charge":0,
+			"multiplicity":1,
+			"correct_QMMM_charge":False,
+			"pySCF_method":"RHF",
 			#parameters energy refinement
 			"xnbins":0,
 			"ynbins":0,
