@@ -203,6 +203,7 @@ class Simulation:
 		if 	 self.parameters["Software"] == "pDynamo"   : ER.RunInternalSMO(self.parameters["methods_lists"],nmaxthreads)
 		elif self.parameters["Software"] == "pDynamoDFT": ER.RunInternalDFT(self.parameters["functional"],self.parameters["basis"],nmaxthreads)
 		elif self.parameters["Software"] == "DFTBplus"  : ER.RunDFTB()
+		elif self.parameters["Software"] == "pySCF"     : ER.RunPySCF(self.parameters["functional"],self.parameters["basis"],_SCF_type=self.parameters["pySCF_method"])
 		elif self.parameters["Software"] == "ORCA"		: ER.RunORCA(self.parameters["orca_method"],self.parameters["basis"],nmaxthreads,_restart=_Restart)
 		elif self.parameters["Software"] == "mopac" or self.parameters["Software"]=="MOPAC":
 			_mopacKeyWords = ["AUX","LARGE"] 
@@ -211,7 +212,7 @@ class Simulation:
 			ER.RunMopacSMO(self.parameters["methods_lists"],_mopacKeyWords)
 		#------------------------------------------------------------
 		log_path = ER.WriteLog()		
-		EA = EnergyAnalysis(self.parameters["xnbins"],self.parameters["ynbins"],_type=_type)		
+		EA       = EnergyAnalysis(self.parameters["xnbins"],self.parameters["ynbins"],_type=_type)		
 		EA.ReadLog(log_path)
 		crd2_label = None
 		#--------------------------------------------------------

@@ -1,0 +1,44 @@
+#/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+from pDynamo_Scripts import Scripts
+import SimulationSystem 
+import os
+#===================================
+def Run_Test():
+	'''
+	'''
+	_parameters = {
+		"Input_Type":"pkl",
+		"set_energy_model":"QM",
+		"functional":"b3lyp",
+		"basis":"6-31G*",
+		"method_class":"pySCF",
+		"QCcharge":-3,
+		"multiplicity":1,
+	}
+	_parameters["set_qc_region"]    = "yes"
+	_parameters["residue_patterns"] = ["*:LIG.248:*","*:GLU.164:*","*:HIE.94:*"]
+	_parameters["pkl_file"]         = "test_01/7tim_pruned_and_fix.pkl"
+
+	_path   = "test_05/Multiple_Distance_rm1/ScanTraj.ptGeo"
+
+	simulation_parameters = { "xnbins":20			    ,
+				   "source_folder":_path                , 
+				   "folder":"test_02_pyscf"                   ,
+				   "charge":-3		                    ,
+				   "multiplicity":1 	                ,
+				   "basis":"6-31G*",
+				   "functional":"b3lyp",
+				   "pySCF_method":"RKS",
+				   "simulation_type":"Energy_Refinement",
+				   "Software":"pySCF"	}	
+
+	test_03 = Scripts("test_02_pyscf")
+	test_03.Set_System(_parameters)
+	test_03.Run_Simulation(simulation_parameters)
+	
+
+
+#===================================
+if __name__ == '__main__': Run_Test()

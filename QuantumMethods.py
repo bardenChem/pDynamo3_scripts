@@ -97,7 +97,8 @@ class QuantumMethods:
 			"center_atom":-1,
 			"new_radius_qc":0.0,
 			"pySCF_method":"RHF",
-			"NmaxThreads":1
+			"NmaxThreads":1,
+			"molden_name":"file.molden"
 		}
 		for key in _parameters.keys(): self.pars[key] = _parameters[key]
 		self.methodClass = self.pars["method_class"]
@@ -138,19 +139,15 @@ class QuantumMethods:
                                             method         = self.pars["pySCF_method"],
                                             mf_kwargs      = { 'diis'    : pyscf.scf.ADIIS ( ) }, 
                                             mole_kwargs    = { 'verbose' : 0 } ,
-                                            orbitalBasis   = self.pars["basis"] )
+                                            orbitalBasis   = self.pars["basis"],
+                                            molden_name    = self.pars["molden_name"]  )
 
 		if self.Hybrid: 
 			self.system.DefineQCModel( qcModel, qcSelection=self.selection )
-			print("---------------------")
-			print(qcModel)
-			print(self.system.qcModel)
 		else:	
-			self.system.DefineQCModel( qcModel )		
-			print(qcModel)
-			print(self.system.qcModel)
-			print("---------------------")
-		
+			self.system.DefineQCModel( qcModel )	
+
+		self.qcModel = qcModel
 		self.system.DefineNBModel( NBmodel, assignQCMMModels=self.Hybrid )
 
 	#--------------------------------------------------------
@@ -171,7 +168,6 @@ class QuantumMethods:
 
 		
 		if self.Hybrid: 
-			print(self.qcModel)
 			self.system.DefineQCModel( self.qcModel, qcSelection=self.selection )
 		else          : self.system.DefineQCModel( self.qcModel )		
 		

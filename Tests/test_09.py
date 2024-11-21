@@ -36,7 +36,7 @@ def Run_Test():
 	#------------------------------------
 	test_01 = Scripts("test_09")
 	test_01.Set_System(system_parameters)
-	test_01.Run_Simulation(simulation_parameters)
+	#test_01.Run_Simulation(simulation_parameters)
 	test_01.SaveSystem()
 	#-----------------------------------
 	methods.append("pm7")
@@ -47,17 +47,27 @@ def Run_Test():
 
 	test_02 = Scripts("test_09_mopac")
 	test_02.Set_System(system_parameters)
-	test_02.Run_Simulation(simulation_parameters)
+	#test_02.Run_Simulation(simulation_parameters)
 	test_02.SaveSystem()
-	
+
+	simulation_parameters["Software"] = "pySCF"
+	simulation_parameters["folder"]   = "test_09_pyscf"
+	simulation_parameters["pySCF_method"] = "RKS"
+	simulation_parameters["functional"] = "b3lyp"   	                                         
+	simulation_parameters["basis"]      = "6-31G*" 
+
+	test_03 = Scripts("test_09_pyscf")
+	test_03.Set_System(system_parameters)
+	test_03.Run_Simulation(simulation_parameters)
+
 	simulation_parameters["Software"]    = "ORCA"
 	simulation_parameters["folder"]      = "test_09_orca"
 	simulation_parameters["orca_method"] = "b3lyp"   	                                         
 	simulation_parameters["basis"]       = "6-31G*" 
-	test_03 = Scripts("test_09_orca")
-	test_03.Set_System(system_parameters)
-	test_03.Run_Simulation(simulation_parameters)
-	test_03.SaveSystem()
+	test_04 = Scripts("test_09_orca")
+	test_04.Set_System(system_parameters)
+	test_04.Run_Simulation(simulation_parameters)
+	test_04.SaveSystem()
 	
 #===================================
 if __name__ == '__main__': Run_Test()

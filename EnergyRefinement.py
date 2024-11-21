@@ -294,10 +294,9 @@ class EnergyRefinement:
 		Perform energy refinement using the interface available on the pDynamo with the ORCA software, enabling QC(QM)/MM potential.
 		Parameters:
 		'''
-		print(_method,_base)
 		self.methods.append(_method+_base)
 		self.restart = _restart		
-		#if self.restart: self.SetRestart4Orca()	
+		if self.restart: self.SetRestart4Orca()	
 		self.SMOenergies = {}			
 		#---------------------------------------------------------
 		#Initiate parallel run
@@ -358,7 +357,38 @@ class EnergyRefinement:
 		#--------------------
 		self.SMOenergies[self.methods[0]] = self.energiesArray
 		#--------------------
-		self.TreatOrcaFiles()		
+		self.TreatOrcaFiles()
+	#====================================================
+	def RunPySCF(self,_method,_base,_SCF_type):
+		'''
+		'''
+		self.SMOenergies = {}		
+		pySCF_pars = {"functional":_method,
+					  "pySCF_method":_SCF_type,
+					  "active_system":self.molecule,
+					  "region":self.pureQCAtoms,
+					  "QCcharge":-3,
+					  "multiplicity":1,
+					  "basis":_base}
+		#---------------------------------------------------------
+		#Initiate parallel run
+		#----------------------------------------
+		#Initiate Loop			
+		for i in range(0, len(self.fileLists) ):
+			lsFrames= GetFrameIndex(self.fileLists[i][:-4])
+			pySCF_pars["molden_name"] = os.path.join( self.baseName, self.fileLists[i][:-4] + ".molden") 
+			qcmol = QuantumMethods(pySCF_pars)
+			qcmol.system.coordinates3 = ImportCoordinates3(self.fileLists[i])
+			qcmol.Set_QC_System()
+			if self.ylen > 1: 
+				self.energiesArray[ lsFrames[1], lsFrames[0] ] = qcmol.system.Energy(log=None)
+				self.indexArrayX[lsFrames[1] , lsFrames[0] ] = lsFrames[0]
+				self.indexArrayY[lsFrames[1] , lsFrames[0] ] = lsFrames[1]
+			else:
+				self.energiesArray[ lsFrames[0] ] = qcmol.system.Energy(log=None)
+				self.indexArrayX[lsFrames[0]] = lsFrames[0]  
+
+
 	#====================================================
 	def TreatOrcaFiles(self):
 		'''

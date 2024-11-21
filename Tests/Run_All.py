@@ -16,7 +16,6 @@ test_10.py -- Energy Refinement with changing quantum region
 test_11.py -- Unidimensional Umbrella Sampling + WHAM with and without step optimization
 test_12.py -- Bidimensional Umbrella Sampling + WHAM 
 test_13.py -- Reaction Path Algorithms
-test_14.py -- Normal modes and Thermodynamics
 
 
 #extra
