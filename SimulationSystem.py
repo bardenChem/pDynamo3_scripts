@@ -214,6 +214,8 @@ class SimulationSystem:
         '''
         _atom_pat = []
         for atom in atoms_rc:
+            print(atom)
+            print(AtomSelection.FromAtomPattern(self.system, atom)[0] )
             _atom_pat.append( AtomSelection.FromAtomPattern(self.system, atom)[0] )
         
         mc = False

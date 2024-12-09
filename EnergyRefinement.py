@@ -368,6 +368,7 @@ class EnergyRefinement:
 					  "active_system":self.molecule,
 					  "region":self.pureQCAtoms,
 					  "QCcharge":-3,
+					  "method_class":"pySCF",
 					  "multiplicity":1,
 					  "basis":_base}
 		#---------------------------------------------------------
@@ -376,7 +377,7 @@ class EnergyRefinement:
 		#Initiate Loop			
 		for i in range(0, len(self.fileLists) ):
 			lsFrames= GetFrameIndex(self.fileLists[i][:-4])
-			pySCF_pars["molden_name"] = os.path.join( self.baseName, self.fileLists[i][:-4] + ".molden") 
+			pySCF_pars["molden_name"] = os.path.join( self.baseName, os.path.basename(self.fileLists[i])[:-4] + ".molden") 
 			qcmol = QuantumMethods(pySCF_pars)
 			qcmol.system.coordinates3 = ImportCoordinates3(self.fileLists[i])
 			qcmol.Set_QC_System()

@@ -111,6 +111,8 @@ class Simulation:
 			"dincre_rc2":0.1,
 			"nsteps_rc1":0,
 			"nsteps_rc2":0,
+			"xlim":None,
+			"ylim":None,
 			#molecular dynamics parameters
 			"MD_method":"LeapFrog",
 			"pressure":1.0,
@@ -263,7 +265,12 @@ class Simulation:
 		#--------------------------------------------------------
 		crd1_label = self.molecule.reactionCoordinates[0].label
 		if   _type == "1D": EA.Plot1D(crd1_label)
-		elif _type == "2D":	EA.Plot2D(14,crd1_label,crd2_label)		
+		elif _type == "2D":	
+			xl = scan.DMINIMUM[0] + float(self.parameters["nsteps_rc1"])*self.parameters["dincre_rc1"]
+			yl = scan.DMINIMUM[1] + float(self.parameters["nsteps_rc2"])*self.parameters["dincre_rc2"]
+			self.parameters["xlim"] = [ scan.DMINIMUM[0], xl  ]
+			self.parameters["ylim"] = [ scan.DMINIMUM[1], yl  ]
+			EA.Plot2D(14,crd1_label,crd2_label,_xlim=self.parameters["xlim"],_ylim=self.parameters["ylim"])		
 	#==================================================================================	
 	def MolecularDynamics(self):
 		'''

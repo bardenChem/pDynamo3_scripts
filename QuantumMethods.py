@@ -144,6 +144,8 @@ class QuantumMethods:
 
 		if self.Hybrid: 
 			self.system.DefineQCModel( qcModel, qcSelection=self.selection )
+			print(qcModel)
+			print("---------------")
 		else:	
 			self.system.DefineQCModel( qcModel )	
 
