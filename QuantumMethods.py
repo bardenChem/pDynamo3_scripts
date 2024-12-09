@@ -138,9 +138,8 @@ class QuantumMethods:
 											functional     = self.pars["functional"],
                                             method         = self.pars["pySCF_method"],
                                             mf_kwargs      = { 'diis'    : pyscf.scf.ADIIS ( ) }, 
-                                            mole_kwargs    = { 'verbose' : 0 } ,
-                                            orbitalBasis   = self.pars["basis"],
-                                            molden_name    = self.pars["molden_name"]  )
+                                            mole_kwargs    = { 'verbose' : 0 , "molden_name":self.pars["molden_name"]} ,
+                                            orbitalBasis   = self.pars["basis"] )
 
 		if self.Hybrid: 
 			self.system.DefineQCModel( qcModel, qcSelection=self.selection )
