@@ -17,6 +17,7 @@ def Run_Test():
 		"set_reaction_crd":1,
 		"atoms_rc1":["*:LIG.*:C02","*:LIG.*:H02","*:GLU.164:OE2"],
 		"multiplicity":1,
+		"mass_constraint":"True",
 	}
 	_parameters["set_qc_region"]    = "yes"
 	_parameters["residue_patterns"] = ["*:LIG.248:*","*:GLU.164:*","*:HIE.94:*","*:ASN.9:*"]
