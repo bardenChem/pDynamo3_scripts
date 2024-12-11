@@ -362,6 +362,7 @@ class EnergyRefinement:
 	def RunPySCF(self,_method,_base,_SCF_type):
 		'''
 		'''
+		self.methods.append(_method+_base)
 		self.SMOenergies = {}		
 		pySCF_pars = {"functional":_method,
 					  "pySCF_method":_SCF_type,
