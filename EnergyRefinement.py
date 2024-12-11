@@ -374,7 +374,8 @@ class EnergyRefinement:
 		#---------------------------------------------------------
 		#Initiate parallel run
 		#----------------------------------------
-		#Initiate Loop			
+		#Initiate Loop
+
 		for i in range(0, len(self.fileLists) ):
 			lsFrames= GetFrameIndex(self.fileLists[i][:-4])
 			pySCF_pars["molden_name"] = os.path.join( self.baseName, os.path.basename(self.fileLists[i])[:-4] + ".molden") 
@@ -388,7 +389,8 @@ class EnergyRefinement:
 			else:
 				self.energiesArray[ lsFrames[0] ] = qcmol.system.Energy(log=None)
 				self.indexArrayX[lsFrames[0]] = lsFrames[0]  
-
+		
+		self.SMOenergies[self.methods[0]] = self.energiesArray
 
 	#====================================================
 	def TreatOrcaFiles(self):
