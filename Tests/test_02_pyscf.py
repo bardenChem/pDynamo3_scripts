@@ -14,6 +14,8 @@ def Run_Test():
 		"functional":"b3lyp",
 		"basis":"6-31G*",
 		"QCcharge":-3,
+		"set_reaction_crd":1,
+		"atoms_rc1":["*:LIG.*:C02","*:LIG.*:H02","*:GLU.164:OE2"],
 		"multiplicity":1,
 	}
 	_parameters["set_qc_region"]    = "yes"
