@@ -147,6 +147,8 @@ class Simulation:
 			"spring_force_constant":None,
 			"fixed_terminal_images":None,
 			"RMS_growing_intial_string":None,
+			"reverse_rc1":"no",
+			"reverse_rc2":"no",
 		}
 
 		for key in _parameters.keys(): self.parameters[key] = _parameters[key]
@@ -198,7 +200,7 @@ class Simulation:
 							  _trajfolder  		  ,
 							  self.parameters["folder"]     ,
 							  dimensions                    ,
-							  self.parameters["charge"]     ,
+							  self.parameters["QCcharge"]   ,
 							  self.parameters["multiplicity"])
 		
 		#------------------------------------------------------------------
@@ -219,9 +221,13 @@ class Simulation:
 		crd2_label = None
 		#--------------------------------------------------------
 		crd1_label = self.molecule.reactionCoordinates[0].label
+		_reverse_rc1 = False
+		_reverse_rc2 = False
+		if self.parameters["reverse_rc1"] == "yes": _reverse_rc1 = True 
+		if self.parameters["reverse_rc2"] == "yes": _reverse_rc2 = True 
 		if   _type == "1DRef": EA.MultPlot1D(crd1_label)
 		elif _type == "2DRef":
-			EA.MultPlot2D(14,crd1_label,crd2_label)	
+			EA.MultPlot2D(14,crd1_label,crd2_label,_reverserc1=_reverse_rc1,_reverserc2=_reverse_rc2)	
 	#==================================================================
 	def GeometryOptimization(self):
 		'''

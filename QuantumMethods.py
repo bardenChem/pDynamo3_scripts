@@ -50,7 +50,6 @@ class QuantumMethods:
 		self.system = _parameters["active_system"]
 		NBmodel     = None
 		if self.pars["region"]: self.Hybrid = True
-
 		#---------------------------------------------
 		if self.Hybrid:
 			atomlist = []
@@ -143,8 +142,6 @@ class QuantumMethods:
 
 		if self.Hybrid: 
 			self.system.DefineQCModel( qcModel, qcSelection=self.selection )
-			print(qcModel)
-			print("---------------")
 		else:	
 			self.system.DefineQCModel( qcModel )	
 
@@ -193,7 +190,6 @@ class QuantumMethods:
 					  #"PAL{}".format(self.pars["NmaxThreads"]),
 					  options ]
 
-		print(self.pars["QCcharge"],self.system.electronicState.charge)
 
 		NBmodel  = NBModelORCA.WithDefaults()
 		self.qcModel = QCModelORCA.WithOptions( keywords = _keyWords                  , 

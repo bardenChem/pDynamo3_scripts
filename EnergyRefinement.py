@@ -369,7 +369,7 @@ class EnergyRefinement:
 					  "pySCF_method":_SCF_type,
 					  "active_system":self.molecule,
 					  "region":self.pureQCAtoms,
-					  "QCcharge":-3,
+					  "QCcharge":self.charge,
 					  "method_class":"pySCF",
 					  "multiplicity":1,
 					  "basis":_base}

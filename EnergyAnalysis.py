@@ -281,7 +281,7 @@ class EnergyAnalysis:
 		plt.clf()	
 		plt.close()
 	#===============================================
-	def Plot2D(self,contourlines,crd1label,crd2label,_xlim=None,_ylim=None,SHOW=False,_figS=[7,5]):
+	def Plot2D(self,contourlines,crd1label,crd2label,_xlim=None,_ylim=None,SHOW=False,_figS=[7,5],_reverserc1=False,_reverserc2=False):
 		'''
 		Plot contour plot for potential, free energy and potential of mean field
 		'''			
@@ -296,8 +296,10 @@ class EnergyAnalysis:
 				X = np.linspace( np.min(self.RC1) , np.max(self.RC1), self.xlen )
 				Y = np.linspace( np.min(self.RC2) , np.max(self.RC2), self.ylen )
 			else:
-				X = np.linspace(0,self.xlen,self.xlen)
-				Y = np.linspace(0,self.ylen,self.ylen)
+				if _reverserc1: X = np.linspace(self.xlen,0,self.xlen)
+				else:           X = np.linspace(0,self.xlen,self.xlen)
+				if _reverserc2: Y = np.linspace(self.ylen,0,self.ylen)
+				else:           Y = np.linspace(0,self.ylen,self.ylen)
 		#------------------------------------------------------
 		else:			
 			X = np.linspace(_xlim[0],_xlim[1],self.xlen)
@@ -346,13 +348,13 @@ class EnergyAnalysis:
 		plt.close()
 		fig.clf()
 	#----------------------------------------------------------------------------------------
-	def MultPlot2D(self,contourlines,crd1label,crd2label,_xlim=None,_ylim=None,SHOW=False):
+	def MultPlot2D(self,contourlines,crd1label,crd2label,_xlim=None,_ylim=None,SHOW=False,_reverserc1=False,_reverserc2=False):
 		'''
 		'''
 		for i in range(self.nplots2D):
 			self.identifiers.append( self.identifiers[i] )
 			self.energiesMatrix = self.multiple2Dplot[i]
-			self.Plot2D(contourlines,crd1label,crd2label,_xlim=_xlim,_ylim=_ylim,SHOW=False)
+			self.Plot2D(contourlines,crd1label,crd2label,_xlim=_xlim,_ylim=_ylim,SHOW=False,_reverserc1=False,_reverserc2=False)
 	#----------------------------------------------------------------------------------------
 	def Plot1D_FreeEnergy(self,crd1label,crd2label,SHOW=False):
 		'''
