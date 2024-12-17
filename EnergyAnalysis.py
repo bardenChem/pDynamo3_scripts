@@ -288,7 +288,6 @@ class EnergyAnalysis:
 		#-----------------------------------------------------
 		X = []
 		Y = []
-		print(_reverserc1,_reverserc2)
 		self.NormalizeEnergies()
 		if _xlim == None and _ylim == None:
 			_xlim = [ 0, self.xlen ]
@@ -359,7 +358,7 @@ class EnergyAnalysis:
 		for i in range(self.nplots2D):
 			self.identifiers.append( self.identifiers[i] )
 			self.energiesMatrix = self.multiple2Dplot[i]
-			self.Plot2D(contourlines,crd1label,crd2label,_xlim=_xlim,_ylim=_ylim,SHOW=False,_reverserc1=_reverserc1,_reverserc2=_reverserc2)
+			self.Plot2D(contourlines,crd1label,crd2label,_xlim=_xlim,_ylim=_ylim,SHOW=False,_reverserc1=_reverserc2,_reverserc2=_reverserc1)
 	#----------------------------------------------------------------------------------------
 	def Plot1D_FreeEnergy(self,crd1label,crd2label,SHOW=False):
 		'''
