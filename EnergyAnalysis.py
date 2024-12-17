@@ -296,9 +296,13 @@ class EnergyAnalysis:
 				X = np.linspace( np.min(self.RC1) , np.max(self.RC1), self.xlen )
 				Y = np.linspace( np.min(self.RC2) , np.max(self.RC2), self.ylen )
 			else:
-				if _reverserc1: X = np.linspace(self.xlen,0,self.xlen)
+				if _reverserc1: 
+					X = np.linspace(self.xlen,0,self.xlen)
+					print(X)
 				else:           X = np.linspace(0,self.xlen,self.xlen)
-				if _reverserc2: Y = np.linspace(self.ylen,0,self.ylen)
+				if _reverserc2: 
+					Y = np.linspace(self.ylen,0,self.ylen)
+					print(Y)
 				else:           Y = np.linspace(0,self.ylen,self.ylen)
 		#------------------------------------------------------
 		else:			
