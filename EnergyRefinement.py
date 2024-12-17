@@ -53,6 +53,7 @@ class EnergyRefinement:
 		self.methods 	 = []
 		self.fileLists   = []
 		
+
 		if hasattr(self.molecule,"qcState"): 
 			self.pureQCAtoms = list(self.molecule.qcState.pureQCAtoms)
 		i = 0
@@ -106,8 +107,8 @@ class EnergyRefinement:
 							try: self.energiesArray[ lsFrames[1], lsFrames[0] ]    = qcSystem.system.Energy(log=None)
 							except: self.energiesArray[ lsFrames[1], lsFrames[0] ] = self.energiesArray[0,0] + 1000
 							self.indexArrayX[ lsFrames[1], lsFrames[0] ] = lsFrames[0]
-							self.indexArrayY[ lsFrames[1], lsFrames[0] ] = lsFrames[1]
-						else:				
+							self.indexArrayY[ lsFrames[1], lsFrames[0] ] = lsFrames[1]							
+						else:
 							try: 	self.energiesArray[ lsFrames[0] ] = qcSystem.system.Energy(log=None)
 							except: self.energiesArray[ lsFrames[0] ] = self.energiesArray[0] + 1000
 							self.indexArrayX[ lsFrames[0] ] 		  = lsFrames[0]	
@@ -199,7 +200,7 @@ class EnergyRefinement:
 				mop.Execute()				
 				lsFrames = []
 				if self.fileLists[i] == "single.pkl": lsFrames.append(0)
-				else: lsFrames = GetFrameIndex(self.fileLists[i][:-4])						
+				else: lsFrames = GetFrameIndex(self.fileLists[i][:-4])		
 				if self.ylen > 0:
 					self.energiesArray[ lsFrames[1], lsFrames[0] ] = mop.GetEnergy()
 					self.indexArrayX[ lsFrames[1], lsFrames[0] ] = lsFrames[0]

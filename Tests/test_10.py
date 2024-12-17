@@ -53,7 +53,7 @@ def Run_Test():
 
 	test_02 = Scripts("test_10_mopac")
 	test_02.Set_System(system_parameters)
-	#test_02.Run_Simulation(simulation_parameters)
+	test_02.Run_Simulation(simulation_parameters)
 	#test_02.SaveSystem()
 	
 	simulation_parameters["Software"]    = "ORCA"
@@ -62,7 +62,7 @@ def Run_Test():
 	simulation_parameters["basis"]       = "6-31G*" 
 	test_03 = Scripts("test_10_orca")
 	test_03.Set_System(system_parameters)
-	test_03.Run_Simulation(simulation_parameters)
+	#test_03.Run_Simulation(simulation_parameters)
 	test_03.SaveSystem()
 	
 #===================================

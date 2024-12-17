@@ -150,6 +150,7 @@ class QuantumMethods:
 
 		self.qcModel = qcModel
 		self.system.DefineNBModel( NBmodel, assignQCMMModels=self.Hybrid )
+		self.Export_QC_System()
 
 	#--------------------------------------------------------
 	def Set_Abinitio(self):

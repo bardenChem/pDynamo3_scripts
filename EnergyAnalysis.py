@@ -295,6 +295,9 @@ class EnergyAnalysis:
 			if len(self.RC1) > 0:
 				X = np.linspace( np.min(self.RC1) , np.max(self.RC1), self.xlen )
 				Y = np.linspace( np.min(self.RC2) , np.max(self.RC2), self.ylen )
+			else:
+				X = np.linspace(0,self.xlen,self.xlen)
+				Y = np.linspace(0,self.ylen,self.ylen)
 		#------------------------------------------------------
 		else:			
 			X = np.linspace(_xlim[0],_xlim[1],self.xlen)

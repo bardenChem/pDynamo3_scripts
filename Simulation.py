@@ -220,7 +220,8 @@ class Simulation:
 		#--------------------------------------------------------
 		crd1_label = self.molecule.reactionCoordinates[0].label
 		if   _type == "1DRef": EA.MultPlot1D(crd1_label)
-		elif _type == "2DRef": EA.MultPlot2D(14,crd1_label,crd2_label)	
+		elif _type == "2DRef":
+			EA.MultPlot2D(14,crd1_label,crd2_label)	
 	#==================================================================
 	def GeometryOptimization(self):
 		'''
