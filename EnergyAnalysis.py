@@ -298,11 +298,9 @@ class EnergyAnalysis:
 			else:
 				if _reverserc1: 
 					X = np.linspace(self.xlen,0,self.xlen)
-					print(X)
 				else:           X = np.linspace(0,self.xlen,self.xlen)
 				if _reverserc2: 
 					Y = np.linspace(self.ylen,0,self.ylen)
-					print(Y)
 				else:           Y = np.linspace(0,self.ylen,self.ylen)
 		#------------------------------------------------------
 		else:			
@@ -358,7 +356,7 @@ class EnergyAnalysis:
 		for i in range(self.nplots2D):
 			self.identifiers.append( self.identifiers[i] )
 			self.energiesMatrix = self.multiple2Dplot[i]
-			self.Plot2D(contourlines,crd1label,crd2label,_xlim=_xlim,_ylim=_ylim,SHOW=False,_reverserc1=_reverserc2,_reverserc2=_reverserc1)
+			self.Plot2D(contourlines,crd1label,crd2label,_xlim=_xlim,_ylim=_ylim,SHOW=False,_reverserc1=_reverserc1,_reverserc2=_reverserc2)
 	#----------------------------------------------------------------------------------------
 	def Plot1D_FreeEnergy(self,crd1label,crd2label,SHOW=False):
 		'''

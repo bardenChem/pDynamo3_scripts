@@ -63,6 +63,7 @@ class QuantumMethods:
 
 		newSelection           = AtomSelection.ByComponent(self.system,self.selection)
 		newSystem    		   = PruneByAtom(self.system, Selection(newSelection) )	
+		#ExportSystem( os.path.join( "qcSystem.pdb"), newSystem )
 		try:
 			new_charge  = self.GetQCCharge(newSystem)
 			if not new_charge == self.pars["QCcharge"]:
@@ -71,6 +72,7 @@ class QuantumMethods:
 		except:
 			pass
 
+		
 		#---------------------------------------------       	
 		self.convergerLevel = self.pars["converger"]
 		self.Set_Converger()

@@ -70,9 +70,9 @@ class EnergyRefinement:
 			self.indexArrayX   = pymp.shared.array( (self.xlen) , dtype='uint8')
 			self.indexArrayY   = pymp.shared.array( (self.xlen) , dtype='uint8')
 		else:
-			self.energiesArray = pymp.shared.array( (self.ylen,self.xlen) , dtype='float')
-			self.indexArrayX   = pymp.shared.array( (self.ylen,self.xlen) , dtype='uint8')
-			self.indexArrayY   = pymp.shared.array( (self.ylen,self.xlen) , dtype='uint8')
+			self.energiesArray = pymp.shared.array( (self.xlen,self.ylen) , dtype='float')
+			self.indexArrayX   = pymp.shared.array( (self.xlen,self.ylen) , dtype='uint8')
+			self.indexArrayY   = pymp.shared.array( (self.xlen,self.ylen) , dtype='uint8')
 		self.SMOenergies   = None
 	
 	
@@ -104,10 +104,10 @@ class EnergyRefinement:
 						qcSystem.system.coordinates3 = ImportCoordinates3( self.fileLists[i], log=None )
 						lsFrames= GetFrameIndex(self.fileLists[i][:-4])						
 						if self.ylen > 0:
-							try: self.energiesArray[ lsFrames[1], lsFrames[0] ]    = qcSystem.system.Energy(log=None)
-							except: self.energiesArray[ lsFrames[1], lsFrames[0] ] = self.energiesArray[0,0] + 1000
-							self.indexArrayX[ lsFrames[1], lsFrames[0] ] = lsFrames[0]
-							self.indexArrayY[ lsFrames[1], lsFrames[0] ] = lsFrames[1]							
+							try:  self.energiesArray[ lsFrames[0], lsFrames[1] ]    = qcSystem.system.Energy(log=None)
+							except: self.energiesArray[ lsFrames[0], lsFrames[1] ] = self.energiesArray[0,0] + 1000
+							self.indexArrayX[ lsFrames[0], lsFrames[1] ] = lsFrames[0]
+							self.indexArrayY[ lsFrames[0], lsFrames[1] ] = lsFrames[1]							
 						else:
 							try: 	self.energiesArray[ lsFrames[0] ] = qcSystem.system.Energy(log=None)
 							except: self.energiesArray[ lsFrames[0] ] = self.energiesArray[0] + 1000
@@ -115,7 +115,7 @@ class EnergyRefinement:
 				#-----------------------------------------
 				if self.ylen > 0:
 					self.SMOenergies[smo] = self.energiesArray
-					self.energiesArray = pymp.shared.array( (self.ylen,self.xlen) , dtype='float')	
+					self.energiesArray = pymp.shared.array( (self.xlen,self.ylen) , dtype='float')	
 				else:
 					self.SMOenergies[smo] = self.energiesArray
 					self.energiesArray = pymp.shared.array( (self.xlen) , dtype='float')		
@@ -152,16 +152,16 @@ class EnergyRefinement:
 				self.molecule.coordinates3 = ImportCoordinates3( self.fileLists[i],log=None )
 				lsFrames= GetFrameIndex(self.fileLists[i][:-4])						
 				if self.ylen > 0:
-					dself.energiesArray[ lsFrames[1], lsFrames[0] ] = self.molecule.Energy()
-					self.indexArrayX[ lsFrames[1], lsFrames[0] ] = lsFrames[0]
-					self.indexArrayY[ lsFrames[1], lsFrames[0] ] = lsFrames[1]
+					dself.energiesArray[ lsFrames[0], lsFrames[1] ] = self.molecule.Energy()
+					self.indexArrayX[ lsFrames[0], lsFrames[1] ] = lsFrames[0]
+					self.indexArrayY[ lsFrames[0], lsFrames[1] ] = lsFrames[1]
 				else:
 					self.energiesArray[ lsFrames[0] ] = self.molecule.Energy()
 					self.indexArrayX[ lsFrames[0] ] = lsFrames[0]	
 			#-----------------------------------------
 			if self.ylen > 0:
 				self.SMOenergies[ self.methods[0] ] = self.energiesArray
-				self.energiesArray = pymp.shared.array( (self.ylen,self.xlen), dtype='float')	
+				self.energiesArray = pymp.shared.array( (self.xlen,self.ylen), dtype='float')	
 			else:
 				self.SMOenergies[ self.methods[0] ] = self.energiesArray
 				self.energiesArray = pymp.shared.array( (self.xlen), dtype='float')
@@ -202,16 +202,16 @@ class EnergyRefinement:
 				if self.fileLists[i] == "single.pkl": lsFrames.append(0)
 				else: lsFrames = GetFrameIndex(self.fileLists[i][:-4])		
 				if self.ylen > 0:
-					self.energiesArray[ lsFrames[1], lsFrames[0] ] = mop.GetEnergy()
-					self.indexArrayX[ lsFrames[1], lsFrames[0] ] = lsFrames[0]
-					self.indexArrayY[ lsFrames[1], lsFrames[0] ] = lsFrames[1]
+					self.energiesArray[ lsFrames[0], lsFrames[1] ] = mop.GetEnergy()
+					self.indexArrayX[ lsFrames[0], lsFrames[1] ] = lsFrames[0]
+					self.indexArrayY[ lsFrames[0], lsFrames[1] ] = lsFrames[1]
 				else:
 					self.energiesArray[ lsFrames[0] ] = mop.GetEnergy()
 					self.indexArrayX[ lsFrames[0] ] = lsFrames[0]					
 			#----------------			
 			if self.ylen > 0:
 				self.SMOenergies[smo] = self.energiesArray
-				self.energiesArray    = pymp.shared.array( (self.ylen,self.xlen) , dtype='float')	
+				self.energiesArray    = pymp.shared.array( (self.xlen,self.ylen) , dtype='float')	
 			else:
 				self.SMOenergies[smo] = self.energiesArray
 				self.energiesArray    = pymp.shared.array( (self.xlen) , dtype='float')	
@@ -248,10 +248,10 @@ class EnergyRefinement:
 			self.molecule.coordinates3 = ImportCoordinates3( self.fileLists[i] )
 				
 			if self.ylen > 0:
-				self.energiesArray[ lsFrames[1], lsFrames[0] ] = self.molecule.Energy()					
-				self.indexArrayX[ lsFrames[1], lsFrames[0] ]   = lsFrames[1]
-				self.indexArrayY[ lsFrames[1], lsFrames[0] ]   = lsFrames[0]
-				tmpText = "{}".format(self.energiesArray[ lsFrames[1], lsFrames[0] ])
+				self.energiesArray[ lsFrames[0], lsFrames[1] ] = self.molecule.Energy()					
+				self.indexArrayX[ lsFrames[0], lsFrames[1] ]   = lsFrames[0]
+				self.indexArrayY[ lsFrames[0], lsFrames[1] ]   = lsFrames[1]
+				tmpText = "{}".format(self.energiesArray[ lsFrames[0], lsFrames[1] ])
 				tmpLog.write(tmpText)
 				tmpLog.close()
 			else:					
@@ -275,12 +275,21 @@ class EnergyRefinement:
 			File = open(fle,'r')
 			energy = File.read()
 			if self.ylen > 1:
-				self.indexArrayX[lf[1],lf[0]] 	= lf[0]
-				self.indexArrayY[lf[1],lf[0]] 	= lf[1]
-				self.energiesArray[lf[1],lf[0]]	= float(energy)
+				self.indexArrayX[lf[0],lf[1]] 	= lf[0]
+				self.indexArrayY[lf[0],lf[1]] 	= lf[1]
+				try:
+					self.energiesArray[lf[0],lf[1]]	= float(energy)
+				except:
+					print(fle + " without energy written!")
+					os.remove(fle)
 			else:
-				self.indexArrayX[lf[0]] 	= lf[0]
-				self.energiesArray[lf[0]]	= float(energy)
+				try:
+					self.indexArrayX[lf[0]] 	= lf[0]
+					self.energiesArray[lf[0]]	= float(energy)
+				except:
+					print(fle + " without energy written!")
+					os.remove(fle)
+
 		#-------------------------
 		#remove files from list that already were calculated
 		for fle in reversed(self.fileLists):			
@@ -343,10 +352,10 @@ class EnergyRefinement:
 				self.molecule.coordinates3 = ImportCoordinates3( self.fileLists[i] )
 				#---------------------------------------------------------------------------
 				if self.ylen > 1:
-					self.energiesArray[ lsFrames[1], lsFrames[0] ] = self.molecule.Energy()					
-					self.indexArrayX[ lsFrames[1], lsFrames[0] ]   = lsFrames[1]
-					self.indexArrayY[ lsFrames[1], lsFrames[0] ]   = lsFrames[0]
-					tmpText = "{}".format(self.energiesArray[ lsFrames[1], lsFrames[0] ])
+					self.energiesArray[ lsFrames[0], lsFrames[1] ] = self.molecule.Energy()					
+					self.indexArrayX[ lsFrames[0], lsFrames[1] ]   = lsFrames[0]
+					self.indexArrayY[ lsFrames[0], lsFrames[1] ]   = lsFrames[1]
+					tmpText = "{}".format(self.energiesArray[ lsFrames[0], lsFrames[1] ])
 					tmpLog.write(tmpText)
 					tmpLog.close()
 				else:					
@@ -385,9 +394,9 @@ class EnergyRefinement:
 			qcmol.system.coordinates3 = ImportCoordinates3(self.fileLists[i])
 			qcmol.Set_QC_System()
 			if self.ylen > 1: 
-				self.energiesArray[ lsFrames[1], lsFrames[0] ] = qcmol.system.Energy(log=None)
-				self.indexArrayX[lsFrames[1] , lsFrames[0] ] = lsFrames[0]
-				self.indexArrayY[lsFrames[1] , lsFrames[0] ] = lsFrames[1]
+				self.energiesArray[ lsFrames[0], lsFrames[1] ] = qcmol.system.Energy(log=None)
+				self.indexArrayX[lsFrames[0] , lsFrames[1] ] = lsFrames[0]
+				self.indexArrayY[lsFrames[0] , lsFrames[1] ] = lsFrames[1]
 			else:
 				self.energiesArray[ lsFrames[0] ] = qcmol.system.Energy(log=None)
 				self.indexArrayX[lsFrames[0]] = lsFrames[0]  
@@ -414,7 +423,7 @@ class EnergyRefinement:
 			for smo in self.methods:
 				for i in range(self.xlen):
 					for j in range(self.ylen):
-						self.text +="{} {} {} {}\n".format(self.indexArrayX[ j, i ],self.indexArrayY[ j,i ], self.SMOenergies[smo][j,i] - self.SMOenergies[smo][0,0], smo)
+						self.text +="{} {} {} {}\n".format(self.indexArrayX[ i, j ],self.indexArrayY[ i,j ], self.SMOenergies[smo][i,j] - self.SMOenergies[smo][0,0], smo)
 		else:
 			for smo in self.methods:
 				for i in range(self.xlen):

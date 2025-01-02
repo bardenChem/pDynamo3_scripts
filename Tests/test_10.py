@@ -24,6 +24,7 @@ def Run_Test():
 		"atoms_rc2":["*:LIG.*:O06","*:HIE.94:HE2","*:HIE.94:NE2"],
 		"type":"Distance",
 		"mass_constraint":"True",
+		"reverse_rc1":"yes",
 	}
 
 	_path   = "test_05/Multiple_Distance_rm1/ScanTraj.ptGeo"
@@ -42,8 +43,8 @@ def Run_Test():
 	#------------------------------------
 	test_01 = Scripts("test_10")
 	test_01.Set_System(system_parameters)
-	#test_01.Run_Simulation(simulation_parameters)
-	#test_01.SaveSystem()
+	test_01.Run_Simulation(simulation_parameters)
+	test_01.SaveSystem()
 	#-----------------------------------
 	methods.append("pm7")
 	
@@ -54,7 +55,7 @@ def Run_Test():
 	test_02 = Scripts("test_10_mopac")
 	test_02.Set_System(system_parameters)
 	test_02.Run_Simulation(simulation_parameters)
-	#test_02.SaveSystem()
+	test_02.SaveSystem()
 	
 	simulation_parameters["Software"]    = "ORCA"
 	simulation_parameters["folder"]      = "test_10_orca"
