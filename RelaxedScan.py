@@ -327,18 +327,18 @@ class SCAN:
         self.energiesMatrix = pymp.shared.array( (X,Y), dtype=float ) 
         self.reactionCoordinate1 = pymp.shared.array( (X,Y), dtype=float )   
         self.reactionCoordinate2 = pymp.shared.array( (X,Y), dtype=float )   
-   
-        if self.dihedral: self.Run2DScanDihedral(X,Y)
-        else:
-            if self.multipleDistance[0] and self.multipleDistance[1]           : self.Run2DScanMultipleDistance(X,Y)            
-            elif self.multipleDistance[0] and self.multipleDistance[1] == False: self.Run2DMixedDistance(X,Y)
-            else                                                               : self.Run2DSimpleDistance(X,Y)
-        #------------------------------------
-        for i in range(X):
-            for j in range(Y):
-                text_line =  "{0:3d} {1:3d} {2:15.8f} {3:15.8f} {4:15.8f}".format( i,j,self.reactionCoordinate1[i,j], self.reactionCoordinate2[i,j], self.energiesMatrix[i,j])
-                self.text += text_line+ '\n'
-                self.logfile.add_text_Line("DATA  "+text_line)    
+        if X > 0 and Y > 0:
+            if self.dihedral: self.Run2DScanDihedral(X,Y)
+            else:
+                if self.multipleDistance[0] and self.multipleDistance[1]           : self.Run2DScanMultipleDistance(X,Y)            
+                elif self.multipleDistance[0] and self.multipleDistance[1] == False: self.Run2DMixedDistance(X,Y)
+                else                                                               : self.Run2DSimpleDistance(X,Y)
+            #------------------------------------
+            for i in range(X):
+                for j in range(Y):
+                    text_line =  "{0:3d} {1:3d} {2:15.8f} {3:15.8f} {4:15.8f}".format( i,j,self.reactionCoordinate1[i,j], self.reactionCoordinate2[i,j], self.energiesMatrix[i,j])
+                    self.text += text_line+ '\n'
+                    self.logfile.add_text_Line("DATA  "+text_line)    
     #=============================================================================
     def Run2DSimpleDistance(self, X, Y ):
         '''

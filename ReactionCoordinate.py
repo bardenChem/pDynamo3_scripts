@@ -55,10 +55,7 @@ class ReactionCoordinate:
 		if self.Type == "multipleDistance":
 			A1 = _molecule.atoms.items[ self.atoms[0] ]
 			A2 = _molecule.atoms.items[ self.atoms[1] ]
-			A3 = _molecule.atoms.items[ self.atoms[2] ]
-			print(A1.label)
-			print(A2.label)
-			print(A3.label)
+			A3 = _molecule.atoms.items[ self.atoms[2] ]			
 			if not sequence == None:
 				A1res = A1.parent.label.split(".")
 				A2res = A2.parent.label.split(".")
@@ -83,9 +80,6 @@ class ReactionCoordinate:
 			else: 
 				self.label  = A1.label + "-" + A2.label			
 				self.label2 = A1.label + "-" + A2.label 
-			print(A1.label)
-			print(A2.label)
-
 		#.--------------------------
 		elif self.Type == "Dihedral":
 			A1 = _molecule.atoms.items[ self.atoms[0] ]

@@ -190,7 +190,7 @@ class SimulationSystem:
         if "functional"  in _parameters: newLabel += _parameters["functional"] 
         self.system.label += newLabel
         self.system = qs.system
-
+        
     #=========================================================================
     def Set_QCMM_Region(self,_pat_list,_centerAtom=None,_radius=None,_DEBUG=False):
         '''
@@ -213,9 +213,7 @@ class SimulationSystem:
         '''
         '''
         _atom_pat = []
-        for atom in atoms_rc:
-            #print(atom)
-            #print(AtomSelection.FromAtomPattern(self.system, atom)[0] )
+        for atom in atoms_rc:            
             _atom_pat.append( AtomSelection.FromAtomPattern(self.system, atom)[0] )
         
         mc = False

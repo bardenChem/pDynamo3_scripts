@@ -65,7 +65,7 @@ class QuantumMethods:
 		newSystem    		   = PruneByAtom(self.system, Selection(newSelection) )	
 		#ExportSystem( os.path.join( "qcSystem.pdb"), newSystem )
 		try:
-			new_charge  = self.GetQCCharge(newSystem)
+			new_charge  = self.GetQCCharge(newSystem)			
 			if not new_charge == self.pars["QCcharge"]:
 				if self.pars["correct_QMMM_charge"]:
 					self.pars["QCcharge"] = new_charge

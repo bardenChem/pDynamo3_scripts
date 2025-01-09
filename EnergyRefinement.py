@@ -104,7 +104,7 @@ class EnergyRefinement:
 						qcSystem.system.coordinates3 = ImportCoordinates3( self.fileLists[i], log=None )
 						lsFrames= GetFrameIndex(self.fileLists[i][:-4])						
 						if self.ylen > 0:
-							try:  self.energiesArray[ lsFrames[0], lsFrames[1] ]    = qcSystem.system.Energy(log=None)
+							try:  self.energiesArray[ lsFrames[0], lsFrames[1] ]   = qcSystem.system.Energy(log=None)
 							except: self.energiesArray[ lsFrames[0], lsFrames[1] ] = self.energiesArray[0,0] + 1000
 							self.indexArrayX[ lsFrames[0], lsFrames[1] ] = lsFrames[0]
 							self.indexArrayY[ lsFrames[0], lsFrames[1] ] = lsFrames[1]							
@@ -152,7 +152,7 @@ class EnergyRefinement:
 				self.molecule.coordinates3 = ImportCoordinates3( self.fileLists[i],log=None )
 				lsFrames= GetFrameIndex(self.fileLists[i][:-4])						
 				if self.ylen > 0:
-					dself.energiesArray[ lsFrames[0], lsFrames[1] ] = self.molecule.Energy()
+					self.energiesArray[ lsFrames[0], lsFrames[1] ] = self.molecule.Energy()
 					self.indexArrayX[ lsFrames[0], lsFrames[1] ] = lsFrames[0]
 					self.indexArrayY[ lsFrames[0], lsFrames[1] ] = lsFrames[1]
 				else:
@@ -184,7 +184,7 @@ class EnergyRefinement:
 			"basename":self.baseName        ,
 			"cood_name":"none"              ,
 			"Hamiltonian":"am1"             ,
-			"QCcharge":self.charge          ,
+			"QCcharge":self.molecule.electronicState.charge,
 			"multiplicity":self.multiplicity,
 			"keywords":_keyWords            , 
 		}

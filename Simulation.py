@@ -227,6 +227,7 @@ class Simulation:
 		if self.parameters["reverse_rc2"] == "yes": _reverse_rc2 = True 
 		if   _type == "1DRef": EA.MultPlot1D(crd1_label)
 		elif _type == "2DRef":
+			crd2_label = self.molecule.reactionCoordinates[1].label
 			EA.MultPlot2D(14,crd1_label,crd2_label,_reverserc1=_reverse_rc1,_reverserc2=_reverse_rc2)	
 	#==================================================================
 	def GeometryOptimization(self):
@@ -249,7 +250,9 @@ class Simulation:
 		By the defualt the PKLs were saved on a child folder from the base path passed in the parameters, named "ScanTraj.ptGeo"
 		The trajectory can be saved as files of the formats allowed by pDynamo 3.0		
 		'''
-		_type = "1D"
+		X = self.parameters["nsteps_rc1"]
+		Y = self.parameters["nsteps_rc2"]
+		_type = "1D"		
 		scan = SCAN(self.molecule.system,self.baseFolder,self.parameters)
 		crd2_label = None
 		#--------------------------------------------------------------------
@@ -261,23 +264,24 @@ class Simulation:
 		if self.molecule.rcs == 2:
 			self.molecule.reactionCoordinates[1].SetInformation(self.molecule.system,self.parameters["dincre_rc2"])
 			scan.SetReactionCoord(self.molecule.reactionCoordinates[1])
-			scan.Run2DScan(self.parameters["nsteps_rc1"], self.parameters["nsteps_rc2"] )
+			scan.Run2DScan(X, Y)
 			_type = "2D"
 			crd2_label = self.molecule.reactionCoordinates[1].label
 		else: scan.Run1DScan(self.parameters["nsteps_rc1"])
 		log_path = scan.Finalize()
 
-		EA = EnergyAnalysis(self.parameters["nsteps_rc1"],self.parameters["nsteps_rc2"],_type=_type)		
-		EA.ReadLog(log_path)
-		#--------------------------------------------------------
-		crd1_label = self.molecule.reactionCoordinates[0].label
-		if   _type == "1D": EA.Plot1D(crd1_label)
-		elif _type == "2D":	
-			xl = scan.DMINIMUM[0] + float(self.parameters["nsteps_rc1"])*self.parameters["dincre_rc1"]
-			yl = scan.DMINIMUM[1] + float(self.parameters["nsteps_rc2"])*self.parameters["dincre_rc2"]
-			self.parameters["xlim"] = [ scan.DMINIMUM[0], xl  ]
-			self.parameters["ylim"] = [ scan.DMINIMUM[1], yl  ]
-			EA.Plot2D(14,crd1_label,crd2_label,_xlim=self.parameters["xlim"],_ylim=self.parameters["ylim"])		
+		if X > 0 and Y > 0: 
+			EA = EnergyAnalysis( X, Y, _type=_type)		
+			EA.ReadLog(log_path)
+			#--------------------------------------------------------
+			crd1_label = self.molecule.reactionCoordinates[0].label
+			if   _type == "1D": EA.Plot1D(crd1_label)
+			elif _type == "2D":	
+				xl = scan.DMINIMUM[0] + float(X)*self.parameters["dincre_rc1"]
+				yl = scan.DMINIMUM[1] + float(Y)*self.parameters["dincre_rc2"]
+				self.parameters["xlim"] = [ scan.DMINIMUM[0], xl  ]
+				self.parameters["ylim"] = [ scan.DMINIMUM[1], yl  ]
+				EA.Plot2D(14,crd1_label,crd2_label,_xlim=self.parameters["xlim"],_ylim=self.parameters["ylim"])		
 	#==================================================================================	
 	def MolecularDynamics(self):
 		'''
