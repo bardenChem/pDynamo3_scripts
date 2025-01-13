@@ -116,7 +116,7 @@ class Scripts:
 		self.activeSystem.system = _Run_Simulation.Execute()
 
 	#-----------------------------------------
-	def Run_Individual_Analysis(self,_parameters):
+	def Run_Analysis(self,_parameters):
 		'''
 		'''
 		_parameters["active_system"] = self.activeSystem

@@ -420,11 +420,13 @@ class EnergyRefinement:
 		Write calculate energies to file.
 		'''
 		if self.ylen > 0:
+			self.text += "x y Enrgy method\n"
 			for smo in self.methods:
 				for i in range(self.xlen):
 					for j in range(self.ylen):
 						self.text +="{} {} {} {}\n".format(self.indexArrayX[ i, j ],self.indexArrayY[ i,j ], self.SMOenergies[smo][i,j] - self.SMOenergies[smo][0,0], smo)
 		else:
+			self.text += "x y Enrgy method\n"
 			for smo in self.methods:
 				for i in range(self.xlen):
 					self.text +="{} {} {}\n".format(self.indexArrayX[i], self.SMOenergies[smo][i] - self.SMOenergies[smo][0], smo)

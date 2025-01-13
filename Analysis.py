@@ -30,7 +30,9 @@ class Analysis:
 		'''
 		self.parameters = _parameters
 		self.molecule   = _parameters["active_system"]
-		self.baseFolder = _parameters["folder"]
+
+		if "folder" in self.parameters: self.baseFolder = _parameters["folder"]
+		else: self.baseFolder = os.getcwd()
 
 		#check parameters
 		if not "analysis_type" in self.parameters:
@@ -78,8 +80,8 @@ class Analysis:
 		'''		
 		multiPlot = False
 		ndim      = 1 
-		crd1_label= "Reaction Coordinate #1"
-		crd2_label= "Reaction Coordinate #2"
+		crd1_label= self.molecule.reactionCoordinates[0].label
+		crd2_label= self.molecule.reactionCoordinates[0].label
 		cnt_lines = 0 
 		ysize     = 0
 		if "ysize" in self.parameters: ysize = self.parameters["ysize"]
@@ -89,16 +91,15 @@ class Analysis:
 
 		in_point  = [0,0]
 		fin_point = [0,0]
+		FindPath  = False
 		#--------------------------------------------------------
-		if "contour_lines" 	in self.parameters: cnt_lines  = self.parameters["contour_lines"]
-		if "crd1_label" 	in self.parameters: crd1_label = self.parameters["crd1_label"]
-		if "crd2_label" 	in self.parameters:	crd2_label = self.parameters["crd2_label"]
-		if "xlim_list" 		in self.parameters: xlim  	   = self.parameters["xlim_list"]
-		if "ylim_list" 		in self.parameters: ylim       = self.parameters["ylim_list"]
-		if "show" 			in self.parameters: show       = self.parameters["show"]
-		if "in_point"       in self.parameters: in_point   = self.parameters["in_point"]
-		if "fin_point"      in self.parameters: fin_point  = self.parameters["fin_point"]
-		if "multiple_plot" 	in self.parameters: multiPlot = True 		
+		if "contour_lines" 	in self.parameters: cnt_lines  = self.parameters["contour_lines"]		
+		if "xlim_list" 		in self.parameters: xlim  	   = self.parameters["xlim_list"    ]
+		if "ylim_list" 		in self.parameters: ylim       = self.parameters["ylim_list"    ]
+		if "show" 			in self.parameters: show       = self.parameters["show"         ]
+		if "in_point"       in self.parameters: in_point   = self.parameters["in_point"     ]
+		if "fin_point"      in self.parameters: fin_point  = self.parameters["fin_point"    ]
+		if "multiple_plot" 	in self.parameters: multiPlot  = True 		
 		if ysize > 0: ndim = 2
 		#--------------------------------------------------------
 		EA = EnergyAnalysis(self.parameters["xsize"],ysize,_type=self.parameters["type"] )
@@ -111,7 +112,7 @@ class Analysis:
 		elif ndim == 1: EA.Plot1D(crd1_label,XLIM=xlim,SHOW=show)
 		elif ndim == 2:	EA.Plot2D(cnt_lines,crd1_label,crd2_label,xlim,ylim,show)
 
-		if  "in_point" in self.parameters: EA.Path_From_PES(in_point,fin_point)
+		if  "retrieve_path" in self.parameters: EA.Path_From_PES(in_point,fin_point,self.parameters["retrieve_path"],self.baseFolder,self.molecule.system)
 
 	#=========================================================================
 	def PMFAnalysis(self):

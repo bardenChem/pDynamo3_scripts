@@ -85,13 +85,13 @@ def Multiple_Distance2D(_hamiltonian):
 	}		
 	scan1_parameters = {
 		"simulation_type":"Relaxed_Surface_Scan",
-		"dincre_rc1":0.1,
-		"dincre_rc2":0.1,
+		"dincre_rc1":0.2,
+		"dincre_rc2":0.2,
 		"optmizer":"ConjugatedGradient",
 		"maxIterations":2200,
-		"nsteps_rc1":12,
-		"nsteps_rc2":12,
-		"NmaxThreads":16,
+		"nsteps_rc1":14,
+		"nsteps_rc2":14,
+		"NmaxThreads":10,
 		"force_constants":[4000.0,4000.0]
 
 	}

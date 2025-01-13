@@ -11,7 +11,7 @@
 
 #==============================================================================
 
-import os, sys, glob
+import os, sys, glob, shutil
 import numpy as np
 
 import matplotlib.pyplot as plt
@@ -129,8 +129,8 @@ class EnergyAnalysis:
 					oldMethod = method
 					self.nplots2D += 1
 					self.energiesMatrix = np.zeros( (self.ylen, self.xlen), dtype=float )
-				m = int( lns[0])				
-				n = int( lns[1])				
+				m = int(lns[0])				
+				n = int(lns[1])				
 				self.energiesMatrix[n][m] = float(lns[2])
 			
 			self.multiple2Dplot.append(self.energiesMatrix)
@@ -376,15 +376,15 @@ class EnergyAnalysis:
 		plt.clf()
 		plt.close()
 	#----------------------------------------------------------------------------------------
-	def Path_From_PES(self, in_point,fin_point):
+	def Path_From_PES(self, in_point,fin_point,_path,_folder_dst,_system):
 		''''
 		'''
 		#setting current point as initial
 		cp = in_point
 
 		z = self.energiesMatrix
-		path = [] 
-		path.append(in_point)
+		pathx = [in_point[0]] 
+		pathy = [in_point[1]]
 
 		xi = 1
 		yi = 1 
@@ -400,21 +400,55 @@ class EnergyAnalysis:
 			B = 100000000
 			C = 100000000
 
-			if  (cp[1] + yi) <= fin_point[1]: A = z[ cp[0], cp[1] ] + z[cp[0], (cp[1] + yi)    ] 
-			if  (cp[0] + xi) <= fin_point[0]: B = z[ cp[0], cp[1] ] + z[ (cp[0]+xi), cp[1]     ] 
-			
 			if  (cp[0] + xi) == fin_point[0] and (cp[1] + yi) == fin_point[1]:
-				path.append( [ cp[0] + xi, cp[1] + yi  ])
+				pathx.append( cp[0] + xi )
+				pathy.append( cp[1] + yi )
+
+				print("Next point is equal to the final point. \nAdding to the list and stopping program!\n")
 				break
-			else: C = z[ cp[0], cp[1] ] + z[ (cp[0]+xi), (cp[1]+yi) ] 
+
+			if  (cp[1] + yi) <= fin_point[1]:
+				A = z[ cp[0], cp[1] ] + z[ cp[0], (cp[1] + yi) ] 
+				print( "Increment in Y:  {}".format(A) )
+
+			if  (cp[0] + xi) <= fin_point[0]: 
+				B = z[ cp[0], cp[1] ] + z[ (cp[0]+xi), cp[1] ] 
+				print("Increment in X:  {}".format(B))
+
+			if  (cp[0] + xi) <= fin_point[0] and (cp[1] + yi) <= fin_point[1]:
+				C = z[ cp[0], cp[1] ] + z[ (cp[0]+xi), (cp[1]+yi) ] 
+				print( "Increment in both directions:  {}".format(C) )
 
 			D = [ A, B, C]
-			ind = D.index(min(d))
+			ind = D.index(min(D))
+			print( "Minimum Energy is from index: {}".format(ind) )
+			print( "Energy: {}".format(z[ cp[0], cp[1] ]) )
 			cp[0] += dirs[ind][0]
 			cp[1] += dirs[ind][1]
-			path.append(cp)
+			pathx.append(cp[0])
+			pathy.append(cp[1])
 
-		return(path)
+			
+			print( "Point chosen: {} {}".format(cp[0],cp[1]) )
+		#---------------------------------------------------------------
+		if not os.path.exists( os.path.join(_folder_dst,"traj1d.ptGeo") ): os.makedirs( os.path.join(_folder_dst,"traj1d.ptGeo") )
+		new_idx = 0
+		for indx in range(len(pathx)):
+			pkl = _path + "/frame{}_{}.pkl".format(pathx[indx],pathy[indx])
+			finalPath = os.path.join( _folder_dst , "traj1d.ptGeo/frame{}.pkl".format(new_idx) )
+			_system.coordinates3 = ImportCoordinates3(finalPath)
+			pdb_file = os.path.join( _folder_dst , "frame{}.pdb".format(new_idx) )
+			ExportSystem( pdb_file,_system)
+			shutil.copy(pkl,finalPath)
+			new_idx +=1
+
+		trajName = os.path.join( _folder_dst, "traj1d.dcd" )
+		trajpath = os.path.join( _folder_dst, "traj1d.ptGeo" )
+		Duplicate( trajpath, trajName, _system ) 
+
+
+
+		
 
 #=====================================================================
 
