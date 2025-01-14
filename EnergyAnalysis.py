@@ -237,10 +237,12 @@ class EnergyAnalysis:
 		'''
 		Plot one dimensional energy plot.
 		'''
+
 		self.NormalizeEnergies()
 		if self.Type == "FE1D" or self.Type == "1DRef":
 			if XLIM == None:
 				self.RC1 = np.linspace( 0,len(self.energies1D),len(self.energies1D) )
+				self.labely = "Potential Energy (kJ/mol)"
 			else:
 				self.RC1 = np.linspace( XLIM[0],XLIM[1],len(self.energies1D) )
 			self.labely = "Free Energy (kJ/mol)"			
@@ -255,7 +257,7 @@ class EnergyAnalysis:
 		plt.xlabel(label)
 		plt.ylabel(self.labely)		
 		#--------------------------------------------
-		plt.savefig(self.baseName+".png",dpi=1000)
+		plt.savefig(self.baseName+"1d.png",dpi=1000)
 		#---------------------------------------------
 		if SHOW: plt.show()
 		plt.clf()
@@ -385,7 +387,6 @@ class EnergyAnalysis:
 		z = self.energiesMatrix
 		pathx = [in_point[0]] 
 		pathy = [in_point[1]]
-
 		xi = 1
 		yi = 1 
 
@@ -407,26 +408,27 @@ class EnergyAnalysis:
 				print("Next point is equal to the final point. \nAdding to the list and stopping program!\n")
 				break
 
-			if  (cp[1] + yi) <= fin_point[1]:
-				A = z[ cp[0], cp[1] ] + z[ cp[0], (cp[1] + yi) ] 
+			if  (cp[0] + yi) < fin_point[1]:
+				A = z[ cp[1], cp[0] ] + z[ cp[1], (cp[0] + yi) ] 
 				print( "Increment in Y:  {}".format(A) )
 
-			if  (cp[0] + xi) <= fin_point[0]: 
-				B = z[ cp[0], cp[1] ] + z[ (cp[0]+xi), cp[1] ] 
+			if  (cp[1] + xi) < fin_point[0]: 
+				B = z[ cp[1], cp[0] ] + z[ (cp[1]+xi), cp[0] ] 
 				print("Increment in X:  {}".format(B))
 
-			if  (cp[0] + xi) <= fin_point[0] and (cp[1] + yi) <= fin_point[1]:
-				C = z[ cp[0], cp[1] ] + z[ (cp[0]+xi), (cp[1]+yi) ] 
+			if  (cp[1] + xi) <=fin_point[0] and (cp[0] + yi) < fin_point[1]:
+				C = z[ cp[1], cp[0] ] + z[ (cp[1]+xi), (cp[0]+yi) ] 
 				print( "Increment in both directions:  {}".format(C) )
 
-			D = [ A, B, C]
-			ind = D.index(min(D))
-			print( "Minimum Energy is from index: {}".format(ind) )
-			print( "Energy: {}".format(z[ cp[0], cp[1] ]) )
+			D = [ A, B, C ]
+			ind = D.index(min(D))			
 			cp[0] += dirs[ind][0]
 			cp[1] += dirs[ind][1]
 			pathx.append(cp[0])
 			pathy.append(cp[1])
+			print( "Energy: {}".format(  z[ cp[1], cp[0] ]) )
+			self.energies1D.append(      z[ cp[1], cp[0] ] )
+
 
 			
 			print( "Point chosen: {} {}".format(cp[0],cp[1]) )
@@ -436,9 +438,9 @@ class EnergyAnalysis:
 		for indx in range(len(pathx)):
 			pkl = _path + "/frame{}_{}.pkl".format(pathx[indx],pathy[indx])
 			finalPath = os.path.join( _folder_dst , "traj1d.ptGeo/frame{}.pkl".format(new_idx) )
-			_system.coordinates3 = ImportCoordinates3(finalPath)
+			_system.coordinates3 = ImportCoordinates3(finalPath,log=None)
 			pdb_file = os.path.join( _folder_dst , "frame{}.pdb".format(new_idx) )
-			ExportSystem( pdb_file,_system)
+			ExportSystem( pdb_file,_system,log=None)
 			shutil.copy(pkl,finalPath)
 			new_idx +=1
 
@@ -446,9 +448,13 @@ class EnergyAnalysis:
 		trajpath = os.path.join( _folder_dst, "traj1d.ptGeo" )
 		Duplicate( trajpath, trajName, _system ) 
 
-
-
-		
+		log_text = ""
+		new_log  = open( os.path.join(_folder_dst,"traj1D.log"), 'w' )
+		for i in range(len(self.energies1D)):
+			log_text += "{} {}\n".format(i,self.energies1D[i])
+		new_log.write(log_text)
+		self.Type = "1DRef"
+		self.Plot1D("Reaction Path frames (n)")
 
 #=====================================================================
 
