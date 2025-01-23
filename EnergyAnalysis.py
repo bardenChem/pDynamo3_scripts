@@ -118,20 +118,23 @@ class EnergyAnalysis:
 		elif self.Type == "2DRef":
 			oldMethod = "none"
 			method    = "none"
+			i = 0 
 			for line in reading:
-				lns = line.split()
-				if oldMethod == "none":
-					oldMethod = lns[3]
-				method = lns[3]
-				if not method == oldMethod:
-					self.multiple2Dplot.append(self.energiesMatrix)
-					self.identifiers.append(oldMethod)
-					oldMethod = method
-					self.nplots2D += 1
-					self.energiesMatrix = np.zeros( (self.ylen, self.xlen), dtype=float )
-				m = int(lns[0])				
-				n = int(lns[1])				
-				self.energiesMatrix[n][m] = float(lns[2])
+				if i > 0:
+					lns = line.split()
+					if oldMethod == "none":
+						oldMethod = lns[3]
+					method = lns[3]
+					if not method == oldMethod:
+						self.multiple2Dplot.append(self.energiesMatrix)
+						self.identifiers.append(oldMethod)
+						oldMethod = method
+						self.nplots2D += 1
+						self.energiesMatrix = np.zeros( (self.ylen, self.xlen), dtype=float )
+					m = int(lns[0])		
+					n = int(lns[1])				
+					self.energiesMatrix[n][m] = float(lns[2])
+				i += 1
 			
 			self.multiple2Dplot.append(self.energiesMatrix)
 			self.identifiers.append(method)
@@ -450,6 +453,21 @@ class EnergyAnalysis:
 		new_log.write(log_text)
 		self.Type = "1DRef"
 		self.Plot1D("Reaction Path frames (n)")
+
+		pymol_text = "preset.publication(selection='all')\n"
+		pymol_text+= "set sticks\n"
+		pymol_text+= "set label_size, 20\n"
+		pymol_text+= "set sphere_scale, 0.2\n"
+		pymol_text+= "set bg_rgb, white\n" 
+		pymol_text+= "set stick_radius, 0.18\n"
+		pymol_text+= "load {}".format( os.path.join( _folder_dst , "frame0.pdb" ) )
+		pymol_text+= "\nload_traj {}, ".format( trajName )
+		pymol_text+= "frame0, 1, start=1, stop=1, interval=1"
+
+
+		pymols_file = open( os.path.join(_folder_dst,"traj1d.pym"), "w") 
+		pymols_file.write(pymol_text)
+		pymols_file.close()
 
 #=====================================================================
 

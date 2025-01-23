@@ -106,13 +106,16 @@ class Analysis:
 		
 		EA.ReadLog(self.parameters["log_name"] )
 		if multiPlot:
+			print("Multiplot_required")
 			if   ndim == 1: EA.MultPlot1D(label=crd1_label)
 			elif ndim == 2: EA.MultPlot2D(cnt_lines,crd1label=crd1_label,crd2label=crd2_label,_xlim=xlim,_ylim=ylim,SHOW=show) 
 		#--------------------------------------------------------
 		elif ndim == 1: EA.Plot1D(crd1_label,XLIM=xlim,SHOW=show)
 		elif ndim == 2:	EA.Plot2D(cnt_lines,crd1_label,crd2_label,xlim,ylim,show)
 
-		if  "retrieve_path" in self.parameters: EA.Path_From_PES(in_point,fin_point,self.parameters["retrieve_path"],self.baseFolder,self.molecule.system)
+
+		if  "retrieve_path" in self.parameters: 
+			EA.Path_From_PES(in_point,fin_point,self.parameters["retrieve_path"],self.baseFolder,self.molecule.system)
 
 	#=========================================================================
 	def PMFAnalysis(self):

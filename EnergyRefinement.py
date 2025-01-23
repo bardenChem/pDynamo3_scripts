@@ -328,6 +328,7 @@ class EnergyRefinement:
 				tmpLog  = open(tmpPath,'w')
 				tmpText = ""
 				#---------------------------------------------
+				opt = ""
 				options =  "\n% output\n"
 				options +=  "print [ p_mos ] 1\n"
 				options +=  "print [ p_overlap ] 5\n"
@@ -336,7 +337,8 @@ class EnergyRefinement:
 				if self.restart:
 					options += "%scf \nMaxIter 500\n "
 					options += "SOSCFStart 0.00033 \n end\n"
-					#options += '!MORead \n %moinp "orcaJob.gbw"'			
+					#options += '!MORead \n %moinp "orcaJob.gbw"'
+
 
 				#...............................................................................................
 				self.molecule.electronicState = ElectronicState.WithOptions(charge       = self.charge 		, 

@@ -27,6 +27,8 @@ def Run_Test():
 	
 	test_02 = Scripts("test_02_orca_cyclohex")
 	test_02.Set_System(_parameters)	
+	_parameters["simulation_type"] = "Geometry_Optimization"
+	test_02.Run_Simulation(_parameters)
 	test_02.SaveSystem()
 	#-------------------------------
 	#test QC/MM from gromacs
