@@ -85,21 +85,24 @@ class EnergyAnalysis:
 			self.labely = "Potential Energy (kJ/mol)"
 		#-----------------------------------
 		elif self.Type == "1DRef":
+			i = 0
 			oldMethod = "none"
 			method    = "none"
 			for line in reading:
-				lns = line.split()
-				if oldMethod == "none":
-					oldMethod = lns[2]
-				method = lns[2]
-				if not method == oldMethod:
-					self.multiple1Dplot.append(energyTmp)
-					self.identifiers.append(oldMethod)
-					oldMethod = method
-					self.nplots1D += 1	
-					energyTmp = []		
-				energyTmp.append( float(lns[1]) )
-				self.energies1D.append( float(lns[1]) )
+				if i > 0:
+					lns = line.split()
+					if oldMethod == "none":
+						oldMethod = lns[2]
+					method = lns[2]
+					if not method == oldMethod:
+						self.multiple1Dplot.append(energyTmp)
+						self.identifiers.append(oldMethod)
+						oldMethod = method
+						self.nplots1D += 1	
+						energyTmp = []		
+					energyTmp.append( float(lns[1]) )
+					self.energies1D.append( float(lns[1]) )
+				i+=1
 			self.multiple1Dplot.append(energyTmp)
 			self.identifiers.append(method)
 			self.labely = "Potential Energy (kJ/mol)"
@@ -259,7 +262,7 @@ class EnergyAnalysis:
 		if self.fig_size_x > 0:
 			plt.set_size_inches(self.fig_size_x,self.fig_size_y)
 		plt.xlabel(label)
-		plt.ylabel(self.labely)		
+		plt.ylabel(self.labely)	
 		#--------------------------------------------
 		plt.savefig(self.baseName+"1d.png",dpi=1000)
 		#---------------------------------------------
@@ -442,14 +445,16 @@ class EnergyAnalysis:
 			shutil.copy(pkl,finalPath)
 			new_idx +=1
 
+			
 		trajName = os.path.join( _folder_dst, "traj1d.dcd" )
 		trajpath = os.path.join( _folder_dst, "traj1d.ptGeo" )
-		Duplicate( trajpath, trajName, _system ) 
+		try: Duplicate( trajpath, trajName, _system ) 
+		except: pass
 
-		log_text = ""
+		log_text = "x Energy method\n"
 		new_log  = open( os.path.join(_folder_dst,"traj1D.log"), 'w' )
 		for i in range(len(self.energies1D)):
-			log_text += "{} {}\n".format(i,self.energies1D[i])
+			log_text += "{} {} {}\n".format(i,self.energies1D[i],"pickPath")
 		new_log.write(log_text)
 		self.Type = "1DRef"
 		self.Plot1D("Reaction Path frames (n)")

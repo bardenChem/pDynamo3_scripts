@@ -220,14 +220,16 @@ class Simulation:
 		EA.ReadLog(log_path)
 		crd2_label = None
 		#--------------------------------------------------------
-		crd1_label = self.molecule.reactionCoordinates[0].label
+		try: crd1_label = self.molecule.reactionCoordinates[0].label
+		except: crd1_label = "Reaction Path frames (n)"
 		_reverse_rc1 = False
 		_reverse_rc2 = False
 		if self.parameters["reverse_rc1"] == "yes": _reverse_rc1 = True 
 		if self.parameters["reverse_rc2"] == "yes": _reverse_rc2 = True 
 		if   _type == "1DRef": EA.MultPlot1D(crd1_label)
 		elif _type == "2DRef":
-			crd2_label = self.molecule.reactionCoordinates[1].label
+			try: crd2_label = self.molecule.reactionCoordinates[1].label
+			except: pass
 			EA.MultPlot2D(14,crd1_label,crd2_label,_reverserc1=_reverse_rc1,_reverserc2=_reverse_rc2)	
 	#==================================================================
 	def GeometryOptimization(self):

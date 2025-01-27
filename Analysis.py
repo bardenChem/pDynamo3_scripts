@@ -79,9 +79,16 @@ class Analysis:
 		Optional keys in self.parameters:
 		'''		
 		multiPlot = False
-		ndim      = 1 
-		crd1_label= self.molecule.reactionCoordinates[0].label
-		crd2_label= self.molecule.reactionCoordinates[0].label
+		ndim      = 1
+		try: crd1_label= self.molecule.reactionCoordinates[0].label
+		except: 
+			crd1_label = "Reaction Path Frames (n)"
+			pass
+		try: crd2_label= self.molecule.reactionCoordinates[1].label
+		except:
+			crd2_label = "No label"
+			pass
+
 		cnt_lines = 0 
 		ysize     = 0
 		if "ysize" in self.parameters: ysize = self.parameters["ysize"]
@@ -112,7 +119,6 @@ class Analysis:
 		#--------------------------------------------------------
 		elif ndim == 1: EA.Plot1D(crd1_label,XLIM=xlim,SHOW=show)
 		elif ndim == 2:	EA.Plot2D(cnt_lines,crd1_label,crd2_label,xlim,ylim,show)
-
 
 		if  "retrieve_path" in self.parameters: 
 			EA.Path_From_PES(in_point,fin_point,self.parameters["retrieve_path"],self.baseFolder,self.molecule.system)
