@@ -465,9 +465,9 @@ class EnergyAnalysis:
 		pymol_text+= "set sphere_scale, 0.2\n"
 		pymol_text+= "set bg_rgb, white\n" 
 		pymol_text+= "set stick_radius, 0.18\n"
-		pymol_text+= "load {}".format( os.path.join( _folder_dst , "frame0.pdb" ) )
-		pymol_text+= "\nload_traj {}, ".format( trajName )
-		pymol_text+= "frame0, 1, start=1, stop=1, interval=1"
+		pymol_text+= "load {}".format( "frame0.pdb" )
+		pymol_text+= "\nload_traj {}, ".format( "traj1d.dcd" )
+		pymol_text+= "frame0, 1, start=1, stop=-1, interval=1"
 
 
 		pymols_file = open( os.path.join(_folder_dst,"traj1d.pym"), "w") 

@@ -30,7 +30,7 @@ def Run_Test():
 	simulation_parameters = { "xnbins":20			    ,
 				   "source_folder":_path                , 
 				   "folder":"test_02_pyscf"             ,
-				   "charge":-3		                    ,
+				   "QCcharge":-3		                    ,
 				   "multiplicity":1 	                ,
 				   "basis":"6-31G*"						,
 				   "functional":"b3lyp"					,
