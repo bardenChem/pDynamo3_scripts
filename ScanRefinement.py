@@ -14,6 +14,8 @@ from commonFunctions import *
 from pMolecule import *
 from pMolecule.QCModel import *
 
+from GeometrySearcher import * 
+
 import os, glob, sys, shutil
 import numpy as np 
 
@@ -31,7 +33,7 @@ class ScanRefinement:
 
 	def __init__(self, _parameters):
 		self.system 	   = _parameters["active_system"].system
-		self.traj   	   = _parameters["traj_folder"]
+		self.traj   	   = _parameters["source_folder"]
 		self.outFolder	   = _parameters["folder"]
 		self.sigma_a1_a3   = []
 		self.sigma_a3_a1   = []
@@ -44,29 +46,34 @@ class ScanRefinement:
 		self.energies1D    = []
 		self.RC1           = []
 		self.RC2           = []
-		self.optmizer      = self.parameters["optmizer"]
+		self.optmizer      = _parameters["optmizer"]
 		self.pureQCAtoms   = list(self.system.qcState.pureQCAtoms)
 		self.logname       = os.path.join(self.outFolder,"ScanRefined.log")
+		self.forceC        = [2500.0,2500.0]
 
-		self.baseName = _outFolder	
+		self.baseName = self.outFolder
 		if not os.path.exists(self.baseName): os.makedirs(self.baseName)
 
-		_path = os.path.join( _trajFolder,"")
+		_path = os.path.join( self.traj,"")
 		self.fileLists  = glob.glob(_path + "frame*.pkl")
 		self.xsize      = len(self.fileLists)
 
-		self.GeoOptPars =   { "maxIterations":self.parameters["maxIterations"]  ,
-                              "rmsGradient"  :self.parameters["rmsGradient"]   }
+		self.energies1D = pymp.shared.array( (self.xsize) , dtype='float')
+		self.indexArrayX  = pymp.shared.array( (self.xsize) , dtype='uint8')
+		self.GeoOptPars =   { "maxIterations":_parameters["maxIterations"]  ,
+                              "rmsGradient"  :_parameters["rmsGradient"]   }
 
-
+		if "force_constants"  in _parameters:
+			cnt=0
+			for fc in _parameters["force_constants"]:
+				self.forceC[cnt] = fc
+				cnt +=1
 	#-------------------------------------------------------
 	def SetReactionCoord(self,_RC):
 		'''
 		Set reaction coordinate, determining initial parameters from the atoms information
 		'''
 		#------------------------------------------------------------
-		ndim = self.nDim # temp var to hold the index of the curren dim
-		self.nDim += 1
 		self.atoms.append(_RC.atoms)
 		self.sigma_a1_a3.append(_RC.weight13)
 		self.sigma_a3_a1.append(_RC.weight31)
@@ -77,14 +84,14 @@ class ScanRefinement:
 		else: print("Wrong Number of atoms in RC!!")
 
 	#-----------------------------------------------------
-	def RunRelaxRefinement(self,_method,_base,_SCF_type):
+	def RunRelaxedRefinement(self,_method,_base,_SCF_type):
 
 		
 		pySCF_pars = {"functional":_method          ,
 					  "pySCF_method":_SCF_type      ,
 					  "active_system":self.system   ,
 					  "region":self.pureQCAtoms     , 
-					  "QCcharge":self.charge        ,
+					  "QCcharge":0        ,
 					  "method_class":"pySCF"        ,
 					  "multiplicity":1              ,
 					  "basis":_base                 }
@@ -104,41 +111,42 @@ class ScanRefinement:
 			pySCF_pars["molden_name"] = os.path.join( self.outFolder, os.path.basename(self.fileLists[i])[:-4] + ".molden") 
 			qcmol = QuantumMethods(pySCF_pars)
 			qcmol.system.coordinates3 = ImportCoordinates3(self.fileLists[i])
+			lsFrames= GetFrameIndex(self.fileLists[i][:-4])	
 			qcmol.Set_QC_System()
 			qcmol.system.DefineRestraintModel( restraints )
 
-
 			if self.RCTypes[0] == "Distance":
 				distance1 = qcmol.system.coordinates3.Distance( self.atoms[0][0], self.atoms[0][1])
-				rmodel1   = RestraintEnergyModel.Harmonic( distance, self.forceC[0] )
-				restraint = RestraintDistance.WithOptions(energyModel = rmodel1, point1= self.atoms[0][0], point2= self.atoms[0][1])
-				restraints["RC1"] = restraint
+				rmodel1   = RestraintEnergyModel.Harmonic( distance1, self.forceC[0] )
+				restraint1 = RestraintDistance.WithOptions(energyModel = rmodel1, point1= self.atoms[0][0], point2= self.atoms[0][1])
+				restraints["RC1"] = restraint1
 			elif self.RCTypes[0] == "multipleDistance":
 				distance1  = ( qcmol.system.coordinates3.Distance( self.atoms[0][1], self.atoms[0][2]) ) *self.sigma_a3_a1[0]
 				distance1 -= ( qcmol.system.coordinates3.Distance( self.atoms[0][0], self.atoms[0][1]) ) *self.sigma_a1_a3[0]
-				rmodel1 = RestraintEnergyModel.Harmonic( distance, self.forceC[0] )
-				restraint = RestraintMultipleDistance.WithOptions( energyModel = rmodel1, distances= [ [ self.atoms[0][1],self.atoms[0][0] , self.sigma_a1_a3[0] ], [ self.atoms[0][1], self.atoms[0][2], self.sigma_a3_a1[0] ] ] )
-				restraints[´"RC1"]
+				rmodel1 = RestraintEnergyModel.Harmonic( distance1, self.forceC[0] )
+				restraint1 = RestraintMultipleDistance.WithOptions( energyModel = rmodel1, distances= [ [ self.atoms[0][1],self.atoms[0][0] , self.sigma_a1_a3[0] ], [ self.atoms[0][1], self.atoms[0][2], self.sigma_a3_a1[0] ] ] )
+				restraints["RC1"] = restraint1
 			if self.RCTypes[1] == "Distance":
-				distance1 = qcmol.system.coordinates3.Distance( self.atoms[1][0], self.atoms[1][1])
-				rmodel1   = RestraintEnergyModel.Harmonic( distance, self.forceC[1] )
-				restraint = RestraintDistance.WithOptions(energyModel = rmodel1, point1= self.atoms[1][0], point2= self.atoms[1][1])
-				restraints["RC2"] = restraint
+				distance2 = qcmol.system.coordinates3.Distance( self.atoms[1][0], self.atoms[1][1])
+				rmodel2   = RestraintEnergyModel.Harmonic( distance2, self.forceC[1] )
+				restraint2 = RestraintDistance.WithOptions(energyModel = rmodel2, point1= self.atoms[1][0], point2= self.atoms[1][1])
+				restraints["RC2"] = restraint2
 			elif self.RCTypes[1] == "multipleDistance":
-				distance1  = ( qcmol.system.coordinates3.Distance( self.atoms[1][1], self.atoms[1][2]) ) *self.sigma_a3_a1[1]
-				distance1 -= ( qcmol.system.coordinates3.Distance( self.atoms[1][0], self.atoms[1][1]) ) *self.sigma_a1_a3[1]
-				rmodel1   = RestraintEnergyModel.Harmonic( distance, self.forceC[1] )
-				restraint = RestraintMultipleDistance.WithOptions( energyModel = rmodel1, distances= [ [ self.atoms[1][1],self.atoms[1][0] , self.sigma_a1_a3[1] ], [ self.atoms[1][1], self.atoms[1][2], self.sigma_a3_a1[1] ] ] )
-				restraints["RC2"]			         
+				distance2  = ( qcmol.system.coordinates3.Distance( self.atoms[1][1], self.atoms[1][2]) ) *self.sigma_a3_a1[1]
+				distance2 -= ( qcmol.system.coordinates3.Distance( self.atoms[1][0], self.atoms[1][1]) ) *self.sigma_a1_a3[1]
+				rmodel2   = RestraintEnergyModel.Harmonic( distance2, self.forceC[1] )
+				restraint2 = RestraintMultipleDistance.WithOptions( energyModel = rmodel2, distances= [ [ self.atoms[1][1],self.atoms[1][0] , self.sigma_a1_a3[1] ], [ self.atoms[1][1], self.atoms[1][2], self.sigma_a3_a1[1] ] ] )
+				restraints["RC2"] = restraint2		         
             #--------------------------------------------------------------------
 			relaxRun = GeometrySearcher(qcmol.system, self.baseName)
 			relaxRun.ChangeDefaultParameters(self.GeoOptPars)
 			relaxRun.Minimization(self.optmizer)
             #--------------------------------------------------------------------
-			if i == 0:
+			if lsFrames[0] == 0:
 				en0 = qcmol.system.Energy(log=None)
 				self.energies1D[0] = 0.0
-			else: self.energies1D[i] = self.molecule.Energy(log=None) - en0 
+			else: self.energies1D[ lsFrames[0] ] = self.molecule.Energy(log=None) - en0 
+			self.indexArrayX[ lsFrames[0] ] = lsFrames[0]
             #--------------------------------------------------------------------
 			if self.RCTypes[0] == "Distance":
 				self.RC1.append( qcmol.system.coordinates3.Distance( self.atoms[0][0], self.atoms[0][1]) )
@@ -149,13 +157,13 @@ class ScanRefinement:
 			elif self.RCTypes[1] == "multipleDistance":
 				self.RC2.append( qcmol.system.coordinates3.Distance( self.atoms[1][1], self.atoms[1][2]) -  qcmol.system.coordinates3.Distance( self.atoms[1][0], self.atoms[1][1]) )
 
-            Pickle( os.path.join( self.outFolder,"ScanRefined.ptGeo", "frame{}.pkl".format(i) ), self.molecule.coordinates3 )
-        	
-        	qcmol.system.DefineRestraintModel(None)
+			Pickle( os.path.join( self.outFolder,"ScanRefined.ptGeo", "frame{}.pkl".format(lsFrames[0]) ), self.molecule.coordinates3 )
+
+			qcmol.system.DefineRestraintModel(None)
 
 			trajName = os.path.join( self.outFolder, "ScanRefined.dcd")
 			trajpath = os.path.join( self.outFolder, "ScanRefined.ptGeo" )
- 			Duplicate( trajpath, trajName, self.system )  
+			Duplicate( trajpath, trajName, self.system )  
 
  	#----------------------------------------------------------------------------
 	def WriteLog(self):
@@ -167,7 +175,7 @@ class ScanRefinement:
 			text+= "{}  {}\n".format( i, self.energiesMatrix[i])
 		textfile.write(textfile)
 		textfile.close()
-		return = self.logname
+		return (self.logname)
 
 
 

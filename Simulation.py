@@ -290,13 +290,14 @@ class Simulation:
 	def ScanRefinement(self):
 		'''
 		'''
+		self.parameters["folder"] = self.baseFolder
 		scan = ScanRefinement(self.parameters)
 		scan.SetReactionCoord(self.molecule.reactionCoordinates[0])
 		scan.SetReactionCoord(self.molecule.reactionCoordinates[1])
 		scan.RunRelaxedRefinement(self.parameters["functional"], self.parameters["basis"], self.parameters["pySCF_method"])
 
 		log_path = scan.WriteLog()		
-		EA       = EnergyAnalysis(scan.xsize,0,_type="1DRef")		
+		EA       = EnergyAnalysais(scan.xsize,0,_type="1DRef")		
 		EA.ReadLog(log_path)
 		#--------------------------------------------------------
 		crd1_label = "Reaction Path frames (n)"		
