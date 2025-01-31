@@ -30,6 +30,7 @@ from UmbrellaSampling  	    import US
 from PotentialOfMeanForce   import PMF
 from ReactionCoordinate 	import ReactionCoordinate
 from EnergyRefinement	 	import EnergyRefinement
+from ScanRefinement			import ScanRefinement
 #--------------------------------------------------------------
 #loading pDynamo Libraries
 from pBabel                    import *                                     
@@ -164,6 +165,7 @@ class Simulation:
 		if 	 self.parameters["simulation_type"] == "Energy_Refinement": 			self.EnergyRefine()		
 		elif self.parameters["simulation_type"] == "Geometry_Optimization":			self.GeometryOptimization()
 		elif self.parameters["simulation_type"] == "Relaxed_Surface_Scan":	 		self.RelaxedSurfaceScan()
+		elif self.parameters["simulation_type"] == "ScanRefinement":				self.ScanRefinement()
 		elif self.parameters["simulation_type"] == "Molecular_Dynamics":			self.MolecularDynamics()	
 		elif self.parameters["simulation_type"] == "Restricted_Molecular_Dynamics": self.RestrictedMolecularDynamics()
 		elif self.parameters["simulation_type"] == "Umbrella_Sampling":				self.UmbrellaSampling()
@@ -284,6 +286,21 @@ class Simulation:
 				self.parameters["xlim"] = [ scan.DMINIMUM[0], xl  ]
 				self.parameters["ylim"] = [ scan.DMINIMUM[1], yl  ]
 				EA.Plot2D(14,crd1_label,crd2_label,_xlim=self.parameters["xlim"],_ylim=self.parameters["ylim"])		
+	#==================================================================================	
+	def ScanRefinement(self):
+		'''
+		'''
+		scan = ScanRefinement(self.parameters)
+		scan.SetReactionCoord(self.molecule.reactionCoordinates[0])
+		scan.SetReactionCoord(self.molecule.reactionCoordinates[1])
+		scan.RunRelaxedRefinement(self.parameters["functional"], self.parameters["basis"], self.parameters["pySCF_method"])
+
+		log_path = scan.WriteLog()		
+		EA       = EnergyAnalysis(scan.xsize,0,_type="1DRef")		
+		EA.ReadLog(log_path)
+		#--------------------------------------------------------
+		crd1_label = "Reaction Path frames (n)"		
+		EA.Plot1D(crd1_label)
 	#==================================================================================	
 	def MolecularDynamics(self):
 		'''
