@@ -414,12 +414,9 @@ class Simulation:
 		#------------------------------------------------------------------
 		rc1 = self.molecule.reactionCoordinates[0]
 		rc1.GetRCLabel(self.molecule.system)
-		rc1.SetInformation(self.molecule.system,0.0)
-		_Optimize = False
-		if self.parameters["optimize_US"] == "True": _Optimize  = True
+		rc1.SetInformation(self.molecule.system,0.0)		
 		sampling   = self.parameters["sampling_production"]
 		_crdFormat = self.parameters["crd_format"] 
-		if self.parameters["relax"] == "True": _Optimize = True
 		
 		nDims = self.parameters['ndim']
 		rc2   = None
