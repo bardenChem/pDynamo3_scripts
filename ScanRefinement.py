@@ -118,7 +118,7 @@ class ScanRefinement:
 			if self.RCTypes[0] == "Distance":
 				distance1 = qcmol.system.coordinates3.Distance( self.atoms[0][0], self.atoms[0][1])
 				rmodel1   = RestraintEnergyModel.Harmonic( distance1, self.forceC[0] )
-				restraint1 = RestraintDistance.WithOptions(energyModel = rmodel1, point1= self.atoms[0][0], point2= self.atoms[0][1])
+				restraint1 = RestraintDistance.WithOptions( energyModel = rmodel1, point1= self.atoms[0][0], point2= self.atoms[0][1] )
 				restraints["RC1"] = restraint1
 			elif self.RCTypes[0] == "multipleDistance":
 				distance1  = ( qcmol.system.coordinates3.Distance( self.atoms[0][1], self.atoms[0][2]) ) *self.sigma_a3_a1[0]
@@ -129,7 +129,7 @@ class ScanRefinement:
 			if self.RCTypes[1] == "Distance":
 				distance2 = qcmol.system.coordinates3.Distance( self.atoms[1][0], self.atoms[1][1])
 				rmodel2   = RestraintEnergyModel.Harmonic( distance2, self.forceC[1] )
-				restraint2 = RestraintDistance.WithOptions(energyModel = rmodel2, point1= self.atoms[1][0], point2= self.atoms[1][1])
+				restraint2 = RestraintDistance.WithOptions( energyModel = rmodel2, point1= self.atoms[1][0], point2= self.atoms[1][1] )
 				restraints["RC2"] = restraint2
 			elif self.RCTypes[1] == "multipleDistance":
 				distance2  = ( qcmol.system.coordinates3.Distance( self.atoms[1][1], self.atoms[1][2]) ) *self.sigma_a3_a1[1]

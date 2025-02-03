@@ -439,19 +439,27 @@ class Simulation:
 		#---------------------------------------
 		USrun.ChangeDefaultParameters(self.parameters)
 		USrun.SetMode(rc1)
+
 		if self.parameters["analysis_only"] == "yes":
+			self.parameters["active_system"] = self.molecule.system
+			self.parameters["folder"] = self.baseFolder
+			self.parameters["source_folder"] = self.baseFolder
+			self.parameters["analysis_type"] = "PMF"
+			WHAM = Analysis(self.parameters)
+			WHAM.PMFAnalysis()
+		else:		
 			if self.parameters["ndim"]   == 1: 
 				USrun.Run1DSampling(self.parameters["source_folder"],_crdFormat,sampling)
 			elif self.parameters["ndim"] == 2:
 				USrun.SetMode(rc2)
 				USrun.Run2DSampling(self.parameters["source_folder"],_crdFormat,sampling)
-			USrun.Finalize()
-		self.parameters["active_system"] = self.molecule.system
-		self.parameters["folder"] = self.baseFolder
-		self.parameters["source_folder"] = self.baseFolder
-		self.parameters["analysis_type"] = "PMF"
-		WHAM = Analysis(self.parameters)
-		WHAM.PMFAnalysis()		
+			USrun.Finalize()		
+			self.parameters["active_system"] = self.molecule.system
+			self.parameters["folder"] = self.baseFolder
+			self.parameters["source_folder"] = self.baseFolder
+			self.parameters["analysis_type"] = "PMF"
+			WHAM = Analysis(self.parameters)
+			WHAM.PMFAnalysis()		
 	
 	#==========================================================================
 	def NormalModes(self):

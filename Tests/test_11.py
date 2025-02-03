@@ -26,7 +26,7 @@ def Run_Test():
 				   "ndim": 1 					        ,
 				   "sampling_production":100	   		,
 				   "equilibration_nsteps":2000			,
-				   "production_nsteps":20000   			,
+				   "production_nsteps":50000   			,
 				   "source_folder":_path 		       	,
 				   "MD_method":"LeapFrog"		      	,
 				   "MC_RC1":True				        ,
