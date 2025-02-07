@@ -480,7 +480,7 @@ class SCAN:
             restraint   = RestraintDistance.WithOptions( energyModel = rmodel, point1=atom4, point2=atom5 )                
             restraints["RC2"] = restraint  
             #---------------------------------------------------------------------------------                    
-            initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format(0,0) ) 
+            initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format(i-1,0) ) 
             self.molecule.coordinates3 = ImportCoordinates3( initCoordinateFile, log = None )                
             #--------------------------------------------------------------------------------
             coordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format( i, 0 ) )
