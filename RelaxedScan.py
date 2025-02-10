@@ -261,7 +261,7 @@ class SCAN:
             restraint = RestraintMultipleDistance.WithOptions( energyModel = rmodel, distances= [ [ atom2, atom1, weight1 ], [ atom2, atom3, weight2 ] ] )
             restraints["RC1"] =  restraint            
             #--------------------------------------------------------------------
-             if i > 0:
+            if i > 0:
                 initCoordinateFile: os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i-1) )
                 if self.restart:
                     if os.path.exists( os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i) ) ):
