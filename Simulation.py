@@ -260,7 +260,7 @@ class Simulation:
 		scan = SCAN(self.molecule.system,self.baseFolder,self.parameters)
 		crd2_label = None
 		#--------------------------------------------------------------------
-		scan = SCAN(self.molecule.system,self.baseFolder,self.parameters["optmizer"],self.parameters["restart"])
+		scan = SCAN(self.molecule.system,self.baseFolder,self.parameters["optmizer"],self.parameters["adaptative"],self.parameters["restart"])
 		scan.ChangeDefaultParameters(self.parameters)	
 		#--------------------------------------------------------------------
 		self.molecule.reactionCoordinates[0].SetInformation(self.molecule.system,self.parameters["dincre_rc1"])
