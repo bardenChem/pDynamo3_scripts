@@ -513,7 +513,7 @@ class SCAN:
                     initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format(i,0) )                 
 
             coordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format( i, 0 ) )
-            self.molecule.coordinates3 = ImportCoordinates3( initCoordinateFile, log = None )                
+            self.molecule.coordinates3 = ImportCoordinates3( initCoordinateFile )                
             #--------------------------------------------------------------------------------
             relaxRun = GeometrySearcher( self.molecule, self.baseName )
             relaxRun.ChangeDefaultParameters( self.GeoOptPars )
