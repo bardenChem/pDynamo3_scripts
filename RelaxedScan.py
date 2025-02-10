@@ -546,7 +546,10 @@ class SCAN:
                     #-----------------------------------------------------------------------------------
                     self.molecule.coordinates3 = ImportCoordinates3( initCoordinateFile, log=None )             
                     #-----------------------------------------------------------------------------------
-                    if self.adaptative: self.ChangeConvergenceParameters(i,j-1)
+                    if self.adaptative:
+                        print(self.adaptative)
+                        try: self.ChangeConvergenceParameters(i,j-1)
+                        except:pass
                     #-----------------------------------------------------------------------------------
                     coordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format( i, j ) )
                     relaxRun = GeometrySearcher( self.molecule, self.baseName  )
