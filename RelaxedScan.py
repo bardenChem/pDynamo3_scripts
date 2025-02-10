@@ -495,8 +495,10 @@ class SCAN:
         self.EnergyRef = self.en0 = self.molecule.Energy(log=None)         
         Pickle( coordinateFile, self.molecule.coordinates3 )
 
-        for i in range ( 1, X ):  
-            if self.adaptative: self.ChangeConvergenceParameters(i-1,0) 
+        for i in range ( 1, X ):
+            if self.adaptative:
+            try: self.ChangeConvergenceParameters(i-1,0) 
+            except: pass
             distance_1 = self.DMINIMUM[0] + self.DINCREMENT[0] * float(i)
             rmodel     = RestraintEnergyModel.Harmonic( distance_1, self.forceC[0] )
             restraint  = RestraintMultipleDistance.WithOptions(energyModel = rmodel, distances = [ [ atom2, atom1, weight1 ],[ atom2, atom3, weight2 ] ] )
