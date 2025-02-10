@@ -22,7 +22,7 @@ class SCAN:
     Class to setup and execute relaxed surface scan procedure
     '''
     #---------------------------------------------------------------
-    def __init__(self,_system,_baseFolder,_optimizer,ADAPTATIVE=False):
+    def __init__(self,_system,_baseFolder,_optimizer,ADAPTATIVE=False,RESTART=False):
         '''
         Default constructor
         Parameters:
@@ -65,6 +65,7 @@ class SCAN:
         self.dihedral           = False                             # If the simulation are from dihedral reaction coordinates
         self.saveFormat         = None
         self.trajFolder         = "ScanTraj"
+        self.restart            = RESTART
                
         #------------------------------------------------------------------------  
         #set the parameters dict for the geometry search classes
@@ -220,6 +221,13 @@ class SCAN:
             restraint         = RestraintDistance.WithOptions(energyModel = rmodel, point1= atom1, point2= atom2)
             restraints["RC1"] = restraint            
             #--------------------------------------------------------------------
+            
+            if i > 0:
+                initCoordinateFile: os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i-1) )
+                if self.restart:
+                    if os.path.exists( os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i) ) ):
+                        initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i) )                
+                self.molecule.coordinates3 = ImportCoordinates3(initCoordinateFile,log=None)
             relaxRun = GeometrySearcher(self.molecule,self.baseName)
             relaxRun.ChangeDefaultParameters(self.GeoOptPars)
             relaxRun.Minimization(self.optmizer)
@@ -253,6 +261,12 @@ class SCAN:
             restraint = RestraintMultipleDistance.WithOptions( energyModel = rmodel, distances= [ [ atom2, atom1, weight1 ], [ atom2, atom3, weight2 ] ] )
             restraints["RC1"] =  restraint            
             #--------------------------------------------------------------------
+             if i > 0:
+                initCoordinateFile: os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i-1) )
+                if self.restart:
+                    if os.path.exists( os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i) ) ):
+                        initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i) )                
+                self.molecule.coordinates3 = ImportCoordinates3(initCoordinateFile,log=None)
             relaxRun = GeometrySearcher(self.molecule, self.baseName)
             relaxRun.ChangeDefaultParameters(self.GeoOptPars)
             relaxRun.Minimization(self.optmizer)
@@ -291,6 +305,12 @@ class SCAN:
                                                        point4      = atom4 )
             restraints["PHI"] =  restraint            
             #--------------------------------------------------------------------
+            if i > 0:
+                initCoordinateFile: os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i-1) )
+                if self.restart:
+                    if os.path.exists( os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i) ) ):
+                        initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i) )                
+                self.molecule.coordinates3 = ImportCoordinates3(initCoordinateFile,log=None)
             relaxRun = GeometrySearcher(self.molecule, self.baseName  )
             relaxRun.ChangeDefaultParameters(self.GeoOptPars)
             relaxRun.Minimization(self.optmizer)
@@ -314,8 +334,7 @@ class SCAN:
         #self.text += "x y RC1 RC2 Energy\n" 
         
         text_line = "{0:>3s} {1:>3s} {2:>15s} {3:>15s} {4:>15s}".format('x', 'y', 'RC1', 'RC2', 'Energy' )
-        #self.text += "{0:>3s} {1:>3s} {2:>15s} {3:>15s} {4:>15s}\n".format('x', 'y', 'RC1', 'RC2', 'Energy' )#i,j,self.reactionCoordinate1[i,j], self.reactionCoordinate2[i,j], self.energiesMatrix[i,j])
-        
+
         self.text += text_line+"\n"
         #------------------------------------------------------               
         self.logfile.add_text_Line("")
@@ -384,11 +403,15 @@ class SCAN:
             rmodel      = RestraintEnergyModel.Harmonic( distance_2, self.forceC[1] )
             restraint   = RestraintDistance.WithOptions( energyModel = rmodel, point1=atom3, point2=atom4 )                    
             restraints["RC2"] = restraint  
-            #----------------------------------------------------------------------------------------------                   
+            #---------------------------------------------------------------------------------------------- 
             initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format( 0 , 0) ) 
+            if i > 0:
+                initCoordinateFile: os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format(i-1,0) )
+                if self.restart:
+                    if os.path.exists( os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format(i,0) ) ):
+                        initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format(i,0) )          
             self.molecule.coordinates3 = ImportCoordinates3( initCoordinateFile, log=None )               
             #----------------------------------------------------------------------------------------------
-            coordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format( i, 0 ) )
             relaxRun = GeometrySearcher( self.molecule, self.baseName )
             relaxRun.ChangeDefaultParameters(self.GeoOptPars)
             relaxRun.Minimization(self.optmizer)
@@ -397,6 +420,7 @@ class SCAN:
             self.reactionCoordinate1[ i,0 ] = self.molecule.coordinates3.Distance( atom1, atom2 ) 
             self.reactionCoordinate2[ i,0 ] = self.molecule.coordinates3.Distance( atom3, atom4 )   
             #-----------------------------------------------------------------------------------
+            coordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format( i, 0 ) )
             Pickle( coordinateFile, self.molecule.coordinates3 )                
         #-------------------------------------------------------------------------------------------
         with pymp.Parallel(self.nprocs) as p:
@@ -414,7 +438,10 @@ class SCAN:
                     restraint   = RestraintDistance.WithOptions(energyModel = rmodel, point1=atom3, point2=atom4  )
                     restraints["RC2"] = restraint                    
                     #------------------------------------------------------------------------------------------
-                    initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo" , "frame{}_{}.pkl".format( i, j-1 ) )                    
+                    initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo" , "frame{}_{}.pkl".format( i, j-1 ) )   
+                    if self.restart:
+                        if os.path.exists( os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format(i,j) ) ):
+                            initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format(i,j) )                 
                     self.molecule.coordinates3 = ImportCoordinates3( initCoordinateFile, log=None )             
                     #----------------------------------------------------------------------------------------------
                     if self.adaptative: self.ChangeConvergenceParameters(i,j-1)
@@ -481,9 +508,13 @@ class SCAN:
             restraints["RC2"] = restraint  
             #---------------------------------------------------------------------------------                    
             initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format(i-1,0) ) 
+            if self.restart:
+                if os.path.exists( os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format(i,0) ) ):
+                    initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format(i,0) )                 
+
+            coordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format( i, 0 ) )
             self.molecule.coordinates3 = ImportCoordinates3( initCoordinateFile, log = None )                
             #--------------------------------------------------------------------------------
-            coordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format( i, 0 ) )
             relaxRun = GeometrySearcher( self.molecule, self.baseName )
             relaxRun.ChangeDefaultParameters( self.GeoOptPars )
             relaxRun.Minimization(self.optmizer)
@@ -508,7 +539,10 @@ class SCAN:
                     restraint   = RestraintDistance.WithOptions( energyModel = rmodel, point1=atom4, point2=atom5 )
                     restraints["RC2"] = restraint  
                     #-----------------------------------------------------------------------------------
-                    initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo" , "frame{}_{}.pkl".format( i, j-1 ) )                 
+                    initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo" , "frame{}_{}.pkl".format( i, j-1 ) )
+                    if self.restart:
+                        if os.path.exists( os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format(i,j) ) ):
+                            initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format(i,j) )             
                     #-----------------------------------------------------------------------------------
                     self.molecule.coordinates3 = ImportCoordinates3( initCoordinateFile, log=None )             
                     #-----------------------------------------------------------------------------------
@@ -577,7 +611,10 @@ class SCAN:
             restraint   = RestraintMultipleDistance.WithOptions( energyModel = rmodel, distances = [ [ atom5, atom4, weight3 ],[ atom5, atom6, weight4 ] ] )
             restraints["RC2"] = restraint  
             #---------------------------------------------------------------------------------
-            initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format(0,0) ) 
+            initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format(i-1,0) ) 
+            if self.restart:
+                if os.path.exists( os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format(i,0) ) ):
+                    initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format(i,0) )   
             self.molecule.coordinates3 = ImportCoordinates3( initCoordinateFile, log = None )             
             #-----------------------------------------------------------------------------------
             if self.adaptative: self.ChangeConvergenceParameters(i-1,0)
@@ -607,6 +644,9 @@ class SCAN:
                     restraints["RC2"] = restraint  
                     #---------------------------------------------------------------------------------
                     initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo" , "frame{}_{}.pkl".format( i, j-1 ) )  
+                    if self.restart:
+                        if os.path.exists( os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format(i,j) ) ):
+                            initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}_{}.pkl".format(i,j) )   
                     #----------------------------------------------------------------------------              
                     self.molecule.coordinates3 = ImportCoordinates3( initCoordinateFile, log = None )             
                     if self.adaptative: self.ChangeConvergenceParameters(i,j-1)
