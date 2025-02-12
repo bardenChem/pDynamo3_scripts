@@ -185,7 +185,6 @@ class Simulation:
 		'''
 		Set up and execute energy refinement using a series of methods	
 		'''
-		_Restart      = False
 		dimensions    = [0,0] 
 		dimensions[0] =  self.parameters["xnbins"]
 		nmaxthreads   = 1 
@@ -210,7 +209,7 @@ class Simulation:
 		elif self.parameters["Software"] == "pDynamoDFT": ER.RunInternalDFT(self.parameters["functional"],self.parameters["basis"],nmaxthreads)
 		elif self.parameters["Software"] == "DFTBplus"  : ER.RunDFTB()
 		elif self.parameters["Software"] == "pySCF"     : ER.RunPySCF(self.parameters["functional"],self.parameters["basis"],_SCF_type=self.parameters["pySCF_method"])
-		elif self.parameters["Software"] == "ORCA"		: ER.RunORCA(self.parameters["orca_method"],self.parameters["basis"],nmaxthreads,_restart=_Restart)
+		elif self.parameters["Software"] == "ORCA"		: ER.RunORCA(self.parameters["orca_method"],self.parameters["basis"],nmaxthreads,_restart=self.parameters["restart"])
 		elif self.parameters["Software"] == "mopac" or self.parameters["Software"]=="MOPAC":
 			_mopacKeyWords = ["AUX","LARGE"] 
 			if "mopac_keywords" in self.parameters:

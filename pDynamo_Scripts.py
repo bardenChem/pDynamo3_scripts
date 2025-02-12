@@ -80,7 +80,7 @@ class Scripts:
 		if "spherical_prune" in _parameters:			
 			self.activeSystem.Spherical_Pruning(_parameters["spherical_prune"],float(_parameters["spherical_prune_radius"]))
 		if "set_fixed_atoms" in _parameters:
-			self.activeSystem.Setting_Free_Atoms(_parameters["spherical_prune"],float(_parameters["free_atoms_radius"]))
+			self.activeSystem.Setting_Free_Atoms(_parameters["set_fixed_atoms"],float(_parameters["free_atoms_radius"]))
 		if "set_reaction_crd" in _parameters:
 			for rc in range(0,_parameters["set_reaction_crd"]):
 				self.activeSystem.Set_Reaction_crd( _parameters["atoms_rc"+str(rc+1)],_parameters )
