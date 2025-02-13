@@ -147,6 +147,8 @@ class SimulationSystem:
         oldSystem = Clone(self.system)
         #---------------------------------------------------
         atomref      = AtomSelection.FromAtomPattern( oldSystem, _centerAtom )
+        print(atomref)
+        input()
         core         = AtomSelection.Within(oldSystem,atomref,_radius)
         core2        = AtomSelection.ByComponent(oldSystem,core)
         #---------------------------------------------------

@@ -85,7 +85,9 @@ class Scripts:
 			for rc in range(0,_parameters["set_reaction_crd"]):
 				self.activeSystem.Set_Reaction_crd( _parameters["atoms_rc"+str(rc+1)],_parameters )
 		if "set_initial_crd" in _parameters:
-			self.activeSystem.system.coordinates3 = ImportCoordinates3(_parameters["set_initial_crd"])
+			if isinstance( _parameters["set_initial_crd"], tuple):
+				self.activeSystem.system.coordinates3 = Unpickle(_parameters["set_initial_crd"])[0]
+			else: self.activeSystem.system.coordinates3 = ImportCoordinates3(_parameters["set_initial_crd"])
 		if "set_qc_region" in _parameters:
 			_residue_list = []
 			_centerAtom = None

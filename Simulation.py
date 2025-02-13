@@ -82,6 +82,7 @@ class Simulation:
 			"log_frequency":0,
 			"sampling_factor":0,
 			"save_format":".dcd",
+			"save_frequency":0,
 			"adaptative":"not",
 			"trajectory_name":"trajectory.ptGeo",
 			"seed":3029202049,
