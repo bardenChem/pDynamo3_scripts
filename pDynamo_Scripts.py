@@ -87,8 +87,11 @@ class Scripts:
 		if "set_initial_crd" in _parameters:
 			print(_parameters["set_initial_crd"][-4:])
 			input()
-			if ( _parameters["set_initial_crd"][-4:] ) == ".pkl":				
-				self.activeSystem.system.coordinates3 = Unpickle(_parameters["set_initial_crd"])[0]
+			if ( _parameters["set_initial_crd"][-4:] ) == ".pkl":
+				try:				
+					self.activeSystem.system.coordinates3 = Unpickle(_parameters["set_initial_crd"])[0]
+				except:
+					self.activeSystem.system.coordinates3 = Unpickle(_parameters["set_initial_crd"])
 			else: self.activeSystem.system.coordinates3 = ImportCoordinates3(_parameters["set_initial_crd"])
 		if "set_qc_region" in _parameters:
 			_residue_list = []
