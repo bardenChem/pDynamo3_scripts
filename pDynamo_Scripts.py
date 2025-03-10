@@ -85,8 +85,6 @@ class Scripts:
 			for rc in range(0,_parameters["set_reaction_crd"]):
 				self.activeSystem.Set_Reaction_crd( _parameters["atoms_rc"+str(rc+1)],_parameters )
 		if "set_initial_crd" in _parameters:
-			print(_parameters["set_initial_crd"][-4:])
-			input()
 			if ( _parameters["set_initial_crd"][-4:] ) == ".pkl":
 				try:				
 					self.activeSystem.system.coordinates3 = Unpickle(_parameters["set_initial_crd"])[0]
