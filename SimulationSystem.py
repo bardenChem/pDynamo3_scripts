@@ -147,8 +147,6 @@ class SimulationSystem:
         oldSystem = Clone(self.system)
         #---------------------------------------------------
         atomref      = AtomSelection.FromAtomPattern( oldSystem, _centerAtom )
-        print(atomref)
-        input()
         core         = AtomSelection.Within(oldSystem,atomref,_radius)
         core2        = AtomSelection.ByComponent(oldSystem,core)
         #---------------------------------------------------
@@ -170,8 +168,9 @@ class SimulationSystem:
         '''
         #-----------------------------------------------------
         atomref = AtomSelection.FromAtomPattern(self.system, _centerAtom)
-        core    = AtomSelection.Within(self.system,atomref,_radius)
-        mobile  = AtomSelection.ByComponent(self.system,core)        
+        core    = AtomSelection.Within(self.system,atomref,_radius)        
+        mobile  = AtomSelection.ByComponent(self.system,core)  
+        
         #-----------------------------------------------------
         newLabel= self.system.label + "_fixed"       
         #------------------------------------------------------        
@@ -220,9 +219,7 @@ class SimulationSystem:
         
         mc = False
         if _parameters["mass_constraint"] == "True": mc = True
-        _rc = ReactionCoordinate(_atom_pat                   ,
-                                mc,
-                                _parameters["type"]           )
+        _rc = ReactionCoordinate(_atom_pat,mc,_parameters["type"])
         _rc.GetRCLabel(self.system)
 
         self.reactionCoordinates.append(_rc)

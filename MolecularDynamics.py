@@ -45,7 +45,7 @@ class MD:
         '''        
         #Important parameters that are recurrently wanted to be change by the user
         self.molecule               = _system
-        self.baseName               = _baseFolder 
+        self.baseName               = _baseFolder     
         self.trajName               = _parameters["trajectory_name"]
         self.trajectoryNameSoft     = os.path.join(_baseFolder,self.trajName+".ptRes")
         self.trajectoryNameCurr     = os.path.join(_baseFolder,self.trajName+".ptGeo")

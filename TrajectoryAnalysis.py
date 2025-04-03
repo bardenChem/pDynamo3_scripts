@@ -10,7 +10,7 @@
 ##############################################################
 
 #=============================================================
-import os, sys, glob
+import os, sys, glob,shutil
 import numpy as np
 #--------------------------------------------------------------
 import matplotlib.pyplot as plt
@@ -60,6 +60,30 @@ class TrajectoryAnalysis:
 			self.trajectory = ImportTrajectory( self.trajFolder , self.molecule )
 		
 		self.trajectory.ReadHeader()		
+
+	#=================================================
+	def Split_Traj(self,_bp):
+		'''
+		'''
+		first_part_trj  = self.trajFolder[:-4] + "_1st_trj.ptGeo"
+		second_part_trj = self.trajFolder[:-4] + "_2nd_trj.ptGeo"
+
+		print(first_part_trj,second_part_trj)
+
+		if not os.path.exists(first_part_trj):  os.makedirs(first_part_trj)
+		if not os.path.exists(second_part_trj): os.makedirs(second_part_trj)
+
+		pkls = glob.glob(self.trajFolder+"/*.pkl")
+
+		cnt = 0 
+		for pkl in pkls:
+			newName = "framenone.pkl"
+			if cnt < _bp:
+				newName = os.path.join(first_part_trj,"frame{}.pkl".format( cnt ) )
+			elif cnt >= _bp:
+				newName = os.path.join(second_part_trj,"frame{}.pkl".format( cnt-_bp ) )
+			cnt +=1
+			shutil.copy(pkl,newName)
 
     #=================================================
 	def CalculateRG_RMSD(self,qc_mm=False,protein=False):

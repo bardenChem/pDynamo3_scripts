@@ -446,7 +446,7 @@ class US:
                 if self.adaptative: self.ChangeDefaultParameters()
                 #-----------------------------------------------------------------------
                 self.mdParameters["trajectory_name"] = self.mdPaths[i] 
-                mdRun = MD(self.molecule,self.mdPaths[i],self.mdMethod)
+                mdRun = MD(self.molecule,self.mdPaths[i],self.mdParameters)
                 mdRun.RunProduction(self.equiNsteps,0,_Restricted=True,_equi=True)
                 mdRun.RunProduction(self.prodNsteps,self.samplingFactor,_Restricted=True)                 
         #---------------------------------------
@@ -490,7 +490,7 @@ class US:
                     self.ChangeConvergenceParameters()
                 #-----------------------------------------------------------------------
                 self.mdParameters["trajectory_name"] = self.mdPaths[i] 
-                mdRun = MD(self.molecule,self.mdPaths[i],self.mdMethod)
+                mdRun = MD(self.molecule,self.mdPaths[i],self.mdParameters)
                 mdRun.ChangeDefaultParameters(self.mdParameters)
                 mdRun.RunProduction(self.equiNsteps,0,_Restricted=True,_equi=True)
                 mdRun.RunProduction(self.prodNsteps,self.samplingFactor,_Restricted=True)

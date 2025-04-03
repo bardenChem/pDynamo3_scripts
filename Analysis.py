@@ -47,6 +47,7 @@ class Analysis:
 		if   Type == "Trajectory_Analysis": self.TrajectoryPlots() 		
 		elif Type == "Energy_Plots":		self.EnergyPlots()
 		elif Type == "PMF":                 self.PMFAnalysis()
+		elif Type == "Split_Traj": 			self.SplitTraj()
 
 	#=========================================================================	
 	def TrajectoryPlots(self) :
@@ -192,5 +193,11 @@ class Analysis:
 			if OneDimPlot: EAfe.Plot1D_FreeEnergy(crd1_label,crd2_label,show)
 			else 		 : EAfe.Plot2D(cnt_lines,crd1_label,crd2_label,xlims,ylims,show)
 		elif nDims == 1: EAfe.Plot1D(crd1_label,XLIM=xlims,SHOW=show)
+	#====================================================================	
+	def SplitTraj(self):
+		'''
+		'''
+		trj = TrajectoryAnalysis(self.parameters["trajectory_name"],self.molecule,0)
+		trj.Split_Traj(self.parameters["break_point"])
 
 #==================================================================================

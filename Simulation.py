@@ -136,7 +136,7 @@ class Simulation:
 			#free energy parameters
 			"relax":"False",
 			"crd_format":"pkl",
-			"optimize_US":"False",
+			"optimize_US":False,
 			"analysis_only":"False",
 			#thermo parameters
 			"cycles":10,
@@ -256,25 +256,25 @@ class Simulation:
 		'''
 		X = self.parameters["nsteps_rc1"]
 		Y = self.parameters["nsteps_rc2"]
-		_type = "1D"		
-		scan = SCAN(self.molecule.system,self.baseFolder,self.parameters)
-		crd2_label = None
-		#--------------------------------------------------------------------
-		scan = SCAN(self.molecule.system,self.baseFolder,self.parameters["optmizer"],self.parameters["adaptative"],self.parameters["restart"])
-		scan.ChangeDefaultParameters(self.parameters)	
-		#--------------------------------------------------------------------
-		self.molecule.reactionCoordinates[0].SetInformation(self.molecule.system,self.parameters["dincre_rc1"])
-		scan.SetReactionCoord(self.molecule.reactionCoordinates[0])
-		if self.molecule.rcs == 2:
-			self.molecule.reactionCoordinates[1].SetInformation(self.molecule.system,self.parameters["dincre_rc2"])
-			scan.SetReactionCoord(self.molecule.reactionCoordinates[1])
-			scan.Run2DScan(X, Y)
-			_type = "2D"
-			crd2_label = self.molecule.reactionCoordinates[1].label
-		else: scan.Run1DScan(self.parameters["nsteps_rc1"])
-		log_path = scan.Finalize()
-
 		if X > 0 and Y > 0: 
+			_type = "1D"		
+			scan = SCAN(self.molecule.system,self.baseFolder,self.parameters)
+			crd2_label = None
+			#--------------------------------------------------------------------
+			scan = SCAN(self.molecule.system,self.baseFolder,self.parameters["optmizer"],self.parameters["adaptative"],self.parameters["restart"])
+			scan.ChangeDefaultParameters(self.parameters)	
+			#--------------------------------------------------------------------
+			self.molecule.reactionCoordinates[0].SetInformation(self.molecule.system,self.parameters["dincre_rc1"])
+			scan.SetReactionCoord(self.molecule.reactionCoordinates[0])
+			if self.molecule.rcs == 2:
+				self.molecule.reactionCoordinates[1].SetInformation(self.molecule.system,self.parameters["dincre_rc2"])
+				scan.SetReactionCoord(self.molecule.reactionCoordinates[1])
+				scan.Run2DScan(X, Y)
+				_type = "2D"
+				crd2_label = self.molecule.reactionCoordinates[1].label
+			else: scan.Run1DScan(self.parameters["nsteps_rc1"])
+			log_path = scan.Finalize()
+
 			EA = EnergyAnalysis( X, Y, _type=_type)		
 			EA.ReadLog(log_path)
 			#--------------------------------------------------------
@@ -418,6 +418,7 @@ class Simulation:
 		sampling   = self.parameters["sampling_production"]
 		_crdFormat = self.parameters["crd_format"] 
 		
+
 		nDims = self.parameters['ndim']
 		rc2   = None
 		if nDims == 2:
