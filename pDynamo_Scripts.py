@@ -14,10 +14,12 @@ from Analysis import *
 #==============================================================
 class Scripts:
 	'''
+	Set scripts and control the library of the presetted simulations
 	'''
 
 	def __init__(self, _projectFolder=None):
 		'''
+		Initialize project folder and paths.
 		'''
 		self.activeSystem    = None 
 		self.system_historic = []
@@ -32,8 +34,38 @@ class Scripts:
 	@classmethod
 	def From_Input(selfClass,_inputFile):
 		'''
+		Reads input and automate system setting, simulation and analysis.
 		'''
-		pass
+		
+		RUN_SIMULATIONS = 0
+		RUN_ANALYSIS    = 0 
+
+		Spherical_Pruning = False
+		Fixed_atoms = False
+
+		reactions_crds = []
+
+		_parameters = {}
+
+		inpFile = open(_inputFile,"r")
+		for line in lines;
+			lines = line.split()
+			if   lines[0] == "#INPUT_TYPE":
+				_parameters["Input_Type"] = lines[1]
+				if lines[1] == "geometry":
+					_parameters["crd_file"] = lines[2]
+				elif lines[1] == "amber" or lines[1] == "gromacs":
+					_parameters["top_file"] = lines[2]
+					_parameters["crd_file"] = lines[3]
+				elif lines[1] == "pkl_file":
+					_parameters["pkl_file"] = lines[2]
+				elif lines[1] == "protein":
+					_parameters["pdb_file"] = lines[2]
+			elif lines[0] == "#SPHERICAL_PRUNING":
+			elif lines[0] == "#FIXED_ATOMS":
+			elif lines[0] == "#SET_REACTION_CRD":
+			
+		self.Set_System(_parameters)
 
 	#-----------------------------------------
 	def Set_System(self,_parameters):

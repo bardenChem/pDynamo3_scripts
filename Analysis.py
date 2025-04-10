@@ -178,9 +178,10 @@ class Analysis:
 		elif nDims == 1: EA.Plot1D(crd1_label,SHOW=show)
 		#-------------------------------------------
 		#Plot Free energy of the calculated windows
-		if 	 OneDimPlot == True: TYPE = "FE1D"
-		elif nDims 		== 2: 	 TYPE = "FE2D"
-		elif nDims 		== 1: 	 TYPE = "FE1D"
+		if OneDimPlot: TYPE = "FE1D"
+		elif nDims 	  == 2: 	  TYPE = "FE2D"
+		elif nDims 	  == 1: 	  TYPE = "FE1D"
+		
 
 		xlims = [ np.min(EA.RC1), np.max(EA.RC1) ]
 

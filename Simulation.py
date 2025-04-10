@@ -445,6 +445,7 @@ class Simulation:
 			self.parameters["analysis_type"] = "PMF"
 			WHAM = Analysis(self.parameters)
 			WHAM.PMFAnalysis()
+			USrun.Finalize()	
 		else:		
 			if self.parameters["ndim"]   == 1: 
 				USrun.Run1DSampling(self.parameters["source_folder"],_crdFormat,sampling)
