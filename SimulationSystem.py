@@ -210,20 +210,18 @@ class SimulationSystem:
 
         self.quantumRegion = list(self.quantumRegion)
     #=========================================================================
-    def Set_Reaction_crd(self,atoms_rc,_parameters):
+    def Set_Reaction_crd(self,atoms_rc,_type,_mass_c):
         '''
         '''
         _atom_pat = []
         for atom in atoms_rc:            
             _atom_pat.append( AtomSelection.FromAtomPattern(self.system, atom)[0] )
         
-        mc = False
-        if _parameters["mass_constraint"] == "True": mc = True
-        _rc = ReactionCoordinate(_atom_pat,mc,_parameters["type"])
+        
+        _rc = ReactionCoordinate(_atom_pat,_mass_c,_type)
         _rc.GetRCLabel(self.system)
 
         self.reactionCoordinates.append(_rc)
-        #self.reactionCoordinates[-1].Print()
         self.rcs +=1 
         
 

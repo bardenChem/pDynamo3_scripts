@@ -39,16 +39,15 @@ class Scripts:
 		
 		RUN_SIMULATIONS = 0
 		RUN_ANALYSIS    = 0 
+		SET_CRD_NMB     = 0
 
 		Spherical_Pruning = False
 		Fixed_atoms = False
-
 		reactions_crds = []
-
 		_parameters = {}
 
 		inpFile = open(_inputFile,"r")
-		for line in lines;
+		for line in lines:
 			lines = line.split()
 			if   lines[0] == "#INPUT_TYPE":
 				_parameters["Input_Type"] = lines[1]
@@ -61,9 +60,36 @@ class Scripts:
 					_parameters["pkl_file"] = lines[2]
 				elif lines[1] == "protein":
 					_parameters["pdb_file"] = lines[2]
-			elif lines[0] == "#SPHERICAL_PRUNING":
+			elif lines[0] == "#SPHERICAL_PRUNNING":
+				_parameters["spherical_prune"] = lines[1] # put the patterns to center the selection
+				_parameters["spherical_prune_radius"] = float(lines[2])
 			elif lines[0] == "#FIXED_ATOMS":
+				_parameters["set_fixed_atoms"] = lines[1] # put the patterns to centert the selection
+				_parameters["free_atoms_radius"] = float(lines[2])
 			elif lines[0] == "#SET_REACTION_CRD":
+				SET_CRD_NMB+=1
+				_parameters["type_rc"+str(SET_CRD_NMB)]     = lines[1]
+				_parameters["mass_ctr_rc"+str(SET_CRD_NMB)] = lines[2]
+				for i in range(0, int(lines[3])):
+					_parameters["atoms_rc"+str(SET_CRD_NMB)] = lines[i+4]
+			elif lines[0] == "#SET_INITIAL_CRD":
+				_parameters["set_initial_crd"] = lines[1]
+			elif lines[0] == "#SET_QMMM_REGION":
+				_parameters["set_qc_region"] = "yes"
+				if lines[1] == "#residues_paterns":
+					list_res = []
+					for i in range( 0,int(lines[2]) ):
+						list_res.append(lines[i+3]) 
+					_parameters["residue_patterns"] = list_res
+				elif lines[1] == "#center_atom":
+					_parameters["center_atom"] = lines[2]
+					_parameters["radius"] = float(lines[3])
+			elif lines[0] == "#SET_ENERGY_MODEL_QM":
+				_parameters["method_class"] = lines[1]
+				
+
+
+		_parameters["set_reaction_crd"] = SET_CRD_NMB
 			
 		self.Set_System(_parameters)
 
@@ -73,6 +99,13 @@ class Scripts:
 		Sets up the simulation system based on the provided parameters.
 		'''
 		_system4load =  SimulationSystem()
+
+		mass_constraints = []
+
+		if "mass_constraints" in _parameters:
+			for mc in _parameters["mass_constraints"]:
+				if mc == "yes": mass_constraints.append(True)
+				elif mc == "no": mass_constraints.append(False)
 
 		_debug_ok = False
 		if "DEBUG" in _parameters: _debug_ok = True 
@@ -115,7 +148,7 @@ class Scripts:
 			self.activeSystem.Setting_Free_Atoms(_parameters["set_fixed_atoms"],float(_parameters["free_atoms_radius"]))
 		if "set_reaction_crd" in _parameters:
 			for rc in range(0,_parameters["set_reaction_crd"]):
-				self.activeSystem.Set_Reaction_crd( _parameters["atoms_rc"+str(rc+1)],_parameters )
+				self.activeSystem.Set_Reaction_crd( _parameters["atoms_rc"+str(rc+1)],_parameters["type_"+str(rc+1)],mass_constraints[rc])
 		if "set_initial_crd" in _parameters:
 			if ( _parameters["set_initial_crd"][-4:] ) == ".pkl":
 				try:				

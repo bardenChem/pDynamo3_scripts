@@ -174,7 +174,10 @@ class Analysis:
 		EA = EnergyAnalysis(self.parameters['xnbins'],nRC2,_type=TYPE)
 		EA.ReadLog( os.path.join(potmean.baseName,"PotentialOfMeanForce.dat") ) 
 		#-------------------------------------------------------------
-		if   nDims == 2: EA.Plot2D(cnt_lines,crd1_label,crd2_label,xlims,ylims,show)
+		xlims = [ np.min(EA.RC1), np.max(EA.RC1) ]
+		if   nDims == 2: 
+			ylims = [ np.min(EA.RC2), np.max(EA.RC2) ]
+			EA.Plot2D(cnt_lines,crd1_label,crd2_label,xlims,ylims,show)
 		elif nDims == 1: EA.Plot1D(crd1_label,SHOW=show)
 		#-------------------------------------------
 		#Plot Free energy of the calculated windows
