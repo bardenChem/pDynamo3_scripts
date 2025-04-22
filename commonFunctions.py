@@ -235,3 +235,7 @@ def GetFrameIndex(fname):
             else: idxs.append( int(ssplit[1]) )
     return(idxs)
 #=========================================================================================
+def write_base_input():
+    '''
+    '''
+    pass

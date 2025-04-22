@@ -45,6 +45,7 @@ class Scripts:
 		Fixed_atoms = False
 		reactions_crds = []
 		_parameters = {}
+		simulations = []
 
 		inpFile = open(_inputFile,"r")
 		for line in lines:
@@ -61,20 +62,25 @@ class Scripts:
 				elif lines[1] == "protein":
 					_parameters["pdb_file"] = lines[2]
 			elif lines[0] == "#SPHERICAL_PRUNNING":
-				_parameters["spherical_prune"] = lines[1] # put the patterns to center the selection
-				_parameters["spherical_prune_radius"] = float(lines[2])
+				if not lines[1] == "no":
+					_parameters["spherical_prune"] = lines[1] # put the patterns to center the selection
+					_parameters["spherical_prune_radius"] = float(lines[2])
 			elif lines[0] == "#FIXED_ATOMS":
-				_parameters["set_fixed_atoms"] = lines[1] # put the patterns to centert the selection
-				_parameters["free_atoms_radius"] = float(lines[2])
+				if not lines[1] == "no":
+					_parameters["set_fixed_atoms"] = lines[1] # put the patterns to centert the selection
+					_parameters["free_atoms_radius"] = float(lines[2])
 			elif lines[0] == "#SET_REACTION_CRD":
-				SET_CRD_NMB+=1
-				_parameters["type_rc"+str(SET_CRD_NMB)]     = lines[1]
-				_parameters["mass_ctr_rc"+str(SET_CRD_NMB)] = lines[2]
-				for i in range(0, int(lines[3])):
-					_parameters["atoms_rc"+str(SET_CRD_NMB)] = lines[i+4]
+				if not lines[1] == "no":
+					SET_CRD_NMB+=1
+					_parameters["type_rc"+str(SET_CRD_NMB)]     = lines[1]
+					_parameters["mass_ctr_rc"+str(SET_CRD_NMB)] = lines[2]
+					for i in range(0, int(lines[3])):
+						_parameters["atoms_rc"+str(SET_CRD_NMB)] = lines[i+4]
 			elif lines[0] == "#SET_INITIAL_CRD":
-				_parameters["set_initial_crd"] = lines[1]
+				if not lines[1] == "no":
+					_parameters["set_initial_crd"] = lines[1]
 			elif lines[0] == "#SET_QMMM_REGION":
+				if not lines[1] == "no":
 				_parameters["set_qc_region"] = "yes"
 				if lines[1] == "#residues_paterns":
 					list_res = []
@@ -85,13 +91,16 @@ class Scripts:
 					_parameters["center_atom"] = lines[2]
 					_parameters["radius"] = float(lines[3])
 			elif lines[0] == "#SET_ENERGY_MODEL_QM":
-				_parameters["method_class"] = lines[1]
-				
-
+				if not lines[1] == "no":
+					_parameters["method_class"] = lines[1]
+			elif lines[0] == "#RUN_SIMULATION":
+				_parameters["simulation_type"] = lines[1]
 
 		_parameters["set_reaction_crd"] = SET_CRD_NMB
 			
 		self.Set_System(_parameters)
+		if not _parameters["simulation_type"] == "no":
+			self.Run_Simulation(_parameters)
 
 	#-----------------------------------------
 	def Set_System(self,_parameters):

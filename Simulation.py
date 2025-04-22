@@ -101,7 +101,6 @@ class Simulation:
 			"Software":"internal",
 			#parameters geometry opt
 			"max_iter":500,
-			"log_frequency":20,
 			"save_pdb":False,
 			"rmsGradient":0.1,
 			"optmizer":"ConjugatedGradient",
