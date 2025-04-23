@@ -150,6 +150,9 @@ class Simulation:
 			"RMS_growing_intial_string":None,
 			"reverse_rc1":"no",
 			"reverse_rc2":"no",
+			"contour_lines":15,
+			"crd1_labels":[],
+			"fig_size":[7,5]
 		}
 
 		for key in _parameters.keys(): self.parameters[key] = _parameters[key]
@@ -185,16 +188,12 @@ class Simulation:
 		'''
 		Set up and execute energy refinement using a series of methods	
 		'''
-		dimensions    = [0,0] 
-		dimensions[0] =  self.parameters["xnbins"]
+		dimensions    = [ self.parameters["xnbins"], 0 ] 
 		nmaxthreads   = 1 
 		_trajfolder   = "single"
 		_type = "1DRef"
 		if self.parameters["ynbins"] > 0: _type = "2DRef"
-
 		if "ynbins"        in self.parameters: dimensions[1] = self.parameters["ynbins"]
-		if "restart"       in self.parameters: _Restart      = self.parameters["restart"]
-		if "NmaxThreads"   in self.parameters: nmaxthreads   = self.parameters["NmaxThreads"]
 		if "source_folder" in self.parameters: _trajfolder   = self.parameters["source_folder"] 
 		#------------------------------------------------------------------
 		ER = EnergyRefinement(self.molecule.system,
@@ -221,17 +220,26 @@ class Simulation:
 		EA.ReadLog(log_path)
 		crd2_label = None
 		#--------------------------------------------------------
-		try: crd1_label = self.molecule.reactionCoordinates[0].label
-		except: crd1_label = "Reaction Path frames (n)"
+		if len(self.parameters["crd_labels"]) == 1:
+			crd1_label = self.parameters["crd_labels"][0]
+		elif len(self.parameters["crd_labels"]) == 2:
+			crd1_label = self.parameters["crd_labels"][0]
+			crd2_label = self.parameters["crd_labels"][1]
+		elif _type == "1DRef":
+			try: crd1_label = self.molecule.reactionCoordinates[0].label
+			except: crd1_label = "Reaction Path frames (n)"
+		elif _type == "2DRef":
+			try: crd1_label = self.molecule.reactionCoordinates[0].label
+			except: crd1_label = "Reaction Path frames (n)"
+			try: crd2_label = self.molecule.reactionCoordinates[1].label
+			except: crd2_label = "Reaction Path frames (n)"
+		
 		_reverse_rc1 = False
 		_reverse_rc2 = False
 		if self.parameters["reverse_rc1"] == "yes": _reverse_rc1 = True 
 		if self.parameters["reverse_rc2"] == "yes": _reverse_rc2 = True 
 		if   _type == "1DRef": EA.MultPlot1D(crd1_label)
-		elif _type == "2DRef":
-			try: crd2_label = self.molecule.reactionCoordinates[1].label
-			except: pass
-			EA.MultPlot2D(14,crd1_label,crd2_label,_reverserc1=_reverse_rc1,_reverserc2=_reverse_rc2)	
+		elif _type == "2DRef": EA.MultPlot2D(_parameters["contour_lines"],crd1_label,crd2_label,self.parameters["fig_size"],_reverse_rc1,_reverse_rc2)	
 	#==================================================================
 	def GeometryOptimization(self):
 		'''
@@ -284,7 +292,7 @@ class Simulation:
 				yl = scan.DMINIMUM[1] + float(Y)*self.parameters["dincre_rc2"]
 				self.parameters["xlim"] = [ scan.DMINIMUM[0], xl  ]
 				self.parameters["ylim"] = [ scan.DMINIMUM[1], yl  ]
-				EA.Plot2D(14,crd1_label,crd2_label,_xlim=self.parameters["xlim"],_ylim=self.parameters["ylim"])		
+				EA.Plot2D(14,crd1_label,crd2_label,_xlim=self.parameters["xlim"],_ylim=self.parameters["ylim"],_figS=self.parameters["fig_size"])		
 	#==================================================================================	
 	def ScanRefinement(self):
 		'''
@@ -552,7 +560,7 @@ class Simulation:
 		if "NmaxThreads" in self.parameters: nmaxthreads = self.parameters["NmaxThreads"]
 
 		refMethod = []
-		if "refine_methods" in self.parameters: refMethod = self.parameters["refine_methods"]
+		if "methods_lists" in self.parameters: refMethod = self.parameters["methods_lists"]
 		if len(refMethod) > 0: 
 			ER = EnergyRefinement(self.molecule.system  					        ,
 								  RSrun.trajectoryName                      ,

@@ -77,8 +77,7 @@ class Scripts:
 					for i in range(0, int(lines[3])):
 						_parameters["atoms_rc"+str(SET_CRD_NMB)] = lines[i+4]
 			elif lines[0] == "#SET_INITIAL_CRD":
-				if not lines[1] == "no":
-					_parameters["set_initial_crd"] = lines[1]
+				if not lines[1] == "no": _parameters["set_initial_crd"] = lines[1]
 			elif lines[0] == "#SET_QMMM_REGION":
 				if not lines[1] == "no":
 				_parameters["set_qc_region"] = "yes"
@@ -91,16 +90,91 @@ class Scripts:
 					_parameters["center_atom"] = lines[2]
 					_parameters["radius"] = float(lines[3])
 			elif lines[0] == "#SET_ENERGY_MODEL_QM":
-				if not lines[1] == "no":
-					_parameters["method_class"] = lines[1]
-			elif lines[0] == "#RUN_SIMULATION":
-				_parameters["simulation_type"] = lines[1]
+				if not lines[1] == "no": _parameters["method_class"] = lines[1]
+			elif lines[0] == "#RUN_SIMULATION":	_parameters["simulation_type"] = simulations.append(lines[1])
+			elif lines[0] == "#QC_CHARGE": _parameters["QCcharge"] = float(lines[1])
+			elif lines[0] == "#MULTIPLICITY": _parameters["multiplicity"] = float(lines[1])
+			elif lines[0] == "#ORCA_METHOD": _parameters["orca_method"] = lines[1] 
+			elif lines[0] == "#FUNCTIONAL": _parameters["functional"] = lines[1] 
+			elif lines[0] == "#SOFTWARE": _parameters["Software"] = lines[1]
+			elif lines[0] == "#BASIS": _parameters["basis"] = lines[1]
+			elif lines[0] == "#PYSCF_METHOD": _parameters["pySCF_method"] = lines[1]
+			elif lines[0] == "#METHODS_SMO":
+				_parameters["methods_lists"] = []
+				for idx in range( 1,len(lines) ):
+					_parameters["methods_lists"].append(lines[idx])
+			elif lines[0] == "#MOPAC_KEYS": 
+				_parameters["mopac_keywords"] = []
+				for idx in range( 1,len(lines) ):
+					_parameters["mopac_keywords"].append(lines[idx])
+			elif lines[0] == "#XNBINS": _parameters["xnbins"] = int(lines[1])
+			elif lines[0] == "#YNBINS": _parameters["ynbins"] = int(lines[1])
+			elif lines[0] == "#MAX_ITERATIONS": _parameters["max_iter"] = int(lines[1])
+			elif lines[0] == "#RMS_GRADIENT": _parameters["rmsGradient"] = float(lines[1])
+			elif lines[0] == "#OPT_ALG":  _parameters["optmizer"] = lines[1]
+			elif lines[0] == "#DINCRE_RC1": _parameters["dincre_RC1"] = float(lines[1])
+			elif lines[0] == "#DINCRE_RC2": _parameters["dincre_RC2"] = float(lines[1])
+			elif lines[0] == "#NDIMS":  _parameters["ndim"] = int(lines[1])
+			elif lines[0] == "#X_NSTEPS": _parameters["nsteps_RC1"] = int(lines[1])
+			elif lines[0] == "#Y_NSTEPS": _parameters["nsteps_RC2"] = int(lines[1])
+			elif lines[0] == "#MD_METHOD": _parameters["MD_method"] = lines[1]
+			elif lines[0] == "#PRESSURE": _parameters["pressure"] = float(lines[1])
+			elif lines[0] == "#PRESSURE_COUPLING": _parameters["pressure_coupling"] = int(lines[1])
+			elif lines[0] == "#PRESSURE_CONTROL": _parameters["pressure_control"] = lines[1]
+			elif lines[0] == "#TEMPERATURE_SCALE_OPTION": _parameters["temperature_scale_option"] = lines[1]
+			elif lines[0] == "#TEMPERATURE_SCALE": _parameters["temperature_scale"] = int(lines[1])
+			elif lines[0] == "#TIME_STEP": _parameters["timeStep"] = float(lines[1])
+			elif lines[0] == "#COLLISION_FREQ": _parameters["coll_freq"] = float(lines[1])
+			elif lines[0] == "#INITIAL_TEMPERATURE": _parameters["start_temperature"] = float(lines[1])
+			elif lines[0] == "#EQUILIBRATION_STEPS": _parameters["equilibration_nsteps"] = int(lines[1])
+			elif lines[0] == "#HEATING_STEPS": _parameters["heating_nsteps"] = int(lines[1])
+			elif lines[0] == "#PRODUCTION_STEPS": _parameters["production_nsteps"] = int(lines[1])
+			elif lines[0] == "#SAMPLING_HEATING": _parameters["heating_sampling"] = int(lines[1])
+			elif lines[0] == "#SAMPLING_EQUILIBRATION": _parameters["sampling_equilibration"] = int(lines[1])
+			elif lines[0] == "#SAMPLING_PRODUCTION": _parameters["sampling_production"] = int(lines[1])
+			elif lines[0] == "#FORCE_CONSTANTS":
+				_parameters["force_constants"] = [] 
+				for idx in range(1,len(lines)):
+					_parameters["force_constants"].append( float(lines[idx]) )
+			elif lines[0] == "#CRD_INPUT": _parameters["crd_format"] = lines[1]
+			elif lines[0] == "#XNWINDOWS": _parameters["xwindows"] = int(lines[1])
+			elif lines[0] == "#YNWINDOWS": _parameters["ywindows"] = int(lines[1])
+			elif lines[0] == "#CYCLES": _parameters["cycles"] = int(lines[1])
+			elif lines[0] == "#MODE": _parameters["mode"] = int(lines[1])
+			elif lines[0] == "#FRAMES": _parameters["frame"] = int(lines[1])
+			elif lines[0] == "#BINS": _parameters["traj_bins"] = int(lines[1])
+			elif lines[0] == "#INITIAL_CRD": _parameters["init_coord"] = lines[1]
+			elif lines[0] == "#FINAL_CRD": _parameters["final_coord"] = lines[1]
+			elif lines[0] == "#SPRING_FORCE": _parameters["spring_force_constant"] = float(lines[1])
+			elif lines[0] == "#FIXED_NEB": _parameters["fixed_terminal_images"] = lines[1]
+			elif lines[0] == "#RMS_GROWING_STRING": _parameters["RMS_growing_intial_string"] = lines[1]
+			elif lines[0] == "#RESTART": _parameters["restart"] = lines[1]
+			elif lines[0] == "#ANALYSIS_ONLY": _parameters["analysis_only"] = lines[1]
+			elif lines[0] == "#MAX_NUM_OF_THREADS": _parameters["NmaxThreads"] = int(lines[1])
+			elif lines[0] == "#TEMPERATURE": _parameters["temperature"] = float(lines[1])
+			elif lines[0] == "#LOG_FREQUENCY": _parameters["log_frequency"] = int(lines[1])
+			elif lines[0] == "#SAVE_FORMAT": _parameters["save_format"] = lines[1]
+			elif lines[0] == "#TRAJECTORY_NAME": _parameters["trajectory_name"] = lines[1]
+			elif lines[0] == "#SEED": _parameters["seed"] = int(lines[1])
+			elif lines[0] == "#RELAX": _parameters["relax"] = lines[1]
+			elif lines[0] == "#REVERSE_RC1": _parameters["reverse_rc1"] = lines[1]
+			elif lines[0] == "#REVERSE_RC2": _parameters["reverse_rc2"] = lines[1]
+			elif lines[0] == "#CORRECT_QMMM_CHARGES": _parameters["correct_QMMM_charge"] = lines[1]
+			elif lines[0] == "#SOURCE_FOLDER": _parameters["source_folder"] = lines[1]
+			elif lines[0] == "#FIGSIZE": _parameters["fig_size"] = [ int(lines[1]), int(lines[2]) ]
+			elif lines[0] == "#CONTOUR_LINES": _parameters["contour_lines"] = int(lines[1])
+			elif lines[0] == "#XLIM": _parameters["xlim"] = [ float(lines[1]), float(lines[2]) ]
+			elif lines[0] == "#YLIM": _parameters["ylim"] = [ float(lines[1]), float(lines[2]) ]
+			elif lines[0] == "#CRD_LABEL_1": _parameters["crd_labels"].append(lines[1])
+			elif lines[0] == "#CRD_LABEL_2": _parameters["crd_labels"].append(lines[1])
 
-		_parameters["set_reaction_crd"] = SET_CRD_NMB
-			
+		
+		_parameters["set_reaction_crd"] = SET_CRD_NMB			
 		self.Set_System(_parameters)
-		if not _parameters["simulation_type"] == "no":
-			self.Run_Simulation(_parameters)
+
+		for sim in simulations:
+			_parameters["simulation_type"] = sim
+			self.Run_Simulation(_parameters)		
 
 	#-----------------------------------------
 	def Set_System(self,_parameters):

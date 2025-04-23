@@ -84,6 +84,7 @@ class SCAN:
         if "rmsGradient"      in _parameters: self.GeoOptPars["rmsGradient"]   = _parameters["rmsGradient"]
         if "maxIterations"    in _parameters: self.GeoOptPars["maxIterations"] = _parameters["maxIterations"]
         if "log_frequency"    in _parameters: self.GeoOptPars["log_frequency"] = _parameters["log_frequency"]
+        if "optimizer"        in _parameters: self.GeoOptPars["optmizer"]      = _parameters["optmizer"]
         if "NmaxThreads"      in _parameters: self.nprocs                      = _parameters["NmaxThreads"]        
         if "save_format"      in _parameters: self.saveFormat = _parameters["save_format"] 
         if "force_constants"  in _parameters:
@@ -92,17 +93,6 @@ class SCAN:
                 self.forceC[cnt] = fc
                 cnt +=1
         #-----------------------------------------------------------------
-
-        if not "system_name"         in self.parameters: self.parameters["system_name"]     = self.molecule.label
-        if not "initial_coordinates" in self.parameters: self.parameters["system_name"]     = "internal"
-        if not "ATOMS_RC1_NAMES"     in self.parameters: self.parameters["ATOMS_RC1_NAMES"] = ""
-        if not "ATOMS_RC2_NAMES"     in self.parameters: self.parameters["ATOMS_RC2_NAMES"] = ""
-        if not "optimizer"           in self.parameters: self.parameters["optimizer"]       = self.optmizer
-        if not "rmsGradient"         in self.parameters: self.parameters["rmsGradient"]     = self.rmsGT
-        if not "maxIterations"       in self.parameters: self.parameters["maxIterations"]   = self.maxIt
-        if not "nprocs"              in self.parameters: self.parameters["nprocs"]          = self.nprocs
-
-
         if self.parameters:
             self.logfile = LogFileWriter()
             self.logfile.add_simulation_parameters_text (self.parameters)
@@ -114,44 +104,43 @@ class SCAN:
         if not self.energiesMatrix[_xframe,_yframe] == 0.0:
             delta = self.energiesMatrix[_xframe,_yframe]  
             if delta < 150.0:
-                #self.forceC[0] = self.forceCRef[0]
-                #self.forceC[1] = self.forceCRef[1]
+               
                 self.molecule.qcModel.converger.energyTolerance  = 0.0001
                 self.molecule.qcModel.converger.densityTolerance = 3e-08
                 self.molecule.qcModel.converger.diisDeviation    = 1e-06
             elif delta >= 150.0:
-                #self.forceC[0] = self.forceCRef[0] - self.forceCRef[0]*0.40
-                #self.forceC[1] = self.forceCRef[1] - self.forceCRef[1]*0.40
+                self.forceC[0] = self.forceCRef[0] - self.forceCRef[0]*0.40
+                self.forceC[1] = self.forceCRef[1] - self.forceCRef[1]*0.40
                 self.molecule.qcModel.converger.energyTolerance  = 0.0003
                 self.molecule.qcModel.converger.densityTolerance = 3e-08
                 self.molecule.qcModel.converger.diisDeviation    = 1e-06
                 if delta > 160.0 and delta < 170.0:
-                    #self.forceC[0] = self.forceCRef[0] - self.forceCRef[0]*0.50
-                    #self.forceC[1] = self.forceCRef[1] - self.forceCRef[1]*0.50
+                    self.forceC[0] = self.forceCRef[0] - self.forceCRef[0]*0.50
+                    self.forceC[1] = self.forceCRef[1] - self.forceCRef[1]*0.50
                     self.molecule.qcModel.converger.energyTolerance  = 0.0006
                     self.molecule.qcModel.converger.densityTolerance = 1e-07
                     self.molecule.qcModel.converger.diisDeviation    = 2e-06
                 elif delta > 170.0 and delta <180.0 :
-                    #self.forceC[0] = self.forceCRef[0] - self.forceCRef[0]*0.50
-                    #self.forceC[1] = self.forceCRef[1] - self.forceCRef[1]*0.50
+                    self.forceC[0] = self.forceCRef[0] - self.forceCRef[0]*0.50
+                    self.forceC[1] = self.forceCRef[1] - self.forceCRef[1]*0.50
                     self.molecule.qcModel.converger.energyTolerance  = 0.001
                     self.molecule.qcModel.converger.densityTolerance = 3e-07
                     self.molecule.qcModel.converger.diisDeviation    = 5e-06
                 elif delta > 180.0 and delta < 185.0:
-                    #self.forceC[0] = self.forceCRef[0] - self.forceCRef[0]*0.70
-                    #self.forceC[1] = self.forceCRef[1] - self.forceCRef[0]*0.70
+                    self.forceC[0] = self.forceCRef[0] - self.forceCRef[0]*0.70
+                    self.forceC[1] = self.forceCRef[1] - self.forceCRef[0]*0.70
                     self.molecule.qcModel.converger.energyTolerance  = 0.0015
                     self.molecule.qcModel.converger.densityTolerance = 1e-06
                     self.molecule.qcModel.converger.diisDeviation    = 1e-05
                 elif delta > 185.0 and delta <200.0:
-                    #self.forceC[0] = self.forceCRef[0] - self.forceCRef[0]*0.70
-                    #self.forceC[1] = self.forceCRef[1] - self.forceCRef[1]*0.70
+                    self.forceC[0] = self.forceCRef[0] - self.forceCRef[0]*0.70
+                    self.forceC[1] = self.forceCRef[1] - self.forceCRef[1]*0.70
                     self.molecule.qcModel.converger.energyTolerance  = 0.003
                     self.molecule.qcModel.converger.densityTolerance = 1e-05
                     self.molecule.qcModel.converger.diisDeviation    = 5e-05
                 elif delta > 200.0:
-                    #self.forceC[0] = self.forceCRef[0] - self.forceCRef[0]*0.80
-                    #self.forceC[1] = self.forceCRef[1] - self.forceCRef[1]*0.80
+                    self.forceC[0] = self.forceCRef[0] - self.forceCRef[0]*0.80
+                    self.forceC[1] = self.forceCRef[1] - self.forceCRef[1]*0.80
                     self.molecule.qcModel.converger.energyTolerance  = 0.003
                     self.molecule.qcModel.converger.densityTolerance = 1e-04
                     self.molecule.qcModel.converger.diisDeviation    = 5e-04
