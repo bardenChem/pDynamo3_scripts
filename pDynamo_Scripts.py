@@ -32,11 +32,12 @@ class Scripts:
 
 	#-----------------------------------------
 	@classmethod
-	def From_Input(selfClass,_inputFile):
+	def From_Input(selfClass,_inputFile,_projectFolder_=None):
 		'''
 		Reads input and automate system setting, simulation and analysis.
 		'''
-		
+		self            = selfClass(_projectFolder=_projectFolder_)
+
 		RUN_SIMULATIONS = 0
 		RUN_ANALYSIS    = 0 
 		SET_CRD_NMB     = 0
@@ -46,18 +47,20 @@ class Scripts:
 		reactions_crds = []
 		_parameters = {}
 		simulations = []
+		_parameters["mass_constraints"] = []
+		save_name = None
 
 		inpFile = open(_inputFile,"r")
-		for line in lines:
+		for line in inpFile:
 			lines = line.split()
-			if   lines[0] == "#INPUT_TYPE":
+			if  lines[0] == "#INPUT_TYPE":
 				_parameters["Input_Type"] = lines[1]
 				if lines[1] == "geometry":
 					_parameters["crd_file"] = lines[2]
 				elif lines[1] == "amber" or lines[1] == "gromacs":
 					_parameters["top_file"] = lines[2]
 					_parameters["crd_file"] = lines[3]
-				elif lines[1] == "pkl_file":
+				elif lines[1] == "pkl":
 					_parameters["pkl_file"] = lines[2]
 				elif lines[1] == "protein":
 					_parameters["pdb_file"] = lines[2]
@@ -73,22 +76,23 @@ class Scripts:
 				if not lines[1] == "no":
 					SET_CRD_NMB+=1
 					_parameters["type_rc"+str(SET_CRD_NMB)]     = lines[1]
-					_parameters["mass_ctr_rc"+str(SET_CRD_NMB)] = lines[2]
+					_parameters["mass_constraints"].append(lines[2])
+					_parameters["atoms_rc"+str(SET_CRD_NMB)] = []
 					for i in range(0, int(lines[3])):
-						_parameters["atoms_rc"+str(SET_CRD_NMB)] = lines[i+4]
+						_parameters["atoms_rc"+str(SET_CRD_NMB)].append(lines[i+4])
 			elif lines[0] == "#SET_INITIAL_CRD":
 				if not lines[1] == "no": _parameters["set_initial_crd"] = lines[1]
 			elif lines[0] == "#SET_QMMM_REGION":
 				if not lines[1] == "no":
-				_parameters["set_qc_region"] = "yes"
-				if lines[1] == "#residues_paterns":
-					list_res = []
-					for i in range( 0,int(lines[2]) ):
-						list_res.append(lines[i+3]) 
-					_parameters["residue_patterns"] = list_res
-				elif lines[1] == "#center_atom":
-					_parameters["center_atom"] = lines[2]
-					_parameters["radius"] = float(lines[3])
+					_parameters["set_qc_region"] = "yes"
+					if lines[1] == "#residues_paterns":
+						list_res = []
+						for i in range( 0,int(lines[2]) ):
+							list_res.append(lines[i+3]) 
+						_parameters["residue_patterns"] = list_res
+					elif lines[1] == "#center_atom":
+						_parameters["center_atom"] = lines[2]
+						_parameters["radius"] = float(lines[3])
 			elif lines[0] == "#SET_ENERGY_MODEL_QM":
 				if not lines[1] == "no": _parameters["method_class"] = lines[1]
 			elif lines[0] == "#RUN_SIMULATION":	_parameters["simulation_type"] = simulations.append(lines[1])
@@ -167,6 +171,7 @@ class Scripts:
 			elif lines[0] == "#YLIM": _parameters["ylim"] = [ float(lines[1]), float(lines[2]) ]
 			elif lines[0] == "#CRD_LABEL_1": _parameters["crd_labels"].append(lines[1])
 			elif lines[0] == "#CRD_LABEL_2": _parameters["crd_labels"].append(lines[1])
+			elif lines[0] == "#SAVE_NAME": save_name = lines[1]
 
 		
 		_parameters["set_reaction_crd"] = SET_CRD_NMB			
@@ -174,7 +179,10 @@ class Scripts:
 
 		for sim in simulations:
 			_parameters["simulation_type"] = sim
-			self.Run_Simulation(_parameters)		
+			self.Run_Simulation(_parameters)
+
+		self.SaveSystem(save_name)
+		inpFile.close()		
 
 	#-----------------------------------------
 	def Set_System(self,_parameters):
@@ -210,7 +218,6 @@ class Scripts:
 				_system4load = load_function(_parameters["crd_file"])
 			elif input_type == "amber":
 				_system4load = load_function(_parameters["top_file"], _parameters["crd_file"])
-				print(_parameters["top_file"],_parameters["crd_file"])
 			elif input_type == "gromacs":
 				_system4load = load_function(_parameters["top_file"], _parameters["crd_file"])
 			elif input_type == "pkl":
@@ -230,8 +237,12 @@ class Scripts:
 		if "set_fixed_atoms" in _parameters:
 			self.activeSystem.Setting_Free_Atoms(_parameters["set_fixed_atoms"],float(_parameters["free_atoms_radius"]))
 		if "set_reaction_crd" in _parameters:
-			for rc in range(0,_parameters["set_reaction_crd"]):
-				self.activeSystem.Set_Reaction_crd( _parameters["atoms_rc"+str(rc+1)],_parameters["type_"+str(rc+1)],mass_constraints[rc])
+
+			for rc in range(0,_parameters["set_reaction_crd"]):				
+				print(_parameters["atoms_rc"+str(rc+1)])
+				print(_parameters["type_rc"+str(rc+1)])
+				print(mass_constraints)
+				self.activeSystem.Set_Reaction_crd( _parameters["atoms_rc"+str(rc+1)],_parameters["type_rc"+str(rc+1)],mass_constraints[rc])
 		if "set_initial_crd" in _parameters:
 			if ( _parameters["set_initial_crd"][-4:] ) == ".pkl":
 				try:				
@@ -343,4 +354,4 @@ class Scripts:
 if __name__=="__main__":
 	'''
 	'''
-	pass
+	run_script = Scripts.From_Input(sys.argv[1],sys.argv[2])
