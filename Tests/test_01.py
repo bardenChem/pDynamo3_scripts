@@ -46,11 +46,11 @@ def Run_Test():
 		"spherical_prune_radius":25.0,
 		"set_fixed_atoms":"*:LIG.248:C02",
 		"free_atoms_radius":20.0,
-		"set_reaction_crd":2,
+		"set_reaction_crd":1,
 		"atoms_rc1":["*:LIG.*:C02","*:LIG.*:H02","*:GLU.164:OE2"],
 		"atoms_rc2":["*:LIG.*:O06","*:HIE.94:HE2","*:HIE.94:NE2"],
-		"mass_constraint":"true",
-		"type":"distance"	
+		"mass_constraints":["yes"],
+		"type_rc1":"distance"	
 	}	
 	test_05 = Scripts("test_01")
 	test_05.Set_System(_parameters)

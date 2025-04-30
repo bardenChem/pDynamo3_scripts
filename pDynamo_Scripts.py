@@ -85,19 +85,22 @@ class Scripts:
 			elif lines[0] == "#SET_QMMM_REGION":
 				if not lines[1] == "no":
 					_parameters["set_qc_region"] = "yes"
-					if lines[1] == "#residues_paterns":
+					if lines[1] == "#residue_patterns":
 						list_res = []
 						for i in range( 0,int(lines[2]) ):
 							list_res.append(lines[i+3]) 
-						_parameters["residue_patterns"] = list_res
+						_parameters["residue_patterns"] = list_res						
 					elif lines[1] == "#center_atom":
 						_parameters["center_atom"] = lines[2]
 						_parameters["radius"] = float(lines[3])
 			elif lines[0] == "#SET_ENERGY_MODEL_QM":
-				if not lines[1] == "no": _parameters["method_class"] = lines[1]
+				if not lines[1] == "no": 
+					_parameters["method_class"] = lines[1]
+					_parameters["set_energy_model"] = "QM"
+			elif lines[0] == "#HAMILTONIAN": _parameters["Hamiltonian"] = lines[1]
 			elif lines[0] == "#RUN_SIMULATION":	_parameters["simulation_type"] = simulations.append(lines[1])
-			elif lines[0] == "#QC_CHARGE": _parameters["QCcharge"] = float(lines[1])
-			elif lines[0] == "#MULTIPLICITY": _parameters["multiplicity"] = float(lines[1])
+			elif lines[0] == "#QC_CHARGE": _parameters["QCcharge"] = int(lines[1])
+			elif lines[0] == "#MULTIPLICITY": _parameters["multiplicity"] = int(lines[1])
 			elif lines[0] == "#ORCA_METHOD": _parameters["orca_method"] = lines[1] 
 			elif lines[0] == "#FUNCTIONAL": _parameters["functional"] = lines[1] 
 			elif lines[0] == "#SOFTWARE": _parameters["Software"] = lines[1]
@@ -172,6 +175,7 @@ class Scripts:
 			elif lines[0] == "#CRD_LABEL_1": _parameters["crd_labels"].append(lines[1])
 			elif lines[0] == "#CRD_LABEL_2": _parameters["crd_labels"].append(lines[1])
 			elif lines[0] == "#SAVE_NAME": save_name = lines[1]
+			elif lines[0] == "#SCRATCH": _parameters["scratch"] = lines[1] 
 
 		
 		_parameters["set_reaction_crd"] = SET_CRD_NMB			
@@ -237,11 +241,7 @@ class Scripts:
 		if "set_fixed_atoms" in _parameters:
 			self.activeSystem.Setting_Free_Atoms(_parameters["set_fixed_atoms"],float(_parameters["free_atoms_radius"]))
 		if "set_reaction_crd" in _parameters:
-
 			for rc in range(0,_parameters["set_reaction_crd"]):				
-				print(_parameters["atoms_rc"+str(rc+1)])
-				print(_parameters["type_rc"+str(rc+1)])
-				print(mass_constraints)
 				self.activeSystem.Set_Reaction_crd( _parameters["atoms_rc"+str(rc+1)],_parameters["type_rc"+str(rc+1)],mass_constraints[rc])
 		if "set_initial_crd" in _parameters:
 			if ( _parameters["set_initial_crd"][-4:] ) == ".pkl":
@@ -257,7 +257,7 @@ class Scripts:
 			if "residue_patterns" in _parameters: _residue_list = _parameters["residue_patterns"]
 			if "center_atom"      in _parameters: _centerAtom   = _parameters["center_atom"]
 			if "radius"           in _parameters: _radius       = _parameters["radius"]
-			if _parameters["set_qc_region"] == "yes":				
+			if _parameters["set_qc_region"] == "yes":
 				self.activeSystem.Set_QCMM_Region(_residue_list,_centerAtom,_radius)
 		if "set_energy_model" in _parameters:
 			if _parameters["set_energy_model"] == "QM":

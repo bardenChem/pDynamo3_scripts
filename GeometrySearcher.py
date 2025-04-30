@@ -296,9 +296,10 @@ class GeometrySearcher:
                 i += 1
             ExportSystem(pdbFile,self.molecule)
         #----------------------------------------------------------------------
-        if self.trajectoryName:
-            if self.saveFormat == ".dcd" or self.saveFormat == ".mdcrd":
-                if self.saveFormat != self.trajectoryName:
+        if self.saveFrequency > 0: 
+            if self.trajectoryName:
+                if self.saveFormat == ".dcd" or self.saveFormat == ".mdcrd":
+                 if self.saveFormat != self.trajectoryName:
                     try:
                         traj_save = os.path.splitext(self.trajectoryName)[0] + self.saveFormat
                         Duplicate(self.trajectoryName,traj_save,self.molecule)

@@ -144,12 +144,11 @@ class QuantumMethods:
 
 		if self.Hybrid: 
 			self.system.DefineQCModel( qcModel, qcSelection=self.selection )
+			self.system.DefineNBModel( NBmodel, assignQCMMModels=self.Hybrid )
+			self.Export_QC_System()
 		else:	
-			self.system.DefineQCModel( qcModel )	
-
+			self.system.DefineQCModel( qcModel )
 		self.qcModel = qcModel
-		self.system.DefineNBModel( NBmodel, assignQCMMModels=self.Hybrid )
-		self.Export_QC_System()
 
 	#--------------------------------------------------------
 	def Set_Abinitio(self):

@@ -209,6 +209,7 @@ class SimulationSystem:
             self.quantumRegion = AtomSelection.ByComponent(self.system,core) 
 
         self.quantumRegion = list(self.quantumRegion)
+       
     #=========================================================================
     def Set_Reaction_crd(self,atoms_rc,_type,_mass_c):
         '''
