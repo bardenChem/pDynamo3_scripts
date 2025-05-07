@@ -15,7 +15,6 @@ from GeometrySearcher import *
 #pDynamo library
 from pMolecule import *
 from pMolecule.QCModel import *
-from LogFile import LogFileWriter
 #**************************************************************
 class SCAN:
     '''
@@ -37,7 +36,6 @@ class SCAN:
                 Thether
         '''
         self.parameters         = None 
-        self.logfile            = None
         
         self.baseName           = _baseFolder
         self.molecule           = _system 
@@ -92,10 +90,7 @@ class SCAN:
             for fc in self.parameters["force_constants"]:
                 self.forceC[cnt] = fc
                 cnt +=1
-        #-----------------------------------------------------------------
-        if self.parameters:
-            self.logfile = LogFileWriter()
-            self.logfile.add_simulation_parameters_text (self.parameters)
+                
 
     #===========================================================================================
     def ChangeConvergenceParameters(self,_xframe,_yframe):
@@ -173,10 +168,6 @@ class SCAN:
         text_line = "{0:>3s} {1:>15s} {2:>15s}".format('x','RC1','Energy' )
         self.text += text_line+"\n"
         
-        self.logfile.add_text_Line("")
-        self.logfile.add_text_Line("DATA  "+text_line)
-        
-        
         self.energiesMatrix      = pymp.shared.array( (_nsteps), dtype=float ) 
         self.reactionCoordinate1 = pymp.shared.array( (_nsteps), dtype=float )
         self.nsteps[0] = _nsteps
@@ -187,7 +178,6 @@ class SCAN:
         for i in range(_nsteps):              
             text_line =  "{0:3d} {1:15.8f} {2:15.8f}".format( i,self.reactionCoordinate1[i], self.energiesMatrix[i])
             self.text += text_line+ '\n'
-            self.logfile.add_text_Line("DATA  "+text_line)            
             
     #=================================================================================================
     def Run1DScanSimpleDistance(self):
@@ -326,10 +316,7 @@ class SCAN:
 
         self.text += text_line+"\n"
         #------------------------------------------------------               
-        self.logfile.add_text_Line("")
-        self.logfile.add_text_Line("DATA  "+text_line)
-        
-        
+            
         self.nsteps[0] = X = _nsteps_x   
         self.nsteps[1] = Y = _nsteps_y 
         self.energiesMatrix = pymp.shared.array( (X,Y), dtype=float ) 
@@ -346,7 +333,6 @@ class SCAN:
                 for j in range(Y):
                     text_line =  "{0:3d} {1:3d} {2:15.8f} {3:15.8f} {4:15.8f}".format( i,j,self.reactionCoordinate1[i,j], self.reactionCoordinate2[i,j], self.energiesMatrix[i,j])
                     self.text += text_line+ '\n'
-                    self.logfile.add_text_Line("DATA  "+text_line)    
     #=============================================================================
     def Run2DSimpleDistance(self, X, Y ):
         '''

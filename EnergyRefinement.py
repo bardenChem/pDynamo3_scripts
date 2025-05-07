@@ -333,7 +333,7 @@ class EnergyRefinement:
 				options +=  "print [ p_mos ] 1\n"
 				options +=  "print [ p_overlap ] 5\n"
 				options +=  "end # output\n"
-				options +=  "! SlowConv\n"
+				options +=  "!PrintBasis\n"
 				if self.restart:
 					options += "%scf \nMaxIter 500\n "
 					options += "SOSCFStart 0.00033 \n end\n"
