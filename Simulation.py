@@ -189,7 +189,7 @@ class Simulation:
 		Set up and execute energy refinement using a series of methods	
 		'''
 		dimensions    = [ self.parameters["xnbins"], 0 ] 
-		nmaxthreads   = 1 
+		nmaxthreads   = self.parameters["NmaxThreads"]
 		_trajfolder   = "single"
 		_type = "1DRef"
 		if self.parameters["ynbins"] > 0: _type = "2DRef"

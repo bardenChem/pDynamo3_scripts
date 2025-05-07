@@ -182,7 +182,7 @@ class QuantumMethods:
 		options += "print [ p_mos ] 1\n"
 		options += "print [ p_overlap ] 5\n"
 		options += "end # output\n"
-		options += "!printbasis"
+		options += "!PrintBasis\n"
 		#options +="%maxcore 1000\n"
 		#options +="%pal\n"
 		#options +="nprocs 2\n"
