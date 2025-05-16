@@ -334,12 +334,7 @@ class EnergyRefinement:
 				options +=  "print [ p_overlap ] 5\n"
 				options +=  "end # output\n"
 				options +=  "!PrintBasis\n"
-				if self.restart:
-					options += "%scf \nMaxIter 500\n "
-					options += "SOSCFStart 0.00033 \n end\n"
-					#options += '!MORead \n %moinp "orcaJob.gbw"'
-
-
+				
 				#...............................................................................................
 				self.molecule.electronicState = ElectronicState.WithOptions(charge       = self.charge 		, 
 				                                                          	multiplicity = self.multiplicity )
