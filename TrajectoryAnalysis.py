@@ -236,7 +236,9 @@ class TrajectoryAnalysis:
 		'''
 		'''
 		try: 	from sklearn.neighbors import KernelDensity
-		except:	pass
+		except:	
+			print("Error loading KernelDensity library!")
+			exit()
 		kde = KernelDensity(bandwidth=1.0, kernel='gaussian')
 
 		distances1 = np.array(rc_1[1], dtype=np.float32)
@@ -345,6 +347,8 @@ class TrajectoryAnalysis:
 			self.RCs[str(cnt)] = [ rc, [] ]
 			cnt +=1
 		cnt -= 1
+
+		print(self.RCs)
 
 		frames = 0 
 		while self.trajectory.RestoreOwnerData():

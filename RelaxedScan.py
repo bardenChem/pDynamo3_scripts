@@ -202,7 +202,7 @@ class SCAN:
             #--------------------------------------------------------------------
             
             if i > 0:
-                initCoordinateFile: os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i-1) )
+                initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i-1) )
                 if self.restart:
                     if os.path.exists( os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i) ) ):
                         initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i) )                
@@ -241,7 +241,7 @@ class SCAN:
             restraints["RC1"] =  restraint            
             #--------------------------------------------------------------------
             if i > 0:
-                initCoordinateFile: os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i-1) )
+                initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i-1) )
                 if self.restart:
                     if os.path.exists( os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i) ) ):
                         initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i) )                
@@ -285,7 +285,7 @@ class SCAN:
             restraints["PHI"] =  restraint            
             #--------------------------------------------------------------------
             if i > 0:
-                initCoordinateFile: os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i-1) )
+                initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i-1) )
                 if self.restart:
                     if os.path.exists( os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i) ) ):
                         initCoordinateFile = os.path.join( self.baseName,self.trajFolder+".ptGeo", "frame{}.pkl".format(i) )                

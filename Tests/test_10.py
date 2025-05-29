@@ -22,8 +22,9 @@ def Run_Test():
 		"set_reaction_crd":2,	
 		"atoms_rc1":["*:LIG.*:C02","*:LIG.*:H02","*:GLU.164:OE2"],
 		"atoms_rc2":["*:LIG.*:O06","*:HIE.94:HE2","*:HIE.94:NE2"],
-		"type":"Distance",
-		"mass_constraint":"True",
+		"type_rc1":"Distance",
+		"type_rc2":"Distance",
+		"mass_constraints":["yes","yes"],
 		"reverse_rc1":"yes",
 	}
 
@@ -33,7 +34,7 @@ def Run_Test():
 	simulation_parameters = { "xnbins":20			    ,
 				   "source_folder":_path                , 
 				   "folder":"test_10"                   ,
-				   "charge":-2		                    ,
+				   "QCcharge":-2		                    ,
 				   "multiplicity":1 	                ,
 				   "methods_lists":methods              ,					   
 				   "NmaxThreads":10                     ,

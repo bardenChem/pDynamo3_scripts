@@ -100,7 +100,7 @@ class Simulation:
 			"functional":"HF",
 			"Software":"internal",
 			#parameters geometry opt
-			"max_iter":500,
+			"maxIterations":500,
 			"save_pdb":False,
 			"rmsGradient":0.1,
 			"optmizer":"ConjugatedGradient",
@@ -151,8 +151,8 @@ class Simulation:
 			"reverse_rc1":"no",
 			"reverse_rc2":"no",
 			"contour_lines":15,
-			"crd1_labels":[],
-			"fig_size":[7,5]
+			"fig_size":[7,5],
+			"crd_labels":[],
 		}
 
 		for key in _parameters.keys(): self.parameters[key] = _parameters[key]
@@ -263,7 +263,7 @@ class Simulation:
 		'''
 		X = self.parameters["nsteps_rc1"]
 		Y = self.parameters["nsteps_rc2"]
-		if X > 0 and Y > 0: 
+		if X > 0: 
 			_type = "1D"		
 			scan = SCAN(self.molecule.system,self.baseFolder,self.parameters)
 			crd2_label = None
@@ -274,25 +274,27 @@ class Simulation:
 			self.molecule.reactionCoordinates[0].SetInformation(self.molecule.system,self.parameters["dincre_rc1"])
 			scan.SetReactionCoord(self.molecule.reactionCoordinates[0])
 			if self.molecule.rcs == 2:
+				print("Two dimensions relaxed surface scan!")
 				self.molecule.reactionCoordinates[1].SetInformation(self.molecule.system,self.parameters["dincre_rc2"])
 				scan.SetReactionCoord(self.molecule.reactionCoordinates[1])
 				scan.Run2DScan(X, Y)
 				_type = "2D"
 				crd2_label = self.molecule.reactionCoordinates[1].label
-			else: scan.Run1DScan(self.parameters["nsteps_rc1"])
+			else: 
+				print("One dimension relaxed surface scan!")
+				scan.Run1DScan(self.parameters["nsteps_rc1"])
 			log_path = scan.Finalize()
 
 			EA = EnergyAnalysis( X, Y, _type=_type)		
 			EA.ReadLog(log_path)
 			#--------------------------------------------------------
 			crd1_label = self.molecule.reactionCoordinates[0].label
+			
 			if   _type == "1D": EA.Plot1D(crd1_label)
-			elif _type == "2D":	
-				xl = scan.DMINIMUM[0] + float(X)*self.parameters["dincre_rc1"]
-				yl = scan.DMINIMUM[1] + float(Y)*self.parameters["dincre_rc2"]
-				self.parameters["xlim"] = [ scan.DMINIMUM[0], xl  ]
-				self.parameters["ylim"] = [ scan.DMINIMUM[1], yl  ]
-				EA.Plot2D(14,crd1_label,crd2_label,_xlim=self.parameters["xlim"],_ylim=self.parameters["ylim"],_figS=self.parameters["fig_size"])		
+			elif _type == "2D":					
+				self.parameters["xlim"] = [scan.reactionCoordinate1[0] , scan.reactionCoordinate1[-1] ]
+				self.parameters["ylim"] = [scan.reactionCoordinate2[0] , scan.reactionCoordinate2[-1] ]	
+				EA.Plot2D(self.parameters["contour_lines"],crd1_label,crd2_label,_xlim=self.parameters["xlim"],_ylim=self.parameters["ylim"],_figS=self.parameters["fig_size"])		
 	#==================================================================================	
 	def ScanRefinement(self):
 		'''
@@ -362,7 +364,7 @@ class Simulation:
 			rc2.SetInformation(self.molecule.system,self.parameters["dincre_rc2"])
 			rc2.GetRCLabel(self.molecule.system)
 			rc2.SetInformation(self.molecule.system,0.0)
-			forcK_2 = self.parameters["force_constant"][1]
+			forcK_2 = self.parameters["force_constants"][1]
 		#-------------------------------------------------------------------
 		distance = rc1.minimumD
 		rmodel = RestraintEnergyModel.Harmonic( distance, forcK_1 )

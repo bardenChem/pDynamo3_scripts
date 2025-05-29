@@ -13,17 +13,11 @@ def Run_Test():
 	system_parameters = {
 		"Input_Type":"pkl",		
 		"pkl_file":os.path.join("test_05","qcmm_optam1","7tim_am1_opt_PF.pkl"),
-		#"set_qc_region":"yes",
-		#"set_energy_model":"QM",
-		#"Hamiltonian":"rm1",
-		#"method_class":"SMO",
-		#"center_atom":"*:LIG.*:H02",
-		#"radius": 3.0,
 		"set_reaction_crd":2,	
 		"atoms_rc1":["*:LIG.*:C02","*:LIG.*:H02","*:GLU.164:OE2"],
 		"atoms_rc2":["*:LIG.*:O06","*:HIE.94:HE2","*:HIE.94:NE2"],
-		"type":"Distance",
-		"mass_constraint":"True",
+		"type_rc1":"Distance",
+		"mass_constraints":["yes","yes"],
 	}
 
 	_path   = "test_06/Multiple_Distance_rm1/ScanTraj.ptGeo"

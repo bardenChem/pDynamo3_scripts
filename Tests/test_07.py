@@ -24,6 +24,7 @@ def Run_Test():
 				  "sampling_equilibration":100,
 				  "sampling_production":50,
 				  "sampling_heating":50,
+				  "log_frequency":10
 				}
 	
 	#------------------------------------

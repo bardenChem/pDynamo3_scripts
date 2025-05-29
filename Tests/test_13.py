@@ -21,8 +21,9 @@ def Run_Test():
 		"set_reaction_crd":2,	
 		"atoms_rc1":["*:LIG.*:C02","*:LIG.*:H02","*:GLU.164:OE2"],
 		"atoms_rc2":["*:LIG.*:O06","*:HIE.94:HE2","*:HIE.94:NE2"],
-		"type":"Distance",
-		"mass_constraint":"True",
+		"type_rc1":"Distance",
+		"type_rc2":"Distance",
+		"mass_constraint":["yes","yes"]
 	}
 
 	parameters_NEB = {  "init_coord":init_path           					,
@@ -33,7 +34,7 @@ def Run_Test():
 						"simulation_type":"NEB"          					,
 						"spring_force_constant":800.0    					,
 						"rmsGradient":0.10               					,
-						"fixed_terminal_images":False    	                }
+						"fixed_terminal_images":"no"    	                }
 
 	test_01 = Scripts("test_13_NEB")
 	test_01.Set_System(system_parameters)
@@ -47,7 +48,7 @@ def Run_Test():
 						"simulation_type":"NEB"          					,
 						"spring_force_constant":800.0    					,
 						"rmsGradient":0.3               					,
-						"fixed_terminal_images":False                       }
+						"fixed_terminal_images":"no"                       }
 	
 	test_02 = Scripts("test_13_NEB_traj")
 	test_02.Set_System(system_parameters)

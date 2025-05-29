@@ -16,8 +16,9 @@ def Run_Test():
 		"set_reaction_crd":2,	
 		"atoms_rc1":["*:LIG.*:C02","*:LIG.*:H02","*:GLU.164:OE2"],
 		"atoms_rc2":["*:LIG.*:O06","*:HIE.94:HE2","*:HIE.94:NE2"],
-		"type":"Distance",
-		"mass_constraint":"True",
+		"type_rc1":"Distance",
+		"type_rc2":"Distance",
+		"mass_constraints":["yes","yes"],
 	}
 
 	simulation_parameters = {
@@ -29,7 +30,8 @@ def Run_Test():
 				  "sampling_equilibration":100,
 				  "sampling_production":50,
 				  "sampling_heating":50,
-				  "force_constants":[300.0,300.0]
+				  "force_constants":[300.0,300.0],
+				  "log_frequency":10
 				}
 	
 	#------------------------------------

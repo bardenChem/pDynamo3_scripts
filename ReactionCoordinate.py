@@ -43,7 +43,7 @@ class ReactionCoordinate:
 			except:self.atoms.append( atom[0] )
 
 
-		if self.Type == "Distance":
+		if self.Type == "Distance" or self.Type == "distance":
 			if self.nAtoms == 3:
 				self.Type = "multipleDistance"
 	#==========================================================================================================
@@ -67,7 +67,7 @@ class ReactionCoordinate:
 			else: 
 				self.label  = A1.label + "-" + A2.label +"-"+ A3.label
 				self.label2 = A1.label + "-" + A2.label               
-		elif self.Type == "Distance":			
+		elif self.Type == "Distance" or self.Type == "distance":			
 			A1 = _molecule.atoms.items[ self.atoms[0] ]
 			A2 = _molecule.atoms.items[ self.atoms[1] ]
 			if not sequence == None:
@@ -129,7 +129,7 @@ class ReactionCoordinate:
 					dist_a2_a3 = _molecule.coordinates3.Distance( self.atoms[1], self.atoms[2] )
 					self.minimumD =  dist_a1_a2 - dist_a2_a3
 				#.-------------------------------------------------------------      
-			elif self.Type == "Distance": self.minimumD = _molecule.coordinates3.Distance( self.atoms[0], self.atoms[1] )
+			elif self.Type == "Distance" or self.Type == "distance": self.minimumD = _molecule.coordinates3.Distance( self.atoms[0], self.atoms[1] )
 			#.--------------------------
 			elif self.Type == "Dihedral": self.minimumD = _molecule.coordinates3.Dihedral(self.atoms[0],self.atoms[1],self.atoms[2],self.atoms[3])
 	#==================================================================================================

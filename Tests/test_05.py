@@ -95,19 +95,17 @@ def Simple_Distance(_hamiltonian):
 		"Input_Type":"pkl",		
 		"pkl_file":os.path.join("test_05","qcmm_opt"+_hamiltonian,"7tim_"+_hamiltonian+"_opt_PF.pkl"),		
 		"set_reaction_crd":1,
-		"atoms_rc1":["*:LIG.*:C02","*:LIG.*:H02"],
-		#"atoms_rc1":["*:LIG.*:C02","*:LIG.*:H02","*:GLU.164:OE2"],
-		#"atoms_rc2":["*:LIG.*:O06","*:HIE.94:HE2","*:HIE.94:NE2"],
-		"type":"Distance",
-		"mass_constraint":"True",
+		"atoms_rc1":["*:LIG.*:H02","*:GLU.164:OE2"],
+		"type_rc1":"Distance",
+		"mass_constraints":["no"]
 	}		
 	scan1_parameters = {
 		"simulation_type":"Relaxed_Surface_Scan",
-		"dincre_rc1":0.1,
-		"nsteps_rc1":16,
+		"dincre_rc1":-0.1,
+		"nsteps_rc1":12,
 		"maxIterations":2200,
 		"optmizer":"SteepestDescent",
-		"force_constants":[4000.0,4000.0]
+		"force_constants":[1200.0,1200.0]
 	}
 	#test simple distance
 	test_01 = Scripts("test_05/Simple_Distance_"+_hamiltonian)
@@ -125,10 +123,9 @@ def Multiple_Distance(_hamiltonian):
 		"pkl_file":os.path.join("test_05","qcmm_opt"+_hamiltonian,"7tim_"+_hamiltonian+"_opt_PF.pkl"),		
 		"set_reaction_crd":1,
 		"atoms_rc1":["*:LIG.*:C02","*:LIG.*:H02","*:GLU.164:OE2"],
-		#"atoms_rc2":["*:LIG.*:O06","*:HIE.94:HE2","*:HIE.94:NE2"],
-		"type":"multipleDistance",
+		"type_rc1":"Distance",
 		"maxIterations":2200,
-		"mass_constraint":"True",
+		"mass_constraints":["yes"],
 	}		
 	scan1_parameters = {
 		"simulation_type":"Relaxed_Surface_Scan",
@@ -136,7 +133,8 @@ def Multiple_Distance(_hamiltonian):
 		"optmizer":"SteepestDescent",
 		"maxIterations":2200,
 		"nsteps_rc1":20,
-		"force_constants":[4000.0,4000.0]
+		"log_frequency":10,
+		"force_constants":[1200.0,1200.0]
 
 	}
 	#test simple distance
@@ -144,7 +142,6 @@ def Multiple_Distance(_hamiltonian):
 	test_01.Set_System(system_parameters)
 	test_01.Run_Simulation(scan1_parameters)
 	test_01.SaveSystem("Multiple_DistanceScan")
-
 
 #-----------------------------------------------
 def Run_Test():
@@ -159,7 +156,7 @@ def Run_Test():
 		Prepare_Prune_System()
 	
 	SMOmodels = ["am1","rm1","pm3","pm6","am1dphot","pddgpm3"]
-	#SMOmodels = ["am1"]
+	SMOmodels = ["am1","rm1"]
 
 	for smo in SMOmodels:
 		Set_QC_MM(smo)

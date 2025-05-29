@@ -16,8 +16,8 @@ def Run_Test():
 		"set_reaction_crd":1,	
 		"atoms_rc1":["*:LIG.*:C02","*:LIG.*:H02","*:GLU.164:OE2"],
 		#"atoms_rc2":["*:LIG.*:O06","*:HIE.94:HE2","*:HIE.94:NE2"],
-		"type":"Distance",
-		"mass_constraint":"True",
+		"type_rc1":"Distance",
+		"mass_constraints":["yes"],
 	}
 
 	_path   = "test_05/Multiple_Distance_rm1/ScanTraj.ptGeo"
@@ -29,7 +29,6 @@ def Run_Test():
 				   "production_nsteps":50000   			,
 				   "source_folder":_path 		       	,
 				   "MD_method":"LeapFrog"		      	,
-				   "MC_RC1":True				        ,
 				   "simulation_type":"Umbrella_Sampling",
 				   "NmaxThreads":10		  				,
 				   "xnbins":10                          ,

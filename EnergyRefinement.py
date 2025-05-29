@@ -299,14 +299,15 @@ class EnergyRefinement:
 				self.fileLists.remove(fle)			
 		
 	#====================================================
-	def RunORCA(self,_method,_base,_NmaxThreads,_restart=False):
+	def RunORCA(self,_method,_base,_NmaxThreads,_restart="no"):
 		'''
 		Perform energy refinement using the interface available on the pDynamo with the ORCA software, enabling QC(QM)/MM potential.
 		Parameters:
 		'''
 		self.methods.append(_method+_base)
-		self.restart = _restart		
-		if self.restart: self.SetRestart4Orca()	
+		self.restart = _restart	
+		if self.restart == "yes":
+			self.SetRestart4Orca()	
 		self.SMOenergies = {}			
 		#---------------------------------------------------------
 		#Initiate parallel run
