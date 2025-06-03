@@ -31,7 +31,8 @@ def Run_Test():
 				   "MD_method":"LeapFrog"		      	,
 				   "simulation_type":"Umbrella_Sampling",
 				   "NmaxThreads":10		  				,
-				   "xnbins":10                          ,
+				   "xnbins":16                          ,
+				   "analysis_only":"yes",
 				   "xwindows":20                        ,  
 				   "trajectory_name":"US_test"          ,
 				   }
@@ -44,8 +45,8 @@ def Run_Test():
 	US_parameters["optmize_US"] = "True"
 	test_01 = Scripts("test_11_opt")
 	test_01.Set_System(system_parameters)
-	test_01.Run_Simulation(US_parameters)
-	test_01.SaveSystem()
+	#test_01.Run_Simulation(US_parameters)
+	#test_01.SaveSystem()
 
 	
 	

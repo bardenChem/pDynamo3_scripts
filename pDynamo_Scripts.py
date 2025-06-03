@@ -179,6 +179,7 @@ class Scripts:
 				elif lines[0] == "#CRD_LABEL_2": _parameters["crd_labels"].append(lines[1])
 				elif lines[0] == "#SAVE_NAME": save_name = lines[1]
 				elif lines[0] == "#SCRATCH": _parameters["scratch"] = lines[1] 
+				elif lines[0] == "#REFINE_METHODS": _parameters["refine_methods"] = lines[1] 
 
 		
 		_parameters["set_reaction_crd"] = SET_CRD_NMB			

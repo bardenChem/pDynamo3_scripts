@@ -485,11 +485,11 @@ class Simulation:
 		if "mode" 	 	 in self.parameters: mode   	 = self.parameters["mode"]
 		#-------------------------------
 		NormalModes_SystemGeometry ( self.molecule.system, modify = ModifyOption.Project )
-		if _mode > 0:
+		if mode > 0:
 			trajectory = ExportTrajectory ( os.path.join (self.baseFolder, "NormalModes","ptGeo"), self.molecule.system )
 			NormalModesTrajectory_SystemGeometry(	self.molecule.system		      ,
                                        			 	trajectory                ,
-                                       				mode        = _mode	      ,
+                                       				mode        = mode	      ,
                                        				cycles      = Cycles      ,
                                        				frames      = Frames 	  ,
                                        				temperature = temperature )
